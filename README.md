@@ -86,7 +86,7 @@ cmd 창을 열어 frontend 폴더로 찾아가주세요.
 다음 커맨드를 실행해주세요
 
 ```
-npm install axios reactor-router-dom bootstrap react-bootstrap
+npm install
 ```
 ```
 npm start
