@@ -5,7 +5,7 @@ OpenAPI 및 MVC 모델을 활용한 커스텀 향수 재고관리 프로그램
 풀스택 개발을 위한 기술 일람
 
 백엔드
-- 프레임워크 : Spring Boot
+- 프레임워크 : Spring Boot 3.5.6
 - 언어 : Java 17
 - 데이타베이스 : MySQL
 - ORM : Spring Data JPA / Hibernate
