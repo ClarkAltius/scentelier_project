@@ -55,7 +55,7 @@ CREATE DATABASE scentelier;
 cmd에서 다음 커맨드를 실행해주세요
 
 ```
-git clone https://github.com/ClarkAltius/scentelier.git
+git clone https://github.com/ClarkAltius/scentelier_project.git
 ```
 ```
 cd scentelier
