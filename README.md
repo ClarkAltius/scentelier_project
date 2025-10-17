@@ -40,7 +40,8 @@ OpenAPI 및 MVC 모델을 활용한 커스텀 향수 재고관리 프로그램
 --- 개발 환경 설정하기 ---
 --------------------------
 
-### [1] 데이타베이스 구성
+.[1]
+데이타베이스 구성
 
 백엔드 실행 전 다음 데이타베이스가 필요합니다
 1. MySQL Workbench 실행
@@ -49,7 +50,7 @@ OpenAPI 및 MVC 모델을 활용한 커스텀 향수 재고관리 프로그램
 CREATE DATABASE scentelier;
 ```
 
-### [2] 레포지토리 클론, 백엔드 설정
+.[2] 레포지토리 클론, 백엔드 설정
 
 cmd에서 다음 커맨드를 실행해주세요
 
@@ -57,10 +58,11 @@ cmd에서 다음 커맨드를 실행해주세요
 git clone https://github.com/ClarkAltius/scentelier_project.git
 ```
 ```
-cd scentelier_project
+cd scentelier
 ```
 
-### [3] 백엔드-데이터베이스 연결 설정 및 실행
+.[3]
+백엔드-데이터베이스 연결 설정 및 실행
 
 IntelliJ 프로그램으로 프로젝트를 실행하고 다음 파일을 찾아가주세요
 backend/src/main/resources/application.properties
@@ -73,17 +75,18 @@ spring.datasource.password=your-mysql-password
 
 부분의 'your-mysql-username' 과 'your-mysql-password'를 여러분이 사용하고 있는 아이디와 비밀번호로 바꿔주세요.
 
-'개별경로/scentelier\backend\src\main\java\com\scentelier_project\backend\BackendApplication.java`
+'개별경로/scentelier\backend\src\main\java\com\scentelier\backend\BackendApplication.java`
 파일을 IntelliJ에서 실행해주세요. http://localhost:9000 으로 실행되면 성공입니다!
 
-### [4] 프론트엔드 설정
+.[4]
+프론트엔드 설정
 
 cmd 창을 열어 frontend 폴더로 찾아가주세요. 
 
 다음 커맨드를 실행해주세요
 
 ```
-npm ci
+npm install
 ```
 ```
 npm start
