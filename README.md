@@ -73,7 +73,7 @@ spring.datasource.password=your-mysql-password
 
 부분의 'your-mysql-username' 과 'your-mysql-password'를 여러분이 사용하고 있는 아이디와 비밀번호로 바꿔주세요.
 
-'개별경로/scentelier\backend\src\main\java\com\scentelier\backend\BackendApplication.java`
+'개별경로/scentelier\backend\src\main\java\com\scentelier_project\backend\BackendApplication.java`
 파일을 IntelliJ에서 실행해주세요. http://localhost:9000 으로 실행되면 성공입니다!
 
 ### [4] 프론트엔드 설정
