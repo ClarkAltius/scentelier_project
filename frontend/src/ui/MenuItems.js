@@ -15,8 +15,7 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => { }}>상품 상세 페이지</NavDropdown.Item>
-
-                        <NavDropdown.Item onClick={() => navigate(`/cart`)}>장바구니 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => {navigate(`/cart`)}}>장바구니 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
 
                         <NavDropdown.Item onClick={() => { }}>결제 페이지</NavDropdown.Item>
