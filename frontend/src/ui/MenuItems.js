@@ -13,13 +13,18 @@ function MenuItems() {
                 <Nav className="me-auto">
                     <NavDropdown title={`1차 페이지 작성`}>
                         <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
+<<<<<<< HEAD
                         <NavDropdown.Item onClick={() => { }}>로그인 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/productlist`)}>상품 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/productdetail`)}>상품 상세 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfumetest`)}>향수테스트 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfumeblending`)}>향수 배합 페이지</NavDropdown.Item>
+=======
+                        <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => { }}>상품 상세 페이지</NavDropdown.Item>
+>>>>>>> 87be8c1fc7d9164b1e63bd99cecf89eaef17a79b
                         <NavDropdown.Item onClick={() => { }}>장바구니 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { }}>결제 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
                     </NavDropdown>
                 </Nav>
             </Container>
