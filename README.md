@@ -5,7 +5,7 @@ OpenAPI 및 MVC 모델을 활용한 커스텀 향수 재고관리 프로그램
 풀스택 개발을 위한 기술 일람
 
 백엔드
-- 프레임워크 : Spring Boot
+- 프레임워크 : Spring Boot 3.5.6
 - 언어 : Java 17
 - 데이타베이스 : MySQL
 - ORM : Spring Data JPA / Hibernate
@@ -55,7 +55,7 @@ CREATE DATABASE scentelier;
 cmd에서 다음 커맨드를 실행해주세요
 
 ```
-git clone https://github.com/ClarkAltius/scentelier.git
+git clone https://github.com/ClarkAltius/scentelier_project.git
 ```
 ```
 cd scentelier
@@ -86,7 +86,7 @@ cmd 창을 열어 frontend 폴더로 찾아가주세요.
 다음 커맨드를 실행해주세요
 
 ```
-npm install axios reactor-router-dom bootstrap react-bootstrap
+npm install
 ```
 ```
 npm start
