@@ -20,8 +20,7 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/productdetail`)}>상품 상세 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfumetest`)}>향수테스트 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfumeblending`)}>향수 배합 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { }}>장바구니 페이지</NavDropdown.Item>
-                         <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
 
                         <NavDropdown.Item onClick={() => { }}>결제 페이지</NavDropdown.Item>
                     </NavDropdown>
