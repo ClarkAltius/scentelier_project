@@ -57,7 +57,7 @@ cmd에서 다음 커맨드를 실행해주세요
 git clone https://github.com/ClarkAltius/scentelier_project.git
 ```
 ```
-cd scentelier
+cd scentelier_project
 ```
 
 ### [3] 백엔드-데이터베이스 연결 설정 및 실행
