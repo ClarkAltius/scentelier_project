@@ -1,4 +1,4 @@
-function Admin() {
+function Login() {
 
     return (
         <div>
@@ -12,4 +12,4 @@ function Admin() {
     );
 }
 
-export default Admin;
+export default Login;
