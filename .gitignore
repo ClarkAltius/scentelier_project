@@ -167,3 +167,6 @@ replay_pid*
 
 # 업로드된 이미지 제외
 /backend/src/main/uploads/
+
+# 개인 백업용 txt 파일
+*.txt
