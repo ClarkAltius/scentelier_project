@@ -96,49 +96,7 @@ function Productlist() {
     const categoriesToShow = activeCategory === 'type' ? types : seasons;
 
     return (<>
-        {/* <div>
-            <header >
-                <div style={{ textAlign: 'left', margin: '50px 0px 10px 50px', fontSize: '40px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>_Best Perfume<span style={{ fontSize: '20px' }}>__ Scentelier의 베스트 향수를 만나보세요.</span>
-                </div>
 
-            </header>
-        </div>
-        <div className="d-flex justify-content-center" >
-
-            <Card style={{ width: '20rem', margin: '60px 50px 30px 0px' }}>
-                <Card.Img variant="top" src="/www.jpg"
-                    style={{
-                        width: '100%',
-                        height: '240px',         // 원하는 높이 고정
-                        objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                        borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                    }} />
-                <Card.Body>
-                    <Card.Title>Powder Whisper</Card.Title>
-                    <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
-                        <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                        <br />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                            {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                <span
-                                    key={idx}
-                                    style={{
-                                        padding: '4px 10px',
-                                        backgroundColor: '#ebebebff',
-                                        borderRadius: '20px',
-                                        fontSize: '0.8em',
-                                        color: '#555',
-                                        border: '1px solid transparent',
-                                    }}
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </Card.Text>
-                </Card.Body>
-            </Card>
-        </div> */}
         <div style={{ textAlign: 'left', margin: '50px 0px 10px 50px', fontSize: '40px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>_Best Perfume<span style={{ fontSize: '20px' }}>__ Scentelier의 베스트 향수를 만나보세요.</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -170,7 +128,7 @@ function Productlist() {
                         }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <Card style={{ width: '18rem', margin: '60px 50px 60px 0px' }}>
+                            <Card style={{ width: '18rem', margin: '60px 20px 60px 0px' }}>
                                 <Card.Img variant="top" src="/www.jpg"
                                     style={{
                                         width: '100%',
