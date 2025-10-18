@@ -7,7 +7,8 @@ import PerfumeTest from "../pages/PerfumeTest.js";
 import PerfumeBlending from "../pages/PerfumeBlending.js";
 import Payments from "../pages/Payments.js";
 import Login from "../pages/Login.js";
-import Cart from "../pages/Cart.js";
+import CartList from "../pages/CartList.js";
+import OrderList from "../pages/OrderList.js";
 
 function AppRoutes() {
 
@@ -21,7 +22,8 @@ function AppRoutes() {
             <Route path='/perfumeblending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />
             <Route path='/login' element={<Login />} />
-            <Route path='/cart' element={<Cart />} />
+            <Route path='/cart/list' element={<CartList />} />
+            <Route path='/order/list' element={<OrderList />} />
         </Routes>
     );
 

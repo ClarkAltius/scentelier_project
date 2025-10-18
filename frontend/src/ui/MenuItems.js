@@ -15,7 +15,8 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => { }}>상품 상세 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { navigate(`/cart`) }}>장바구니 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => { navigate(`/cart/list`) }}>장바구니 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => { navigate(`/order/list`) }}>주문 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/productlist`)}>상품 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/productdetail`)}>상품 상세 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfumetest`)}>향수테스트 페이지</NavDropdown.Item>
