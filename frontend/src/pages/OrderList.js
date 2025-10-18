@@ -39,6 +39,7 @@ function OrderList({ user }) {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
+  
 
   useEffect(() => {
     if (!user) {
@@ -64,6 +65,8 @@ function OrderList({ user }) {
       }
     })();
   }, [user]);
+
+  
 
   const makeAdminButton = (bean) => {
     
