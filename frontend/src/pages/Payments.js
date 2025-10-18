@@ -38,7 +38,7 @@ function Payments(props) {
     const closeModal = () => {
         setShowModal(false);
         // 결제 완료 후 리다이렉트 또는 초기화
-        window.scrollTo(0, 0);
+        navigate("/");
     };
 
     return (
@@ -192,11 +192,11 @@ function Payments(props) {
                 </p>
                 </Modal.Body>
                 <Modal.Footer>
-                <Button variant="secondary" onClick={() => navigate("/")}>
+                <Button variant="success" onClick={() => navigate("/")}>
                     홈으로
                 </Button>
                 <Button
-                    variant="success"
+                    variant="warning"
                     onClick={() => navigate("/order/list")}
                 >
                     주문내역
