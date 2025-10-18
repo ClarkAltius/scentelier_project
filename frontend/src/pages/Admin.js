@@ -1,14 +1,22 @@
+import styles from './Admin.module.css';
+import Sidebar from '../component/Sidebar';
+import Topbar from '../component/Topbar';
+
 function Admin() {
 
     return (
-        <div>
-            <header className="App-Header">
-                <p>
-                    ADMIN 랜딩 페이지
-                </p>
-            </header>
-        </div>
+        <div className={styles.adminPageWrapper}>
+            <Sidebar />
 
+            <div className={styles.mainContent}>
+                <div className={styles.topbar}>
+                    <Topbar />
+                </div>
+
+                {/* Admin Main content */}
+
+            </div>
+        </div>
     );
 }
 

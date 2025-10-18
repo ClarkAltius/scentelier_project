@@ -335,7 +335,7 @@ function Productlist() {
         </button>
 
         {/* 향수찾기 */}
-        <div className="d-flex justify-content-center" style={{ marginTop: '30px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
             <Card style={{ width: '80rem', height: '24rem', margin: '55px', borderColor: '#dbdbdbff' }}>
                 <Card.Body style={{
                     display: 'flex'
@@ -353,43 +353,73 @@ function Productlist() {
                         }}
 
                     />
-                    <div style={{ margin: '10px 0px 0px 22px' }}>
-                        <h5 style={{ marginLeft: '40px', marginTop: '60px', fontSize: '40px', fontWeight: 'bold', color: '#67AB9F', fontFamily: "'Gowun Batang',serif" }}>
-                            " 나만의 완벽한 향수를 찾지 못했다면... "
-                        </h5>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <p
-                                style={{
-                                    paddingLeft: '80px',
-                                    paddingTop: '23px',
-                                    fontSize: '22px',
-                                    color: '#808080ff',
-                                    textAlign: 'left',
-                                    lineHeight: 1.4,
-                                    flex: 1
-                                }}>
+                    {/* 오른쪽 텍스트 영역 */}
+                    <div style={{ flex: 1, paddingLeft: '40px', paddingRight: '50px', marginTop: '18px' }}>
+
+                        {/* 타이틀 부분 */}
+                        <div>
+                            <h5 style={{
+                                fontSize: '40px',
+                                fontWeight: 'bold',
+                                color: '#67AB9F',
+                                fontFamily: "'Gowun Batang', serif",
+                                textAlign: 'left',
+                                marginLeft: '50px' // 왼쪽으로 조금 들여쓰기
+                            }}>
+                                " Still searching for
+                            </h5>
+
+                            <h5 style={{
+                                fontSize: '40px',
+                                fontWeight: 'bold',
+                                color: '#67AB9F',
+                                fontFamily: "'Gowun Batang', serif",
+                                textAlign: 'right',           // 오른쪽 정렬
+                                marginRight: '80px',          // 오른쪽 여백
+                            }}>
+                                your perfect fragrance? "
+                            </h5>
+                        </div>
+
+                        {/* 설명 + 버튼 */}
+                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px', backgroundColor: "#f5f5f5ff", borderRadius: '5px', padding: '10px' }}>
+                            <p style={{
+                                paddingLeft: '30px',
+                                fontSize: '22px',
+                                color: '#808080ff',
+                                textAlign: 'left',
+                                lineHeight: 1.4,
+                                flex: 1,
+                                marginTop: '12px'
+                            }}>
                                 <strong>센텔리아와 함께 나만의 향을 찾아보세요.</strong><br /><br />
-                                <span style={{ fontSize: '19px', }}>세상에 하나뿐인 나만의 맞춤 향수를 만들어,<br /> 특별한 나만의 이야기를 시작하세요 →</span>
+                                <span style={{ fontSize: '19px' }}>
+                                    세상에 하나뿐인 나만의 맞춤 향수를 만들어,<br />
+                                    특별한 나만의 이야기를 시작하세요 →
+                                </span>
                             </p>
+
                             <button
                                 style={{
-                                    marginRight: '5px',
+                                    marginRight: '50px',
                                     padding: '10px 20px',
                                     fontSize: '16px',
                                     cursor: 'pointer',
                                     height: 'fit-content',
-                                    backgroundColor: 'transparent',   // 배경 투명
-                                    color: '#67AB9F',                  // 텍스트 노란색
-                                    border: '2px solid #67AB9F',       // 테두리 노란색
+                                    backgroundColor: '#67AB9F',
+                                    color: '#ffff',
+                                    border: '2px solid #67AB9F',
                                     borderRadius: '5px',
+                                    width: '150px'
                                 }}>
                                 NOW
                             </button>
                         </div>
+
                     </div>
                 </Card.Body>
             </Card>
-        </div >
+        </div>
     </>
     );
 }
