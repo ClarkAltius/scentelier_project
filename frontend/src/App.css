@@ -32,7 +32,36 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Home 화면 */
+
+.carousel-caption.top-left {
+  top: 40px;
+  bottom: auto;
+  left: 80px;
+  transform: none;
+  text-align: left;
+  font-family: 'Gowun Batang', serif;
+
+}
+
+.main-font {
+  font-family: 'Gowun Batang', serif;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
 }
