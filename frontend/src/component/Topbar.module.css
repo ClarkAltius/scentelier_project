@@ -4,96 +4,21 @@
 .topbar {
     height: 40px;
     background-color: #424242;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    border-bottom: 1px solid #333;
-    align-items: center;
-    margin-left: 10px;
-}
-
-.logo {
-    color: #ffecaf;
-    /* A contrasting color for the logo, similar to the green accent */
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 30px;
-    padding: 0 20px;
-}
-
-.navMenu {
-    list-style: none;
-    /*no bullet points */
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-}
-
-.navItem {
-    margin-bottom: 5px;
-}
-
-.navLink {
-    display: flex;
-    /* Use flexbox for icon and text alignment */
-    align-items: center;
-    /* Vertically center icon and text */
-    padding: 15px 20px;
     color: #e0e0e0;
-    text-decoration: none;
-    /* Remove underline from links */
-    transition: background-color 0.3s ease;
-    /* Smooth transition for hover effect */
-}
+    padding: 0 20px;
+    /* Add some padding on the sides */
+    box-sizing: border-box;
+    border-bottom: 1px solid #333;
 
-.navLink:hover {
-    background-color: #333;
-    /* Darker background on hover */
-}
-
-.navLink.active {
-    background-color: #4CAF50;
-    /* Green background for the active item */
-    color: #ffffff;
-    /* White text for active item */
-    border-radius: 0 50px 50px 0;
-    /* Rounded right corners, similar to image */
-}
-
-.iconPlaceholder {
-    width: 24px;
-    /* Icon size */
-    height: 24px;
-    margin-right: 15px;
-    /* Space between icon and text */
-    font-size: 20px;
-    /* Adjust emoji size */
+    /* Flexbox layout */
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.navText {
-    font-size: 16px;
+    /* Vertically centers both items */
+    justify-content: space-between;
+    /* Pushes items to opposite ends */
 }
 
 .userInfo {
-    padding: 20px;
-    text-align: center;
-    /* Center the logout text if needed */
-    color: #999;
-    /* Lighter color for secondary text */
     font-size: 14px;
-    /* In the original image, "로그아웃" is at the top right, not in the sidebar.
-       You can remove or adapt this .user-info if you prefer to follow the image strictly.
-       I'm including it as a general placeholder for sidebar footer content. */
-}
-
-/* Basic styling for the main content area to see the layout */
-.mainContent {
-    flex-grow: 1;
-    /* Allow main content to take remaining space */
-    padding: 20px;
+    font-weight: bold;
 }
