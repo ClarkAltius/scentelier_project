@@ -3,7 +3,7 @@ import Admin from "../pages/Admin.js";
 import Home from "../pages/Home.js";
 import ProductList from "../pages/ProductList.js";
 import ProductDetail from "../pages/ProductDetail.js";
-import PerfumeTest from "../pages/PerfumeTest.js";
+import PerfumeFinder from "../pages/PerfumeFinder.js";
 import PerfumeBlending from "../pages/PerfumeBlending.js";
 import Payments from "../pages/Payments.js";
 import Login from "../pages/Login.js";
@@ -16,10 +16,10 @@ function AppRoutes() {
         <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/admin' element={<Admin />} />
-            <Route path='/productlist' element={<ProductList />} />
-            <Route path='/productdetail' element={<ProductDetail />} />
-            <Route path='/perfumetest' element={<PerfumeTest />} />
-            <Route path='/perfumeblending' element={<PerfumeBlending />} />
+            <Route path='/product/list' element={<ProductList />} />
+            <Route path='/product/detail' element={<ProductDetail />} />
+            <Route path='/perfume/finder' element={<PerfumeFinder />} />
+            <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />
             <Route path='/login' element={<Login />} />
             <Route path='/cart/list' element={<CartList />} />

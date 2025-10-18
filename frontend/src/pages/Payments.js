@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { CreditCard, Wallet, Banknote } from "lucide-react";
 
 function Payments(props) {
     const [method, setMethod] = useState("card");
@@ -17,10 +18,10 @@ function Payments(props) {
     const totalPrice = 62000; // 예시 금액
 
     const paymentMethods = [
-        { id: "Card", name: "신용/체크카드" },
-        { id: "KakaoPay", name: "카카오페이" },
-        { id: "NaverPay", name: "네이버페이"},
-        { id: "Bank", name: "계좌이체" },
+        { id: "Card", name: "신용/체크카드", icon: <CreditCard size={30} /> },
+        { id: "KakaoPay", name: "카카오페이", icon: <Wallet size={30} /> },
+        { id: "NaverPay", name: "네이버페이", icon: <Wallet size={30} /> },
+        { id: "Bank", name: "계좌이체", icon: <Banknote size={30} /> },
     ];
 
     const handleChange = (e) => {
@@ -132,7 +133,7 @@ function Payments(props) {
                         <Card.Body>
                         <Form>
                             {paymentMethods.map((m, idx) => (
-                                <label key={idx} className={`mb-3 p-2 rounded ${
+                                <label key={idx} className={`m-1 p-2 rounded ${
                                         method === m.id
                                             ? "bg-success text-light border"
                                             : "border"
@@ -146,7 +147,8 @@ function Payments(props) {
                                         onChange={() => setMethod(m.id)}
                                         style={{display: "none"}}
                                     />
-                                {m.name}
+                                    {m.icon} <br/>
+                                    <span>{m.name}</span>
                                 </label>
                             ))}
                         </Form>
