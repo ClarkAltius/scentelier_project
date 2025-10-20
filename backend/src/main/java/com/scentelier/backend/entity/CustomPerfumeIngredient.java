@@ -1,5 +1,6 @@
 package com.scentelier.backend.entity;
 
+import com.scentelier.backend.Embeddable.CustomPerfumeIngredientId;
 import com.scentelier.backend.constant.Note;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,11 +12,17 @@ import java.math.BigDecimal;
 @Getter @Setter @ToString
 @Entity @Table(name = "custom_perfume_ingredient")
 public class CustomPerfumeIngredient {
+
+    @EmbeddedId
+    private CustomPerfumeIngredientId id;
+
     @ManyToOne
+    @MapsId("customId")
     @JoinColumn(name = "custom_id", nullable = false)
     private CustomPerfume customPerfume;
 
     @ManyToOne
+    @MapsId("ingredientId")
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredients;
 

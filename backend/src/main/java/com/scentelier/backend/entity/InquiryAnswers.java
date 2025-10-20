@@ -20,7 +20,7 @@ public class InquiryAnswers {
     @NotNull(message = "문의 번호는 필수 입력 사항입니다")
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inquiry_id")
-    private Inquiries inquiry;
+    private Inquiry inquiry;
 
     @NotBlank(message = "문의 내용은 필수 입력 사항입니다")
     private String content;
