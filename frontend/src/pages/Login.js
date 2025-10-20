@@ -57,13 +57,13 @@ function Login({ setUser }) {
                 <Col md={6}>
                     <Card>
                         <Card.Body>
-                           <h2 style={{
-            fontSize: "54px",
-            fontFamily: "'Gowun Batang', serif",
-            color: "#67AB9F",
-          }} className="text-center mb-4">Login</h2>
-                                                                                                                                                                                                  
-        
+                            <h2 style={{
+                                fontSize: "54px",
+                                fontFamily: "'Gowun Batang', serif",
+                                color: "#67AB9F",
+                            }} className="text-center mb-4">Login</h2>
+
+
 
 
 
@@ -95,16 +95,25 @@ function Login({ setUser }) {
                                 <Row className="g-2">
                                     <Col xs={8}>
                                         <Button variant="outline-success" type="submit" className="w-100" size="lg"
-            style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}>
+                                            style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}>
                                             로그인
                                         </Button>
                                     </Col>
                                     <Col xs={4}>
-                                        <Link to={`/signup`} variant="outline-dark" style={{ minWidth: 100, borderRadius: 0, fontWeight: 600 }} className="btn btn-outline-secondary w-100">
+                                        <Link to={`/signup`} variant="outline-dark" size="100" style={{ minWidth: 100, borderRadius: 0, fontWeight: 600 }} className="btn btn-outline-secondary w-100">
                                             회원 가입
-                                            
+
                                         </Link>
-                                        
+
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <Link to={`/findpass`}>
+                                            <div class="form-end">
+                                                <a class="inline-link" href="$">비밀번호를 잊으셨나요?</a>
+                                            </div>
+                                        </Link>
                                     </Col>
                                 </Row>
                             </Form>
