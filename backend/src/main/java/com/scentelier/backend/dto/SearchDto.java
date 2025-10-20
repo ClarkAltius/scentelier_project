@@ -1,4 +1,4 @@
 package com.scentelier.backend.dto;
 
-public class SearchDto {
+public class  SearchDto {
 }
