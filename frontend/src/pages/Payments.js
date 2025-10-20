@@ -36,11 +36,11 @@ function Payments() {
     };
 
     return (
-        <Container className="py-5">
+        <Container className="py-5 p-4" style={{ backgroundColor: "#f1f3f6", height:"93vh" }}>
             <Row className="g-4">
                 {/* 배송 정보 */}
                 <Col md={12}>
-                    <Card className="shadow-sm border-0">
+                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <Truck className="me-2 text-success" /> 배송지 정보
                         </Card.Header>
@@ -97,7 +97,7 @@ function Payments() {
 
                 {/* 주문 요약 */}
                 <Col md={6}>
-                    <Card className="shadow-sm border-0">
+                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <Package className="me-2 text-primary" /> 주문 요약
                         </Card.Header>
@@ -120,7 +120,7 @@ function Payments() {
 
                 {/* 결제 방식 */}
                 <Col md={6}>
-                    <Card className="shadow-sm border-0">
+                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <CreditCard className="me-2 text-warning" /> 결제 방식 선택
                         </Card.Header>
