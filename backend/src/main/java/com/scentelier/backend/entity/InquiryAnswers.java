@@ -18,7 +18,7 @@ public class InquiryAnswers {
     private Long id;
 
     @NotNull(message = "문의 번호는 필수 입력 사항입니다")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inquiry_id")
     private Inquiry inquiry;
 

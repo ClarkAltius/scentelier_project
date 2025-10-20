@@ -20,9 +20,6 @@ public class RestockRequest {
     @Column(name = "request_id")
     private Long id;
 
-    @NotNull(message = "수량은 필수 입력 사항입니다")
-    private Long quantity;
-
     @Enumerated(EnumType.STRING)
     private Status status;
 
