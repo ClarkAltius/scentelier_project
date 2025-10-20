@@ -28,6 +28,9 @@ public class OrderProduct {
     // 커스텀 상품 (nullable)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "custom_id", nullable = true)
+    private Products custom_id;
+
+    @Column(nullable = false)
     private int quantity;
 
     private BigDecimal price;
