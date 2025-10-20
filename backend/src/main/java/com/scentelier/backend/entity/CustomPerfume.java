@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter @Setter @ToString
 @Entity @Table(name = "custom_perfume")
@@ -39,4 +40,7 @@ public class CustomPerfume {
     @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deletedAt;
+
+    @OneToMany(mappedBy = "customPerfume", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CustomPerfumeIngredient> customPerfumeIngredients;
 }
