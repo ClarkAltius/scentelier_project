@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "Scent of the Void",
+        "category": "Woody",
+        "price": 150.00,
+        "stock": 50,
+        "description": "Notes of petrichor, aged cedar, and a hint of ozone."
+    },
+    {
+        "id": 2,
+        "name": "Ethereal Bloom",
+        "category": "Floral",
+        "price": 120.50,
+        "stock": 75,
+        "description": "A light bouquet of jasmine, peony, and white musk."
+    },
+    {
+        "id": 3,
+        "name": "Citrus Solstice",
+        "category": "Citrus",
+        "price": 95.00,
+        "stock": 120,
+        "description": "Bright notes of bergamot, grapefruit, and neroli."
+    }
+]
