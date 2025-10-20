@@ -1,0 +1,130 @@
+/* Container for the whole page */
+.productPage {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Page Header (Title + Button) */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Primary "Add" Button */
+.addButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #007bff;
+    /* A standard "primary" blue */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.addButton:hover {
+    background-color: #0056b3;
+}
+
+/* Table styling */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    /* For responsiveness */
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.productTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.productTable th,
+.productTable td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+}
+
+/* Table Header */
+.productTable th {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    background-color: #f9f9f9;
+}
+
+/* Alternating row colors */
+.productTable tbody tr:nth-child(even) {
+    background-color: #fdfdfd;
+}
+
+.productTable tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Action Buttons (Edit/Delete) */
+.actionButtons {
+    display: flex;
+    gap: 8px;
+}
+
+.actionButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editButton {
+    color: #333;
+    background-color: #f0f0f0;
+}
+
+.editButton:hover {
+    background-color: #e0e0e0;
+}
+
+.deleteButton {
+    color: #d9534f;
+    /* A standard "danger" red */
+    background-color: #fdf2f2;
+}
+
+.deleteButton:hover {
+    background-color: #f8e0e0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

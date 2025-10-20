@@ -65,3 +65,15 @@
   -ms-overflow-style: none;
   /* IE 10+ */
 }
+
+.nav .nav-link {
+  font-family: 'Gowun Batang', serif;
+  font-size: "25px";
+  color: #808080ff;
+}
+
+.detail {
+  font-family: 'Gowun Batang', serif;
+  font-size: "25px";
+  color: #808080ff;
+}
