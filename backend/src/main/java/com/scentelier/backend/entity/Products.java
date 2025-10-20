@@ -1,0 +1,51 @@
+package com.scentelier.backend.entity;
+
+import com.scentelier.backend.constant.Season;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Getter @Setter @ToString
+@NoArgsConstructor @AllArgsConstructor
+@Entity @Table(name = "products")
+public class Products {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "product_id")
+    private Long id;
+
+    @NotBlank(message = "상품 이름은 필수 입력 사항입니다.")
+    private String name;
+
+    private String description;
+
+    @NotBlank(message = "상품 가격은 필수 입력 사항입니다.")
+    private BigDecimal price;
+
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private int stock;
+
+    private String category;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Season season;
+
+    private String keyword;
+
+    @CreationTimestamp
+    @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isDeleted = false;
+
+    @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
+    private LocalDateTime deletedAt;
+}

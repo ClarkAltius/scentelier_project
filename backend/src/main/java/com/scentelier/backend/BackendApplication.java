@@ -1,4 +1,4 @@
-package com.scentelier.backend.test;
+package com.scentelier.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
