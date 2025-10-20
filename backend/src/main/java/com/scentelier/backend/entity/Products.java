@@ -1,5 +1,6 @@
 package com.scentelier.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.scentelier.backend.constant.Season;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter @Setter @ToString
@@ -41,11 +43,13 @@ public class Products {
 
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted = false;
 
     @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
-    private LocalDateTime deletedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate deletedAt;
 }
