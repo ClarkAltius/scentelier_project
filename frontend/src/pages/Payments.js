@@ -1,27 +1,35 @@
 import { useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { CreditCard, Wallet, Banknote, Truck, Package } from "lucide-react";
-import { mockUser, mockCartItems } from "../data/mockData";
+import { mockCartItems } from "../data/mockData";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
 
 function Payments(props) {
-    const user = mockUser;
     const products = mockCartItems;
-    // const user = props.user;
+    const user = props.users;
     // const products = props.cartItems;
+
+    const navigate = useNavigate();
 
     const [method, setMethod] = useState("Card");
     const [showModal, setShowModal] = useState(false);
     const [delivery, setDelivery] = useState({
-        receiver: user.username,
-        phone: user.phone,
-        address: user.address,
-        detail: "",
+        receiver: '',
+        phone: '',
+        address: '',
+        detail: '',
     });
 
-    const navigate = useNavigate();
+    if(!user) {
+        return <Navigate to="/" replace />;
+    }
+
+    setDelivery({receiver: user.username,
+        phone: user.phone,
+        address: user.address,
+        detail: ''});
 
     const totalPrice = products.reduce((sum, item) => 
         sum + item.price * (item.quantity || 1), 0);

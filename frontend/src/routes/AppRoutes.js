@@ -11,6 +11,7 @@ import CartList from "../pages/CartList.js";
 import OrderList from "../pages/OrderList.js";
 import AdminRoute from "./AdminRoute.js";
 import Logout from "../pages/Logout.js";
+import ProductInsertForm from "../pages/ProductInsertForm.js"
 
 function AppRoutes() {
 
@@ -19,6 +20,7 @@ function AppRoutes() {
             <Route path='/' element={<Home />} />
             <Route path='/product/list' element={<ProductList />} />
             <Route path='/product/detail' element={<ProductDetail />} />
+            <Route path='/product/insert' element={<ProductInsertForm />} />
             <Route path='/perfume/finder' element={<PerfumeFinder />} />
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />

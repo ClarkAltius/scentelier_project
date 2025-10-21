@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz ->authz
                                 .requestMatchers("/member/login","/signup").permitAll()
                                .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**").permitAll()
-                                .requestMatchers("/api/test/my-roles").authenticated() // Needs login, but no admin role
+                                .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
                         
                                 // 관리자 전용 엔드포인트
                                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")

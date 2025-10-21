@@ -35,8 +35,9 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => { navigate(`/cart/list`) }}>장바구니 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => { navigate(`/order/list`) }}>주문 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/list`)}>상품 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/product/list`)}>상품 목록 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/product/detail`)}>상품 상세 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/product/insert`)}>상품 등록 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfume/finder`)}>향수테스트 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfume/blending`)}>향수 배합 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
