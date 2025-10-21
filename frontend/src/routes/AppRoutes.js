@@ -10,6 +10,7 @@ import Login from "../pages/Login.js";
 import CartList from "../pages/CartList.js";
 import OrderList from "../pages/OrderList.js";
 import AdminRoute from "./AdminRoute.js";
+import Logout from "../pages/Logout.js";
 
 function AppRoutes() {
 
@@ -24,6 +25,7 @@ function AppRoutes() {
             <Route path='/login' element={<Login />} />
             <Route path='/cart/list' element={<CartList />} />
             <Route path='/order/list' element={<OrderList />} />
+            <Route path='/logout' element={<Logout />} />
 
             {/**관리자 전용 경로 */}
             <Route

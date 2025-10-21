@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../component/AuthContext';
 
 function Logout() {
     const { logout } = useAuth();
@@ -10,7 +10,9 @@ function Logout() {
         // 유저 로그아웃
         logout();
 
-        navigate('/');
+        //로그아웃 후 홈페이지로 이동
+        console.log('take me home!')
+        navigate(`/`);
     }, [logout, navigate]);
 
     return null;
