@@ -74,10 +74,6 @@ function Login() {
                                 color: "#67AB9F",
                             }} className="text-center mb-4">Login</h2>
 
-
-
-
-
                             {errors && <Alert variant="danger">{errors}</Alert>}
 
                             <Form onSubmit={LoginAction}>
@@ -122,7 +118,7 @@ function Login() {
                                     <Col>
                                         <Link to={`/findpass`}>
                                             <div class="form-end">
-                                                <a class="inline-link" href="$">비밀번호를 잊으셨나요?</a>
+                                                <a class="inline-link" h    ref="$">비밀번호를 잊으셨나요?</a>
                                             </div>
                                         </Link>
                                     </Col>

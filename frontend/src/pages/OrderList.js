@@ -3,6 +3,7 @@ import { Alert, Button, Card, Col, Container, Row, Spinner } from "react-bootstr
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../component/AuthContext";
 // import { AuthContext } from "../contexts/AuthContext";
 
 /** ---------- 정규화: ERD → ViewModel ---------- */
@@ -32,14 +33,15 @@ const normalizeOrder = (raw) => {
 };
 /* --------------------------------------------- */
 
-function OrderList({ user }) {
-
+function OrderList() { // user 프롭스 제거
+  //AuthContext 글로벌 컨텍스트에서 유저 정보 불러오기  
+  const { user } = useAuth();
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
-  
+
 
   useEffect(() => {
     if (!user) {
@@ -66,10 +68,10 @@ function OrderList({ user }) {
     })();
   }, [user]);
 
-  
+
 
   const makeAdminButton = (bean) => {
-    
+
     if (user?.role !== "ADMIN" && user?.role !== "USER") return null;
 
     const changeStatus = async (newStatus) => {
