@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="App">
       <MenuItems />
-      <div style={{ paddingTop: '63px' }}>{/** 최상단 메뉴바 용 패딩 */}
+      <div style={{ paddingTop: '84px' }}>{/** 최상단 메뉴바 용 패딩 */}
         <AppRoutes />
       </div>
     </div>

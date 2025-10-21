@@ -19,7 +19,7 @@ function Sidebar({ activeView, setActiveView }) {
 
     return (
         <div className={styles.sidebar}>
-            <div className={styles.logo}>Scentelier</div>
+            <div className={styles.logo}>관리자 페이지</div>
             <ul className={styles.navMenu}>
                 <li className={styles.navItem}>
                     <a

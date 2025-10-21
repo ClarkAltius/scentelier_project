@@ -10,7 +10,6 @@ function Dashboard() {
         <div className={styles.dashboard}>
             {/* Header containing title and filter controls */}
             <header className={styles.header}>
-                <h1>Dashboard</h1>
                 <div className={styles.filters}>
                     <div className={styles.searchBar}>
                         <Search size={18} className={styles.searchIcon} />
