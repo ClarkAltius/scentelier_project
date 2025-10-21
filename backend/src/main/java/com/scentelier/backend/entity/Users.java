@@ -52,4 +52,7 @@ public class Users {
     @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deletedAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Carts carts;
 }

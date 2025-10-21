@@ -2,19 +2,29 @@ import { useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, Wallet, Banknote, Truck, Package } from "lucide-react";
+import { mockUser, mockCartItems } from "../data/mockData";
+import { API_BASE_URL } from "../config/config";
+import axios from "axios";
 
-function Payments() {
+function Payments(props) {
+    const user = mockUser;
+    const products = mockCartItems;
+    // const user = props.user;
+    // const products = props.cartItems;
+
     const [method, setMethod] = useState("Card");
     const [showModal, setShowModal] = useState(false);
     const [delivery, setDelivery] = useState({
-        receiver: "",
-        phone: "",
-        address: "",
+        receiver: user.username,
+        phone: user.phone,
+        address: user.address,
         detail: "",
     });
 
     const navigate = useNavigate();
-    const totalPrice = 62000; // 예시 금액
+
+    const totalPrice = products.reduce((sum, item) => 
+        sum + item.price * (item.quantity || 1), 0);
 
     const paymentMethods = [
         { id: "Card", name: "신용/체크카드", icon: <CreditCard size={28} /> },
@@ -27,12 +37,38 @@ function Payments() {
         setDelivery({ ...delivery, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!delivery.receiver || !delivery.phone || !delivery.address) {
             alert("배송지 정보를 모두 입력해주세요.");
             return;
         }
-        setShowModal(true);
+        const url = `${API_BASE_URL}/order`;
+        const orderData = {
+            users: user.id,
+            recipientName: delivery.recipientName,
+            address: delivery.address,
+            totalPrice: totalPrice,
+            paymentMethod: method,
+            orderProducts: [
+                ...products.filter((product) => product.isCustom === false).map((p) => ({
+                products: { id: p.id },
+                quantity: p.quantity,
+                price: p.price,
+                })),
+                ...products.filter((product) => product.isCustom === true).map((c) => ({
+                customPerfume: { id: c.id },
+                quantity: c.quantity,
+                price: c.price,
+                })),
+            ],
+        };
+        try {
+            await axios.post(url, orderData);
+            setShowModal(true);
+        } catch (err) {
+            console.error(err);
+            alert("결제 요청 중 오류가 발생했습니다.");
+        }
     };
 
     return (
@@ -40,7 +76,7 @@ function Payments() {
             <Row className="g-4">
                 {/* 배송 정보 */}
                 <Col md={12}>
-                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
+                    <Card className="shadow border-0 p-3 rounded-4">
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <Truck className="me-2 text-success" /> 배송지 정보
                         </Card.Header>
@@ -97,22 +133,36 @@ function Payments() {
 
                 {/* 주문 요약 */}
                 <Col md={6}>
-                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
+                    <Card className="shadow border-0 p-3 rounded-4">
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <Package className="me-2 text-primary" /> 주문 요약
                         </Card.Header>
                         <Card.Body>
-                            <div className="d-flex justify-content-between mb-2">
-                                <span>커스텀 향수 “Midnight Blossom”</span>
-                                <span>₩59,000</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span>배송비</span>
-                                <span>₩3,000</span>
-                            </div>
+                            <h5>일반 상품</h5>
+                            {products.filter((product) => product.isCustom === false).map((p) => (
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span key={`p-${p.id}`}>
+                                    {p.name} — {p.quantity}개
+                                    </span>
+                                    <span>
+                                        (₩{(p.price*p.quantity).toLocaleString()})
+                                    </span>
+                                </div>
+                            ))}
+                            <h5 className="mt-3">커스텀 향수</h5>
+                            {products.filter((product) => product.isCustom === true).map((c) => (
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span key={`c-${c.id}`}>
+                                    {c.name} — {c.quantity}개
+                                    </span>
+                                    <span>
+                                        (₩{(c.price*c.quantity).toLocaleString()})
+                                    </span>
+                                </div>
+                            ))}
                             <div className="d-flex justify-content-between fw-bold fs-5">
                                 <span>총 결제 금액</span>
-                                <span className="text-success">₩62,000</span>
+                                <span className="text-success">₩{totalPrice.toLocaleString()}</span>
                             </div>
                         </Card.Body>
                     </Card>
@@ -120,7 +170,7 @@ function Payments() {
 
                 {/* 결제 방식 */}
                 <Col md={6}>
-                    <Card className="shadow border-0 p-3" style={{ borderRadius: "1rem" }} >
+                    <Card className="shadow border-0 p-3 rounded-4">
                         <Card.Header className="bg-white border-bottom fw-bold fs-5 d-flex align-items-center">
                             <CreditCard className="me-2 text-warning" /> 결제 방식 선택
                         </Card.Header>

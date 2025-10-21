@@ -29,6 +29,8 @@ public class Orders {
     @Column(name = "recipient_name")
     private String recipientName;
 
+    private String phone;
+
     @NotBlank(message = "배송지는 필수 입력 사항입니다.")
     private String address;
 
