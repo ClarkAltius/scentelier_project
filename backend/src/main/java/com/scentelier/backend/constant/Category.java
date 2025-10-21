@@ -1,4 +1,4 @@
 package com.scentelier.backend.constant;
 
-public class Category {
+public enum Category {
 }

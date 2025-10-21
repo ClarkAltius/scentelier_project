@@ -17,7 +17,7 @@ import java.util.List;
 @Getter @Setter @ToString
 @Entity @Table(name = "orders")
 public class Orders {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
