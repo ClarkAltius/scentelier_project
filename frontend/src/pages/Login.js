@@ -3,8 +3,13 @@ import { useState } from "react";
 import { Container, Row, Col, Card, Alert, Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
-function Login({ setUser }) {
+import { useAuth } from "../component/AuthContext.js"; //useAuth 훅 가져오기
+
+function Login() {
     // setUser : 사용자 정보를 저장하기 위한 setter 메소드
+    // 전일환: 로그인 기능 외부로 빼와서 setter 메소드 삭제
+
+    const { login } = useAuth(); //콘텍스트에서 정의 한 로그인 기능 사용
 
     // 로그인 관련 state 정의
     const [email, setEmail] = useState('');
@@ -20,10 +25,15 @@ function Login({ setUser }) {
 
         try {
             const url = `${API_BASE_URL}/member/login`;
-            const parameters = { email, password };
+            // const parameters = { email, password };
+            // 전일환 : x-www-form-urlencoded 사용을 위해 URLSearchParams로 변경
+            const params = new URLSearchParams();
+            params.append('email', email);
+            params.append('password', password);
 
             // 스프링 부트가 넘겨 주는 정보는 Map<String, Object> 타입입니다.
-            const response = await axios.post(url, parameters);
+            // 전일환 : withCredentials 추가
+            const response = await axios.post(url, params, { withCredentials: true });
 
             // message에는 '로그인 성공 여부'를 알리는 내용, member에는 로그인 한 사람의 객체 정보가 반환 됩니다.
             const { message, member } = response.data;
@@ -32,8 +42,9 @@ function Login({ setUser }) {
                 console.log('로그인 한 사람의 정보');
                 console.log(member);
 
-                // 로그인 성공시 사용자 정보를 어딘가에 저장해야 합니다.  
-                setUser(member);
+                // 로그인 성공시 사용자 정보를 어딘가에 저장해야 합니다.
+                // 글로벌 스테이트 관리를 위해서 login 컨텍스트 저장  
+                login(member);
 
                 navigate(`/`); // 로그인 성공 후 홈 페이지로 이동
 
