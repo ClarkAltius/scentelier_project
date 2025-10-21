@@ -28,7 +28,7 @@ public class OrderProduct {
     // 커스텀 상품 (nullable)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "custom_id", nullable = true)
-    private CustomPerfume custom_id;
+    private CustomPerfume customPerfume;
 
     @Column(nullable = false)
     private int quantity;
