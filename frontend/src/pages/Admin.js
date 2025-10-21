@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import ProductManagement from '../component/ProductManagement';
 import StockManagement from '../component/StockManagement';
 import OrderManagement from '../component/OrderManagement';
-import CustomerInquiries from '../component/CustomerInquiries';
+import CustomerInquiries from '../component/InquiryManagement';
 
 function Admin() {
 

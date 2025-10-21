@@ -1,0 +1,214 @@
+.inquiryManagementPage {
+    padding: 20px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    flex-grow: 1;
+    min-width: 250px;
+}
+
+.searchBar input {
+    border: none;
+    outline: none;
+    padding: 10px 8px;
+    font-size: 14px;
+    background: transparent;
+    width: 100%;
+}
+
+.searchIcon {
+    color: #999;
+    margin-right: 6px;
+}
+
+.filterDropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filterDropdown select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.inquiryTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.inquiryTable th,
+.inquiryTable td {
+    padding: 12px 16px;
+    /* Slightly reduced padding */
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+    font-size: 14px;
+    white-space: nowrap;
+    /* Prevent text wrapping initially */
+}
+
+.inquiryTable th {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    background-color: #f9f9f9;
+}
+
+.inquiryTable tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.customerEmail {
+    font-size: 12px;
+    color: #777;
+}
+
+.titleCell {
+    white-space: normal;
+    /* Allow title to wrap */
+    max-width: 250px;
+    /* Limit title width */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statusBadge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #999;
+}
+
+.statusPENDING {
+    background-color: #ffc107;
+    color: #333;
+}
+
+/* Yellow */
+.statusANSWERED {
+    background-color: #17a2b8;
+}
+
+/* Blue/Teal */
+.statusCLOSED {
+    background-color: #6c757d;
+}
+
+/* Grey */
+
+.actionButtons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actionButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.actionButton:hover {
+    opacity: 0.8;
+}
+
+.viewButton {
+    background-color: #e0f2fe;
+    color: #0c5460;
+}
+
+/* Light blue */
+.closeButton {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+/* Light green */
+
+.loading,
+.error,
+.noResults {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #777;
+}
+
+.error {
+    color: #dc3545;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

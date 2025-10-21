@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './ProductManagement.module.css';
-import { Plus, Edit, Trash2 } from 'lucide-react'; // Using lucide-icons
+import { Plus, Edit, Trash2 } from 'lucide-react';
 
 // 1. Import your mock data.
 // Create a file in '/src/data/mockProducts.json' with this content.
@@ -41,11 +41,11 @@ function ProductManagement() {
                 <table className={styles.productTable}>
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
+                            <th>상품명</th>
+                            <th>카테고리</th>
+                            <th>가격</th>
+                            <th>재고</th>
+                            <th>변경</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,7 +53,7 @@ function ProductManagement() {
                             <tr key={product.id}>
                                 <td>{product.name}</td>
                                 <td>{product.category}</td>
-                                <td>${product.price.toFixed(2)}</td>
+                                <td>{product.price.toFixed(2)}</td>
                                 <td>{product.stock}</td>
                                 <td>
                                     <div className={styles.actionButtons}>
@@ -61,13 +61,13 @@ function ProductManagement() {
                                             className={`${styles.actionButton} ${styles.editButton}`}
                                             onClick={() => handleEdit(product.id)}
                                         >
-                                            <Edit size={16} /> Edit
+                                            <Edit size={16} />
                                         </button>
                                         <button
                                             className={`${styles.actionButton} ${styles.deleteButton}`}
                                             onClick={() => handleDelete(product.id)}
                                         >
-                                            <Trash2 size={16} /> Delete
+                                            <Trash2 size={16} />
                                         </button>
                                     </div>
                                 </td>
