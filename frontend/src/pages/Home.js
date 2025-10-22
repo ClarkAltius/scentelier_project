@@ -1,27 +1,45 @@
 import Carousel from 'react-bootstrap/Carousel';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import { Button } from 'react-bootstrap';
+import axios from 'axios';
+import { API_BASE_URL } from '../config/config';
 
 
 
 function Home() {
+    const [thumbnails, setThumbnails] = useState([]);
     const containerRef = useRef();
 
     // 썸네일 목록 - 3번 반복해 무한 루프 효과
-    const thumbnails = [
-        { id: 1, src: '/type/Chypre.jpg', alt: '썸네일 1', label: '# Chypre' },
-        { id: 2, src: '/type/Citrus.jpg', alt: '썸네일 2', label: '# Citrus' },
-        { id: 3, src: '/type/Floral.jpg', alt: '썸네일 3', label: '# Floral' },
-        { id: 4, src: '/type/Fruity.jpg', alt: '썸네일 4', label: '# Fruity' },
-        { id: 5, src: '/type/Green.jpg', alt: '썸네일 5', label: '# Green' },
-        { id: 6, src: '/type/Powder.jpg', alt: '썸네일 6', label: '# Powder' },
-        { id: 7, src: '/type/Woody.jpg', alt: '썸네일 7', label: '# Woody' },
-        { id: 8, src: '/type/Crystal.jpg', alt: '썸네일 8', label: 'Crystal' },
-    ];
+    // const thumbnails = [
+    //     { id: 1, src: '/type/Chypre.jpg', alt: '썸네일 1', label: '# Chypre' },
+    //     { id: 2, src: '/type/Citrus.jpg', alt: '썸네일 2', label: '# Citrus' },
+    //     { id: 3, src: '/type/Floral.jpg', alt: '썸네일 3', label: '# Floral' },
+    //     { id: 4, src: '/type/Fruity.jpg', alt: '썸네일 4', label: '# Fruity' },
+    //     { id: 5, src: '/type/Green.jpg', alt: '썸네일 5', label: '# Green' },
+    //     { id: 6, src: '/type/Powder.jpg', alt: '썸네일 6', label: '# Powder' },
+    //     { id: 7, src: '/type/Woody.jpg', alt: '썸네일 7', label: '# Woody' },
+    //     { id: 8, src: '/type/Crystal.jpg', alt: '썸네일 8', label: 'Crystal' },
+    // ];
     const extended = [...thumbnails, ...thumbnails, ...thumbnails];
 
     useEffect(() => {
+
+        // console.log("useEffect 시작");
+        // const url = `${API_BASE_URL}/homepage`;
+        // axios
+        //     .get(url)
+        //     .than((response) => {
+        //         console.log("응답 데이터:", response.data);
+        //         setThumbnails(response.data)
+        //     })
+        //     .catch((error) => {
+        //         console.error("에러 발생:", error);
+        //     })
+
+
+        //---------------------------------------------------------------------------- 
         const container = containerRef.current;
         if (!container) return;
 
@@ -77,12 +95,38 @@ function Home() {
     }, []);
 
 
-    // ... 나머지 JSX 렌더링 부분
-
 
     return (
         <>
             <Carousel>
+                {/* {thumbnails.map((bean) => {
+                    <Carousel.Item>
+                        <img
+                            className="d-block w-100"
+                            src={`${API_BASE_URL}/uploads/${bean}`}
+                            alt={bean.name}
+                            style={{ width: '300px', height: '800px', objectFit: 'cover' }}
+                        />
+                        <Carousel.Caption>
+                            <h1>
+                                <span style={{ fontSize: '70px' }}>"Scentelier</span>
+                                <br />— Craft Your Signature Story."</h1>
+                        </Carousel.Caption>
+                    </Carousel.Item>
+
+                })} */}
+
+
+
+
+
+
+
+
+
+
+
+
                 <Carousel.Item>
                     <img
                         className="d-block w-100"
@@ -249,7 +293,7 @@ function Home() {
 
             <div className="d-flex justify-content-center" >
                 <Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
-                    <Card.Img variant="top" src="/www.jpg"
+                    <Card.Img variant="top" src={`${API_BASE_URL}/images/qqq.jpg`}
                         style={{
                             width: '100%',
                             height: '300px',         // 원하는 높이 고정

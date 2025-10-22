@@ -21,7 +21,7 @@ import java.time.LocalDate;
 public class Ingredient {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_id")
     private Long id;
 
@@ -34,8 +34,6 @@ public class Ingredient {
     private String  description;
 
     @Column(nullable = false)//값입력필수
-    @Min(value = 10, message = "재고 수량은 10개 이상이여야합니다.")
-    @Max(value = 300, message = "재고 수량은 300개 이하여야합니다.")
     private int stock;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")

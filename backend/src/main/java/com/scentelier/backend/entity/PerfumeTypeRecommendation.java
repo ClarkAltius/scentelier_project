@@ -16,7 +16,7 @@ import java.util.List;
 @Table(name = "perfume_type_recommendation")
 public class PerfumeTypeRecommendation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) // 아이디를 자동 생성해줌
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 아이디를 자동 생성해줌
     @Column(name = "recomend_id")
     private Long id;
 
