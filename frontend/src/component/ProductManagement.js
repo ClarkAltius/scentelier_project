@@ -6,6 +6,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 // Create a file in '/src/data/mockProducts.json' with this content.
 import mockProductData from '../data/mockProducts.json';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function ProductManagement() {
     const [products, setProducts] = useState(mockProductData);
@@ -19,12 +20,27 @@ function ProductManagement() {
 
     const handleEdit = (productId) => {
         console.log(`TODO: Open 'Edit' modal for product ${productId}`);
+    
+        try{
+            axios.delete(`api/products/${productId}`);
+
+            setProducts((prevProducts)=>
+            prevProducts.filter((p)=>p.id !== productId)
+            );
+            alert('상품이 삭제되었습니다.');
+        }catch(error){
+            console.error('삭제 중 오류 :', error);
+            alert('상품 삭제 중 오류가 발생하였습니다.');
+        }
     };
 
     const handleDelete = (productId) => {
+        if (window.confirm('정말 삭제하시겠습니까?')){
+            setProducts((prevProducts)=>prevProducts.filter((p)=>p.id!==productId));
         console.log(`TODO: Open 'Delete' confirmation for product ${productId}`);
         // Example of how you'd update state (once confirmed):
         // setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+        }
     };
 
     return (
