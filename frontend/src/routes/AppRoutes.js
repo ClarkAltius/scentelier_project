@@ -13,6 +13,12 @@ import AdminRoute from "./AdminRoute.js";
 import Logout from "../pages/Logout.js";
 import ProductInsertForm from "../pages/ProductInsertForm.js"
 
+import Dashboard from '../component/Dashboard';
+import ProductManagement from '../component/ProductManagement';
+import StockManagement from '../component/StockManagement';
+import OrderManagement from '../component/OrderManagement';
+import InquiryManagement from '../component/InquiryManagement';
+
 function AppRoutes() {
 
     return (
@@ -20,7 +26,6 @@ function AppRoutes() {
             <Route path='/' element={<Home />} />
             <Route path='/product/list' element={<ProductList />} />
             <Route path='/product/detail' element={<ProductDetail />} />
-            <Route path='/product/insert' element={<ProductInsertForm />} />
             <Route path='/perfume/finder' element={<PerfumeFinder />} />
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />
@@ -37,8 +42,19 @@ function AppRoutes() {
                         <Admin />
                     </AdminRoute>
                 }
-            />
-        </Routes>
+            >
+            </Route>
+            {/**상품 입력 페이지 접근 제한 */}
+            <Route
+                path='/product/insert'
+                element={
+                    <AdminRoute>
+                        <ProductInsertForm />
+                    </AdminRoute>
+                }
+            >
+            </Route>
+        </Routes >
     );
 
 

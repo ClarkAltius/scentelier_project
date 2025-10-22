@@ -15,7 +15,7 @@ function Admin() {
     //useEffect. 액티브뷰 패널용 state
     const [activeView, setActiveView] = useState('dashboard');
 
-    //render view function
+    //render view 함수
 
     const renderView = () => {
         const views = {

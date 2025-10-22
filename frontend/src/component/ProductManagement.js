@@ -5,14 +5,16 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 // 1. Import your mock data.
 // Create a file in '/src/data/mockProducts.json' with this content.
 import mockProductData from '../data/mockProducts.json';
+import { useNavigate } from 'react-router-dom';
 
 function ProductManagement() {
-    // 2. Store the product list in state
     const [products, setProducts] = useState(mockProductData);
+
+    const navigate = useNavigate();
 
     // 3. Placeholder functions for CUD operations
     const handleAddNew = () => {
-        console.log("TODO: Open 'Add New Product' modal");
+        navigate('/product/insert');
     };
 
     const handleEdit = (productId) => {
@@ -29,10 +31,9 @@ function ProductManagement() {
         <div className={styles.productPage}>
             {/* 4. Page Header */}
             <div className={styles.header}>
-                <h1>Product Management</h1>
                 <button className={styles.addButton} onClick={handleAddNew}>
                     <Plus size={20} />
-                    Add New Product
+                    신규 상품 추가
                 </button>
             </div>
 
