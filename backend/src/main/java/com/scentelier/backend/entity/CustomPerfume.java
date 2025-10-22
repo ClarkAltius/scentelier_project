@@ -15,7 +15,7 @@ import java.util.List;
 @Entity @Table(name = "custom_perfume")
 public class CustomPerfume {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "custom_id")
     private Long id;
 

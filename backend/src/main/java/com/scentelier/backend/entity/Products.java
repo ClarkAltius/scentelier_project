@@ -3,7 +3,9 @@ package com.scentelier.backend.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.scentelier.backend.constant.Season;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -25,11 +27,13 @@ public class Products {
 
     private String description;
 
-    @NotBlank(message = "상품 가격은 필수 입력 사항입니다.")
+    @NotNull(message = "가격은 비어 있을 수 없습니다.")
+    @DecimalMin(value = "0.0", inclusive = false, message = "가격은 0보다 커야 합니다.")
     private BigDecimal price;
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private int stock;
+
 
     private String category;
 

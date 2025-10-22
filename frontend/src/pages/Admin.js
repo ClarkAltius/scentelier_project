@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import ProductManagement from '../component/ProductManagement';
 import StockManagement from '../component/StockManagement';
 import OrderManagement from '../component/OrderManagement';
-import CustomerInquiries from '../component/CustomerInquiries';
+import CustomerInquiries from '../component/InquiryManagement';
 
 function Admin() {
 
@@ -33,14 +33,12 @@ function Admin() {
 
         <div className={styles.adminPageWrapper}>
             <Sidebar activeView={activeView} setActiveView={setActiveView} />
-
             <div className={styles.mainContent}>
                 {/* Just render the Topbar component directly */}
-                <Topbar />
-
+                <Topbar activeView={activeView} />
                 {/* Admin Main content. Active View. */}
+
                 <div style={{ padding: '20px' }}>
-                    <h2>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
                     {renderView()}
                 </div>
 

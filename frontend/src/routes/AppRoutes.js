@@ -9,21 +9,35 @@ import Payments from "../pages/Payments.js";
 import Login from "../pages/Login.js";
 import CartList from "../pages/CartList.js";
 import OrderList from "../pages/OrderList.js";
+import AdminRoute from "./AdminRoute.js";
+import Logout from "../pages/Logout.js";
+import ProductInsertForm from "../pages/ProductInsertForm.js"
 
 function AppRoutes() {
 
     return (
         <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/admin' element={<Admin />} />
             <Route path='/product/list' element={<ProductList />} />
             <Route path='/product/detail' element={<ProductDetail />} />
+            <Route path='/product/insert' element={<ProductInsertForm />} />
             <Route path='/perfume/finder' element={<PerfumeFinder />} />
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />
             <Route path='/login' element={<Login />} />
             <Route path='/cart/list' element={<CartList />} />
             <Route path='/order/list' element={<OrderList />} />
+            <Route path='/logout' element={<Logout />} />
+
+            {/**관리자 전용 경로 */}
+            <Route
+                path='/admin'
+                element={
+                    <AdminRoute>
+                        <Admin />
+                    </AdminRoute>
+                }
+            />
         </Routes>
     );
 

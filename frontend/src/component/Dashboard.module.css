@@ -2,89 +2,11 @@
 .dashboard {
     padding: 24px;
     background-color: #f9fafb;
-    /* A very light grey for the background */
+    /* Lighter background */
     font-family: 'Inter', sans-serif;
-    /* A clean, modern font */
     height: calc(100vh - 40px);
-    /* Full viewport height minus the topbar */
     overflow-y: auto;
-    /* Allow scrolling if content overflows */
-}
-
-/* Header section with title and filters */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.filters {
-    display: flex;
-    gap: 12px;
-}
-
-/* Styling for the search bar */
-.searchBar {
-    display: flex;
-    align-items: center;
-    background-color: #fff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 0 12px;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.searchBar input {
-    border: none;
-    outline: none;
-    padding: 10px 8px;
-    font-size: 14px;
-    background: transparent;
-    min-width: 200px;
-}
-
-.searchIcon {
-    color: #9ca3af;
-}
-
-/* Styling for dropdown filters */
-.dropdown {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #fff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    color: #374151;
-    transition: background-color 0.2s;
-}
-
-.dropdown:hover {
-    background-color: #f9fafb;
-}
-
-/* Main content grid layout */
-.mainGrid {
-    display: grid;
-    /* 3 columns, 1fr each means they are flexible and equal */
-    grid-template-columns: repeat(3, 1fr);
-    /* Define areas for clarity and responsiveness later */
-    grid-template-areas:
-        "metric1 metric2 metric3"
-        "graph graph best-seller";
-    gap: 24px;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Base card styling */
@@ -93,134 +15,184 @@
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     padding: 24px;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
-}
-
-.card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 20px 0;
-}
-
-/* Specific card placements */
-.metricCard:nth-child(1) {
-    grid-area: metric1;
-}
-
-.metricCard:nth-child(2) {
-    grid-area: metric2;
-}
-
-.metricCard:nth-child(3) {
-    grid-area: metric3;
-}
-
-.graphCard {
-    grid-area: graph;
-}
-
-.bestSellerCard {
-    grid-area: best-seller;
-}
-
-/* Metric card styling */
-.metricCard {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.cardIcon {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.cardContent {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
 }
 
-.cardLabel {
+.cardHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.cardHeader h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    /* Darker gray for titles */
+    margin: 0;
+}
+
+.cardIcon {
+    color: #6b7280;
+    /* Medium gray for icons */
+    margin-right: 12px;
+}
+
+/* Grid Layouts */
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.mainGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.operationalGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* KPI Card Specifics */
+.kpiValue {
+    font-size: 36px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.operationalValue {
+    font-size: 30px;
+}
+
+/* Chart Placeholders and Legends */
+.largeCard {
+    grid-column: span 2;
+}
+
+.chartPlaceholder {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.chartLegend {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+    display: flex;
+    gap: 24px;
     font-size: 14px;
+}
+
+.chartLegend li {
+    display: flex;
+    align-items: center;
+}
+
+.legendDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* List Card styling (for best sellers, low stock, etc.) */
+.listCard {
+    justify-content: flex-start;
+}
+
+.itemList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.itemList li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.itemList li:last-child {
+    border-bottom: none;
+}
+
+.itemName {
+    font-weight: 500;
+    color: #1f2937;
+    flex-grow: 1;
+}
+
+.itemStock,
+.itemSales {
     color: #6b7280;
     font-weight: 500;
 }
 
-.cardValue {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
+/* Icon specific colors */
+.warningIcon {
+    color: #f59e0b;
 }
 
-.graphPlaceholder {
-    width: 100%;
-    height: 300px;
+.starIcon {
+    color: #facc15;
 }
 
-/* Best seller card styling */
-.bestSellerCard {
-    display: flex;
-    flex-direction: column;
+.beakerIcon {
+    color: #3b82f6;
 }
 
-.productInfo {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-grow: 1;
-    /* Pushes link to the bottom */
-}
 
-.productImage {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid #e5e7eb;
-}
-
-.productDetails {
-    display: flex;
-    flex-direction: column;
-}
-
-.productName {
-    font-weight: 600;
-    color: #1f2937;
-    font-size: 16px;
-}
-
-.productSku {
+/* Tags for Low Stock list */
+.productTag,
+.ingredientTag {
     font-size: 12px;
-    color: #9ca3af;
-    margin: 4px 0;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: #fff;
 }
 
-.productSales {
-    font-size: 14px;
-    color: #374151;
-    font-weight: 500;
+.productTag {
+    background-color: #3b82f6;
 }
 
-.detailsLink {
-    display: block;
-    margin-top: 20px;
-    text-align: center;
-    padding: 10px;
-    background-color: #f3f4f6;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #374151;
-    font-weight: 500;
-    transition: background-color 0.2s;
+/* Blue */
+.ingredientTag {
+    background-color: #10b981;
 }
 
-.detailsLink:hover {
-    background-color: #e5e7eb;
+/* Green */
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

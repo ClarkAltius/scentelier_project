@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity @Table(name = "order_product")
 public class OrderProduct {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_product_id")
     private Long id;
 
@@ -28,7 +28,7 @@ public class OrderProduct {
     // 커스텀 상품 (nullable)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "custom_id", nullable = true)
-    private CustomPerfume custom_id;
+    private CustomPerfume customPerfume;
 
     @Column(nullable = false)
     private int quantity;

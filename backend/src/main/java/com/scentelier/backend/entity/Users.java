@@ -11,14 +11,13 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter @Setter @ToString
 @NoArgsConstructor @AllArgsConstructor
 @Entity @Table(name = "users")
 public class Users {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -52,4 +51,7 @@ public class Users {
     @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deletedAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Carts carts;
 }

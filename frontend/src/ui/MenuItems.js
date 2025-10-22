@@ -1,17 +1,67 @@
-import { Nav, Navbar, Container, NavDropdown } from "react-bootstrap";
+import { Nav, Navbar, Container, NavDropdown, NavItem } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../component/AuthContext";
+import { ShoppingCart, User } from "lucide-react";
 
 function MenuItems() {
 
+    //로그아웃 버튼 관리용
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
-        <Navbar bg="dark" variant="dark" expand="lg">
+        <Navbar bg="light" variant="light" expand="lg" fixed="top" className="shadow-sm mb-3">
             <Container>
-                <Navbar.Brand href='/'>Scentelier</Navbar.Brand>
-                <Navbar.Brand>임시</Navbar.Brand>
+                {/** 브랜드 로고, 이름 등 */}
+                <Navbar.Brand
+                    href='/'
+                    style={{
+                        color: '#6B4C3B',
+                        fontFamily: "'Gowun Batang', serif",
+                        fontSize: '2rem',
+                        marginBottom: 10,
+                        textShadow: '1px 1px 2px #cfc1af'
+                    }}
+                >
+                    Scentelier
+                </Navbar.Brand>
                 <Nav className="me-auto">
-                    <NavDropdown title={`1차 페이지 작성`}>
+                    <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Product</Nav.Link>
+                    <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
+                    <Nav.Link onClick={() => navigate('/perfume/blending')} style={{ color: '#808080ff' }}>Customize</Nav.Link>
+                </Nav>
+                <Nav>
+                    {user ? (
+                        // 로그인한 유저에겐 유저명 표기
+                        <>
+                            <Nav.Link onClick={() => navigate('/cart/list')} title="Cart">
+                                <ShoppingCart size={20} style={{ color: '#808080ff' }} />
+                            </Nav.Link>
+                            <NavDropdown title={<User size={20} style={{ color: '#808080ff' }} />} id="user-nav-dropdown" align="end">
+                                <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
+                                {/* 회원정보 링크 추가 예정 */}
+                                {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                            </NavDropdown>
+                            <div style={{ paddingLeft: '10px' }}></div>
+                            <Navbar.Text style={{ color: '#6c757d', fontFamily: "'Gowun Batang', serif", fontSize: '1rem', marginLeft: '-5px' }}> {/* Adjusted margin */}
+                                {`어서오세요, ${user.username} 님` || 'User'}
+                            </Navbar.Text>                        </>
+                    ) : (
+                        // 기본적으로 로그인 버튼
+                        <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>
+                    )}
+                </Nav>
+                <div style={{ paddingLeft: '50px' }}></div>
+                {/** Temporary. 개발용 링크들 */}
+                <div style={{ border: '2px solid black', padding: '5px 10px', borderRadius: '5px' }}>
+                    <NavDropdown bg="dark" variant="dark" title={`[임시] 링크 모음`}>
                         <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => { navigate(`/cart/list`) }}>장바구니 페이지</NavDropdown.Item>
@@ -22,9 +72,9 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/perfume/blending`)}>향수 배합 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
                     </NavDropdown>
-                </Nav>
+                </div>
             </Container>
-        </Navbar>
+        </Navbar >
     );
 }
 

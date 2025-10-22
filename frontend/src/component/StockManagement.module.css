@@ -1,0 +1,194 @@
+/* Main container for the stock management page */
+.stockManagementPage {
+    padding: 24px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Header section with title and view toggle */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: #111827;
+    /* Dark gray text */
+}
+
+/* View toggle buttons container */
+.viewToggle {
+    display: flex;
+    background-color: #f3f4f6;
+    /* Light gray background for the container */
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.viewToggle button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    background-color: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #4b5563;
+    /* Medium gray text */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.viewToggle button:hover {
+    background-color: #e5e7eb;
+}
+
+/* Active state for the toggle button */
+.viewToggle button.active {
+    background-color: #ffffff;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Table styling */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stockTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.stockTable th,
+.stockTable td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.stockTable th {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    /* Lighter gray for header text */
+    text-transform: uppercase;
+    background-color: #f9fafb;
+}
+
+.stockTable tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Low stock indicators */
+.lowStockRow {
+    background-color: #fffbeb;
+    /* Light yellow for low stock rows */
+}
+
+.lowStockText {
+    color: #b45309;
+    /* Amber/orange color for low stock text */
+    font-weight: 700;
+}
+
+/* Inline stock input */
+.stockInput {
+    width: 80px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    /* Blue border when editing */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+    outline: none;
+    font-size: 14px;
+}
+
+/* Action Buttons */
+.actionButtons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actionButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+    opacity: 0.85;
+}
+
+.adjustButton {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.saveButton {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+/* Light green */
+.cancelButton {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Light red */
+.restockButton {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Light blue */
+
+
+.loading,
+.error {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.error {
+    color: #dc3545;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
