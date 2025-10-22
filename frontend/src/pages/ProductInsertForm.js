@@ -66,7 +66,8 @@ function ProductInsertForm() {
       alert("상품이 성공적으로 등록 되었습니다.");
 
       setProduct(initial_value);
-      navigate("/product/list");
+      //상품 추가 후 상품 페이지가 아니라 관리자 페이지로 이동하도록 변경했습니다. 2025-10-22 전일환
+      navigate("/admin");
     } catch (error) {
       console.error(error.response?.data);
       alert("상품 등록에 실패하였습니다.");
