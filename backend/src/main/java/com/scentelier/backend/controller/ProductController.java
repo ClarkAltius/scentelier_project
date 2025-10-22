@@ -1,19 +1,18 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.entity.Products;
+import com.scentelier.backend.service.OrderService;
 import com.scentelier.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -55,4 +54,6 @@ public class ProductController {
             return ResponseEntity.status(500).body(Map.of("message", err.getMessage(), "error", "Error file uploading"));
         }
     }
+
+
 }

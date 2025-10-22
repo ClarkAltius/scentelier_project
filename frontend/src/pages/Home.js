@@ -8,38 +8,25 @@ import { API_BASE_URL } from '../config/config';
 
 
 function Home() {
-    const [thumbnails, setThumbnails] = useState([]);
     const containerRef = useRef();
+    const [best, setBest] = useState([]);
 
-    // 썸네일 목록 - 3번 반복해 무한 루프 효과
-    // const thumbnails = [
-    //     { id: 1, src: '/type/Chypre.jpg', alt: '썸네일 1', label: '# Chypre' },
-    //     { id: 2, src: '/type/Citrus.jpg', alt: '썸네일 2', label: '# Citrus' },
-    //     { id: 3, src: '/type/Floral.jpg', alt: '썸네일 3', label: '# Floral' },
-    //     { id: 4, src: '/type/Fruity.jpg', alt: '썸네일 4', label: '# Fruity' },
-    //     { id: 5, src: '/type/Green.jpg', alt: '썸네일 5', label: '# Green' },
-    //     { id: 6, src: '/type/Powder.jpg', alt: '썸네일 6', label: '# Powder' },
-    //     { id: 7, src: '/type/Woody.jpg', alt: '썸네일 7', label: '# Woody' },
-    //     { id: 8, src: '/type/Crystal.jpg', alt: '썸네일 8', label: 'Crystal' },
-    // ];
+
+    //썸네일 목록 - 3번 반복해 무한 루프 효과
+    const thumbnails = [
+        { id: 1, src: `${API_BASE_URL}/uploads/type/Chypre.jpg`, alt: '썸네일 1', label: '# Chypre' },
+        { id: 2, src: `${API_BASE_URL}/uploads/type/Citrus.jpg`, alt: 'Citrus', label: '# Citrus' },
+        { id: 3, src: `${API_BASE_URL}/uploads/type/Floral.jpg`, alt: 'Floral', label: '# Floral' },
+        { id: 4, src: `${API_BASE_URL}/uploads/type/Fruity.jpg`, alt: 'Fruity', label: '# Fruity' },
+        { id: 5, src: `${API_BASE_URL}/uploads/type/Green.jpg`, alt: 'Green', label: '# Green' },
+        { id: 6, src: `${API_BASE_URL}/uploads/type/Powdery.jpg`, alt: 'Powdery', label: '# Powdery' },
+        { id: 7, src: `${API_BASE_URL}/uploads/type/Woody.jpg`, alt: 'Woody', label: '# Woody' },
+        { id: 8, src: `${API_BASE_URL}/uploads/type/Crystal.jpg`, alt: 'Crystal', label: '# Crystal' }
+    ];
     const extended = [...thumbnails, ...thumbnails, ...thumbnails];
 
     useEffect(() => {
 
-        // console.log("useEffect 시작");
-        // const url = `${API_BASE_URL}/homepage`;
-        // axios
-        //     .get(url)
-        //     .than((response) => {
-        //         console.log("응답 데이터:", response.data);
-        //         setThumbnails(response.data)
-        //     })
-        //     .catch((error) => {
-        //         console.error("에러 발생:", error);
-        //     })
-
-
-        //---------------------------------------------------------------------------- 
         const container = containerRef.current;
         if (!container) return;
 
@@ -86,51 +73,40 @@ function Home() {
 
         startAutoScroll();
 
+        const url = `${API_BASE_URL}/order/list`
+        axios.get(url)
+            .then((response) => {
+                console.log("응답받은 데이터 :");
+                console.log(response.data);
+                setBest(response.data);
+            })
+            .catch(error => {
+                console.error('데이터 가져오기 실패:', error);
+            })
+
         return () => {
             clearInterval(scrollInterval);
             clearTimeout(scrollTimeout);
             container.removeEventListener('scroll', onScroll);
             container.removeEventListener('wheel', onWheel);
         };
+
+
+
     }, []);
+
+    // ------------------------ 베스트 향수 ------------------------------------
+
 
 
 
     return (
         <>
             <Carousel>
-                {/* {thumbnails.map((bean) => {
-                    <Carousel.Item>
-                        <img
-                            className="d-block w-100"
-                            src={`${API_BASE_URL}/uploads/${bean}`}
-                            alt={bean.name}
-                            style={{ width: '300px', height: '800px', objectFit: 'cover' }}
-                        />
-                        <Carousel.Caption>
-                            <h1>
-                                <span style={{ fontSize: '70px' }}>"Scentelier</span>
-                                <br />— Craft Your Signature Story."</h1>
-                        </Carousel.Caption>
-                    </Carousel.Item>
-
-                })} */}
-
-
-
-
-
-
-
-
-
-
-
-
                 <Carousel.Item>
                     <img
                         className="d-block w-100"
-                        src="/ddd.jpg"
+                        src={`${API_BASE_URL}/uploads/bigs/bigs1.jpg`}
                         alt="First slide"
                         style={{ width: '300px', height: '800px', objectFit: 'cover' }}
                     />
@@ -144,7 +120,7 @@ function Home() {
                 <Carousel.Item>
                     <img
                         className="d-block w-100"
-                        src="/ttt.jpg"
+                        src={`${API_BASE_URL}/uploads/bigs/bigs2.jpg`}
                         alt="First slide"
                         style={{ width: '300px', height: '800px', objectFit: 'cover' }}
                     />
@@ -158,7 +134,7 @@ function Home() {
                 <Carousel.Item>
                     <img
                         className="d-block w-100"
-                        src="/rrr.jpg"
+                        src={`${API_BASE_URL}/uploads/bigs/bigs3.jpg`}
                         alt="First slide"
                         style={{ width: '300px', height: '800px', objectFit: 'cover' }}
                     />
@@ -234,7 +210,7 @@ function Home() {
                         display: 'flex'
                     }}>
                         < img
-                            src="/qqq.jpg"
+                            src={`${API_BASE_URL}/uploads/bigs/4.jpg`}
                             alt="..."
                             style={{
                                 width: '310px',
@@ -290,115 +266,47 @@ function Home() {
 
             <div style={{ textAlign: 'center', margin: '50px 0px 10px 50px', fontSize: '50px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>_Best Perfume<span style={{ fontSize: '20px' }}>__ Scentelier의 베스트 향수를 만나보세요.</span>
             </div>
+            {/* -----------------------------리스트 ---------------------------- */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: "center" }}>
+                {best.map((item) => {
+                    return (<Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
+                        <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
+                            style={{
+                                width: '100%',
+                                height: '300px',         // 원하는 높이 고정
+                                objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
+                                borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
+                            }} />
+                        <Card.Body>
+                            <Card.Title>{item.name}</Card.Title>
+                            <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
+                                <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
+                                <br />
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
+                                    {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
+                                        <span
+                                            key={idx}
+                                            style={{
+                                                padding: '4px 10px',
+                                                backgroundColor: '#ebebebff',
+                                                borderRadius: '20px',
+                                                fontSize: '0.85em',
+                                                color: '#555',
+                                                border: '1px solid transparent',
+                                            }}
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </Card.Text>
+                            <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
+                        </Card.Body>
+                    </Card>)
+                })}
+            </div>
+            {/* -----------------------------리스트 ---------------------------- */}
 
-            <div className="d-flex justify-content-center" >
-                <Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
-                    <Card.Img variant="top" src={`${API_BASE_URL}/images/qqq.jpg`}
-                        style={{
-                            width: '100%',
-                            height: '300px',         // 원하는 높이 고정
-                            objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                            borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                        }} />
-                    <Card.Body>
-                        <Card.Title>Powder Whisper</Card.Title>
-                        <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
-                            <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                            <br />
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                    <span
-                                        key={idx}
-                                        style={{
-                                            padding: '4px 10px',
-                                            backgroundColor: '#ebebebff',
-                                            borderRadius: '20px',
-                                            fontSize: '0.85em',
-                                            color: '#555',
-                                            border: '1px solid transparent',
-                                        }}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </Card.Text>
-                        <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
-                    </Card.Body>
-                </Card>
-
-                {/* 카드하나 */}
-
-                <Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
-                    <Card.Img variant="top" src="/www.jpg"
-                        style={{
-                            width: '100%',
-                            height: '300px',         // 원하는 높이 고정
-                            objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                            borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                        }} />
-                    <Card.Body>
-                        <Card.Title>Berry Radiant</Card.Title>
-                        <Card.Text style={{ textAlign: 'center', margin: '10px' }}>
-                            <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                            <br />
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                {['#프루티', '#플로럴', '#달콤함'].map((tag, idx) => (
-                                    <span
-                                        key={idx}
-                                        style={{
-                                            padding: '4px 10px',
-                                            backgroundColor: '#ebebebff',
-                                            borderRadius: '20px',
-                                            fontSize: '0.85em',
-                                            color: '#555',
-                                            border: '1px solid transparent',
-                                        }}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </Card.Text>
-                        <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
-                    </Card.Body>
-                </Card>
-                <Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
-                    <Card.Img variant="top" src="/www.jpg"
-                        style={{
-                            width: '100%',
-                            height: '300px',         // 원하는 높이 고정
-                            objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                            borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                        }} />
-                    <Card.Body>
-                        <Card.Title>Moss & Oak</Card.Title>
-                        <Card.Text style={{ textAlign: 'center', margin: '10px' }}>
-                            <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                            <br />
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                {['#시프레', '#우디', '가을향'].map((tag, idx) => (
-                                    <span
-                                        key={idx}
-                                        style={{
-                                            padding: '4px 10px',
-                                            backgroundColor: '#ebebebff',
-                                            borderRadius: '20px',
-                                            fontSize: '0.85em',
-                                            color: '#555',
-                                            border: '1px solid transparent',
-                                        }}
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </Card.Text>
-                        <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
-                    </Card.Body>
-                </Card>
-
-            </div >
             <button
                 style={{
                     marginRight: '5px',
