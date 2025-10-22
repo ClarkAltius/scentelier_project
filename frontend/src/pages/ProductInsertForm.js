@@ -61,7 +61,8 @@ function ProductInsertForm() {
       };
 
       const response = await axios.post(url, parameters, config);
-      console.log(`상품 등록 : [${response.data}]`);
+      console.log('상품 등록 : ');
+      console.log(response.data);
       alert("상품이 성공적으로 등록 되었습니다.");
 
       setProduct(initial_value);

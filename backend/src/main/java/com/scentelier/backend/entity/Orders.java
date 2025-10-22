@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.constant.Payment;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,7 +39,9 @@ public class Orders {
     @Column(name = "tracking_number")
     private String trackingNumber;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price")
+    @NotNull(message = "가격은 비어 있을 수 없습니다.")
+    @DecimalMin(value = "0.0", inclusive = false, message = "가격은 0보다 커야 합니다.")
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)

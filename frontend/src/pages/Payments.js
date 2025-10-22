@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
 import { Navigate, useNavigate } from "react-router-dom";
 import { CreditCard, Wallet, Banknote, Truck, Package } from "lucide-react";
 import { mockCartItems } from "../data/mockData";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
+import { useAuth } from "../component/AuthContext";
 
 function Payments(props) {
     const products = mockCartItems;
-    const user = props.users;
+    const { user } = useAuth();
     // const products = props.cartItems;
 
     const navigate = useNavigate();
@@ -22,14 +23,18 @@ function Payments(props) {
         detail: '',
     });
 
-    if(!user) {
-        return <Navigate to="/" replace />;
-    }
-
-    setDelivery({receiver: user.username,
-        phone: user.phone,
-        address: user.address,
-        detail: ''});
+    useEffect(() => {
+        if(!user) {
+            navigate("/");
+        }else{
+            setDelivery({
+                receiver: user.username,
+                phone: user.phone,
+                address: user.address,
+                detail: ''
+            });
+        }
+    }, [user]);
 
     const totalPrice = products.reduce((sum, item) => 
         sum + item.price * (item.quantity || 1), 0);
@@ -147,8 +152,8 @@ function Payments(props) {
                         </Card.Header>
                         <Card.Body>
                             <h5>일반 상품</h5>
-                            {products.filter((product) => product.isCustom === false).map((p) => (
-                                <div className="d-flex justify-content-between mb-2">
+                            {products.filter((product) => product.isCustom === false).map((p, idx) => (
+                                <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`p-${p.id}`}>
                                     {p.name} — {p.quantity}개
                                     </span>
@@ -158,8 +163,8 @@ function Payments(props) {
                                 </div>
                             ))}
                             <h5 className="mt-3">커스텀 향수</h5>
-                            {products.filter((product) => product.isCustom === true).map((c) => (
-                                <div className="d-flex justify-content-between mb-2">
+                            {products.filter((product) => product.isCustom === true).map((c, idx) => (
+                                <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`c-${c.id}`}>
                                     {c.name} — {c.quantity}개
                                     </span>
