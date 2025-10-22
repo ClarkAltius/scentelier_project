@@ -11,7 +11,10 @@ import CartList from "../pages/CartList.js";
 import OrderList from "../pages/OrderList.js";
 import AdminRoute from "./AdminRoute.js";
 import Logout from "../pages/Logout.js";
-import ProductInsertForm from "../pages/ProductInsertForm.js"
+import ProductInsertForm from "../pages/ProductInsertForm.js";
+import Inquiry from "../pages/Inquiry.js";
+import MyPage from "../pages/MyPage.js";
+import Findpass from "../pages/Findpass.js";
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -33,6 +36,9 @@ function AppRoutes() {
             <Route path='/cart/list' element={<CartList />} />
             <Route path='/order/list' element={<OrderList />} />
             <Route path='/logout' element={<Logout />} />
+            <Route path='/inquiry' element={<Inquiry />} />
+            <Route path='/mypage' element={<MyPage />} />
+            <Route path='/findpass' element={<Findpass />} />
 
             {/**관리자 전용 경로 */}
             <Route
