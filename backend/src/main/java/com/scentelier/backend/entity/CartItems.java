@@ -19,7 +19,7 @@ public class CartItems {
     private Carts cart;
 
     @NotNull(message = "장바구니 품목 수량은 0일 수 없습니다")
-    private Long quantity;
+    private int quantity;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

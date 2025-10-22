@@ -135,9 +135,9 @@ function ProductInsertForm() {
                 <option value="WOODY">우디</option>
                 <option value="CHYPRE">시프레</option>
                 <option value="GREEN">그린</option>
-                <option value="FOUGERE">푸제르</option>
-                <option value="ORIENTAL">오리엔탈</option>
-                <option value="AMBER">앰버</option>
+                <option value="FRUITY">프루티</option>
+                <option value="POWDERY">파우더리</option>
+                <option value="CRYSTAL">크리스탈</option>
               </Form.Select>
             </Form.Group>
 
