@@ -1,141 +1,193 @@
-document.body.style.margin = "0";
-document.body.style.fontFamily = "Arial, sans-serif";
-document.body.style.backgroundColor = "#f7f7f7";
-document.body.style.padding = "30px";
+import React, { useState } from "react";
 
-// 폼 컨테이너
-const container = document.createElement("div");
-container.style.maxWidth = "500px";
-container.style.margin = "0 auto";
-container.style.backgroundColor = "#fff";
-container.style.padding = "25px";
-container.style.borderRadius = "8px";
-container.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-document.body.appendChild(container);
+const Inquiry = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
 
-// 제목
-const heading = document.createElement("h2");
-heading.textContent = "문의하기";
-heading.style.textAlign = "center";
-heading.style.marginBottom = "20px";
-container.appendChild(heading);
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
 
-// 유틸 함수: 입력 그룹 만들기
-function createInputGroup(labelText, inputType, inputId) {
-  const group = document.createElement("div");
-  group.style.marginBottom = "15px";
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
 
-  const label = document.createElement("label");
-  label.textContent = labelText;
-  label.setAttribute("for", inputId);
-  label.style.display = "block";
-  label.style.fontWeight = "bold";
-  label.style.marginBottom = "5px";
+    setErrors({
+      ...errors,
+      [e.target.id]: "", 
+    });
+  };
 
-  let input;
-  if (inputType === "textarea") {
-    input = document.createElement("textarea");
-    input.style.height = "100px";
-    input.style.resize = "vertical";
-  } else {
-    input = document.createElement("input");
-    input.type = inputType;
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newErrors = {};
+    let isValid = true;
 
-  input.id = inputId;
-  input.style.width = "100%";
-  input.style.padding = "10px";
-  input.style.borderRadius = "4px";
-  input.style.border = "1px solid #ccc";
+    if (!formData.name.trim()) {
+      newErrors.name = "이름을 입력해주세요.";
+      isValid = false;
+    }
 
-  const error = document.createElement("div");
-  error.style.color = "red";
-  error.style.fontSize = "14px";
-  error.id = inputId + "Error";
+    if (!formData.email.trim() || !formData.email.includes("@")) {
+      newErrors.email = "이메일을 입력해주세요.";
+      isValid = false;
+    }
 
-  group.appendChild(label);
-  group.appendChild(input);
-  group.appendChild(error);
+    if (!formData.message.trim()) {
+      newErrors.message = "메시지를 입력해주세요.";
+      isValid = false;
+    }
 
-  return group;
-}
+    setErrors(newErrors);
 
-// 입력 필드 추가
-const nameGroup = createInputGroup("이름", "text", "name");
-const emailGroup = createInputGroup("이메일", "email", "email");
-const messageGroup = createInputGroup("메시지", "textarea", "message");
+    if (isValid) {
+      setSuccessMessage("문의가 성공적으로 제출되었습니다.");
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
+    } else {
+      setSuccessMessage("");
+    }
+  };
 
-container.appendChild(nameGroup);
-container.appendChild(emailGroup);
-container.appendChild(messageGroup);
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <h2 style={styles.heading}>문의하기</h2>
+        <form onSubmit={handleSubmit}>
+          <InputGroup
+            label="이름"
+            id="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+          />
+          <InputGroup
+            label="이메일"
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+          />
+          <InputGroup
+            label="메시지"
+            id="message"
+            type="textarea"
+            value={formData.message}
+            onChange={handleChange}
+            error={errors.message}
+          />
 
-// 제출 버튼
-const submitBtn = document.createElement("button");
-submitBtn.textContent = "보내기";
-submitBtn.style.backgroundColor = "#007BFF";
-submitBtn.style.color = "white";
-submitBtn.style.padding = "10px 20px";
-submitBtn.style.border = "none";
-submitBtn.style.borderRadius = "4px";
-submitBtn.style.cursor = "pointer";
+          <div style={styles.buttonWrapper}>
+            <button
+              type="submit"
+              style={styles.submitBtn}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#007BFF")}
+            >
+              보내기
+            </button>
+          </div>
 
-submitBtn.onmouseover = () => {
-  submitBtn.style.backgroundColor = "#0056b3";
+          {successMessage && (
+            <div style={styles.successMessage}>{successMessage}</div>
+          )}
+        </form>
+      </div>
+    </div>
+  );
 };
-submitBtn.onmouseout = () => {
-  submitBtn.style.backgroundColor = "#007BFF";
+
+const InputGroup = ({ label, id, type, value, onChange, error }) => (
+  <div style={styles.inputGroup}>
+    <label htmlFor={id} style={styles.label}>
+      {label}
+    </label>
+    {type === "textarea" ? (
+      <textarea
+        id={id}
+        value={value}
+        onChange={onChange}
+        style={{ ...styles.input, height: "100px", resize: "vertical" }}
+      />
+    ) : (
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        style={styles.input}
+      />
+    )}
+    {error && <div style={styles.error}>{error}</div>}
+  </div>
+);
+
+const styles = {
+  page: {
+    backgroundColor: "#f7f7f7",
+    padding: "30px",
+    fontFamily: "Arial, sans-serif",
+    margin: 0,
+    minHeight: "100vh",
+  },
+  container: {
+    maxWidth: "500px",
+    margin: "0 auto",
+    backgroundColor: "#fff",
+    padding: "25px",
+    borderRadius: "8px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+  },
+  heading: {
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+  inputGroup: {
+    marginBottom: "15px",
+  },
+  label: {
+    display: "block",
+    fontWeight: "bold",
+    marginBottom: "5px",
+  },
+  input: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+  },
+  error: {
+    color: "red",
+    fontSize: "14px",
+    marginTop: "5px",
+  },
+  buttonWrapper: {
+    textAlign: "center",
+  },
+  submitBtn: {
+    backgroundColor: "#67AB9F",
+    color: "white",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  successMessage: {
+    marginTop: "15px",
+    fontWeight: "bold",
+    color: "green",
+    textAlign: "center",
+  },
 };
 
-const buttonGroup = document.createElement("div");
-buttonGroup.style.textAlign = "center";
-buttonGroup.appendChild(submitBtn);
-
-container.appendChild(buttonGroup);
-
-// 성공 메시지
-const successMessage = document.createElement("div");
-successMessage.style.marginTop = "15px";
-successMessage.style.fontWeight = "bold";
-successMessage.style.color = "green";
-successMessage.style.textAlign = "center";
-container.appendChild(successMessage);
-
-// 제출 이벤트 처리
-submitBtn.addEventListener("click", () => {
-  // 초기화
-  successMessage.textContent = "";
-  document.getElementById("nameError").textContent = "";
-  document.getElementById("emailError").textContent = "";
-  document.getElementById("messageError").textContent = "";
-
-  // 값 가져오기
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const message = document.getElementById("message").value.trim();
-
-  let isValid = true;
-
-  // 유효성 검사
-  if (name === "") {
-    document.getElementById("nameError").textContent = "이름을 입력해주세요.";
-    isValid = false;
-  }
-
-  if (email === "" || !email.includes("@")) {
-    document.getElementById("emailError").textContent = "올바른 이메일을 입력해주세요.";
-    isValid = false;
-  }
-
-  if (message === "") {
-    document.getElementById("messageError").textContent = "메시지를 입력해주세요.";
-    isValid = false;
-  }
-
-  // 성공 메시지 표시
-  if (isValid) {
-    successMessage.textContent = "문의가 성공적으로 제출되었습니다. 감사합니다!";
-    document.getElementById("name").value = "";
-    document.getElementById("email").value = "";
-    document.getElementById("message").value = "";
-  }
-});
+export default Inquiry;

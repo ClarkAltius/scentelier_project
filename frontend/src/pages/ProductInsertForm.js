@@ -66,7 +66,8 @@ function ProductInsertForm() {
       alert("상품이 성공적으로 등록 되었습니다.");
 
       setProduct(initial_value);
-      navigate("/product/list");
+      //상품 추가 후 상품 페이지가 아니라 관리자 페이지로 이동하도록 변경했습니다. 2025-10-22 전일환
+      navigate("/admin");
     } catch (error) {
       console.error(error.response?.data);
       alert("상품 등록에 실패하였습니다.");
@@ -135,9 +136,9 @@ function ProductInsertForm() {
                 <option value="WOODY">우디</option>
                 <option value="CHYPRE">시프레</option>
                 <option value="GREEN">그린</option>
-                <option value="FOUGERE">푸제르</option>
-                <option value="ORIENTAL">오리엔탈</option>
-                <option value="AMBER">앰버</option>
+                <option value="FRUITY">프루티</option>
+                <option value="POWDERY">파우더리</option>
+                <option value="CRYSTAL">크리스탈</option>
               </Form.Select>
             </Form.Group>
 

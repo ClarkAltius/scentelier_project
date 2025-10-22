@@ -71,6 +71,10 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/perfume/finder`)}>향수테스트 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/perfume/blending`)}>향수 배합 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/product/insert`)}>상품 입력 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/inquiry`)}>문의 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/mypage`)}>마이 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기 페이지</NavDropdown.Item>
                     </NavDropdown>
                 </div>
             </Container>
