@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -24,6 +26,10 @@ public class UserService {
         //디폴트 역할 설정
         newUser.setRole(Role.USER);
         return userRepository.save(newUser);
+    }
+
+    public Optional<Users> findUserById(Long userId) {
+        return userRepository.findById(userId);
     }
 
     //유저 검색, 비밀번호 수정 업데이트 예정

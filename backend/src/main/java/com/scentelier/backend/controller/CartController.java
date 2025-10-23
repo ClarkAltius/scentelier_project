@@ -27,10 +27,8 @@ public class CartController {
     private final CartService cartService;
     private final CartItemService cartItemService;
 
-    /*
     @PostMapping("/insert")
     public ResponseEntity<String> addToCart(@RequestBody CartItemDto dto){
-        // Member 또는 Product이 유효한 정보인지 확인
         Optional<Users> memberOptional = userService.findUserById(dto.getUserId());
         Optional<Products> productOptional = productService.findProductsById(dto.getProductId()) ;
 
@@ -41,13 +39,11 @@ public class CartController {
         Users users = memberOptional.get();
         Products products = productOptional.get();
 
-        // 재고가 충분한지 확인
         if(products.getStock() < dto.getQuantity()){
             return ResponseEntity.badRequest().body("재고 수량이 부족합니다.");
         }
 
-        // Cart 조회 또는 신규 작성
-        Carts cart = cartService.findByUser(users);
+        Carts cart = cartService.findByUsers(users);
 
         if(cart == null){
             Carts newCart = new Carts();
@@ -79,6 +75,5 @@ public class CartController {
 
         return ResponseEntity.ok("요청하신 상품이 장바구니에 추가되었습니다.") ;
     }
-    */
 
 }
