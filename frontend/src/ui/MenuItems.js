@@ -33,7 +33,7 @@ function MenuItems() {
                 <Nav className="me-auto">
                     <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Product</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
-                    <Nav.Link onClick={() => navigate('/perfume/blending')} style={{ color: '#808080ff' }}>Customize</Nav.Link>
+                    <Nav.Link onClick={() => navigate('/perfume/blending')} style={{ color: '#808080ff' }}>Design</Nav.Link>
                 </Nav>
                 <Nav>
                     {user ? (
