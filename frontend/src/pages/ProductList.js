@@ -1,24 +1,36 @@
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, FormControl } from "react-bootstrap";
+import { API_BASE_URL } from "../config/config";
+import { useNavigate } from "react-router-dom";
 
 function Productlist() {
     const containerRef = useRef();
+    const [extended, setExtended] = useState([]);
+    const [best, setBest] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const navigate = useNavigate();
+
 
     // 썸네일 목록 - 3번 반복해 무한 루프 효과
-    const thumbnails = [
-        { id: 1, src: '/type/Chypre.jpg', alt: '썸네일 1', label: '# Chypre' },
-        { id: 2, src: '/type/Citrus.jpg', alt: '썸네일 2', label: '# Citrus' },
-        { id: 3, src: '/type/Floral.jpg', alt: '썸네일 3', label: '# Floral' },
-        { id: 4, src: '/type/Fruity.jpg', alt: '썸네일 4', label: '# Fruity' },
-        { id: 5, src: '/type/Green.jpg', alt: '썸네일 5', label: '# Green' },
-        { id: 6, src: '/type/Powder.jpg', alt: '썸네일 6', label: '# Powder' },
-        { id: 7, src: '/type/Woody.jpg', alt: '썸네일 7', label: '# Woody' },
-        { id: 8, src: '/type/Crystal.jpg', alt: '썸네일 8', label: 'Crystal' },
-    ];
-    const extended = [...thumbnails, ...thumbnails, ...thumbnails];
+
 
     useEffect(() => {
         const container = containerRef.current;
+
+        const url = `${API_BASE_URL}/order/list2`
+        axios.get(url)
+            .then((response) => {
+                console.log("응답받은 데이터 :");
+                console.log(response.data);
+                setBest(response.data);
+                setExtended([...response.data, ...response.data, ...response.data]);
+            })
+            .catch(error => {
+                console.error('데이터 가져오기 실패:', error);
+            })
+
         if (!container) return;
 
         const singleWidth = container.scrollWidth / 3;
@@ -70,18 +82,64 @@ function Productlist() {
             container.removeEventListener('scroll', onScroll);
             container.removeEventListener('wheel', onWheel);
         };
+
+
     }, []);
 
 
-    const types = ['TYPE1', 'TYPE2', 'TYPE3'];
-    const seasons = ['봄', '여름', '가을', '겨울'];
+    // --------------------------------------------------------------------------------
 
-    const [activeCategory, setActiveCategory] = useState(null); // 'type' or 'season' or null
+    const handleSubmit = (e) => {//검색
+        e.preventDefault();
+        alert(searchTerm + "검색하기");
+    }
+
+    const seachTag = (tag) => {
+        setSearchTerm(tag);
+        alert(tag + "태그검색~")
+    }
+
+    const tags = () => {
+        return best.slice(0, 2).map((item, index) => {
+            const tags = item.keyword.split(',');
+            return (
+                <div key={index}>
+                    {tags.map((tag, j) => (
+                        <button
+                            key={j}
+                            style={{
+                                margin: "5px",
+                                padding: '4px 10px',
+                                backgroundColor: '#ebebebff',
+                                borderRadius: '20px',
+                                fontSize: '0.9em',
+                                color: '#555',
+                                border: '1px solid transparent',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => seachTag(tag)}
+                        >
+                            #{tag}
+                        </button>
+                    ))}
+                </div>
+            );
+        })
+    }
+
+
+    const types = ['Powdery', 'Woody', 'Crystal', 'Chypre', 'Citrus', 'Fruity', 'Green'];
+    const seasons = ['SPRING', 'SUMMER', 'FALL', 'WINTER'];
+
+    const [activeCategory, setActiveCategory] = useState(null); // 'type' | 'season' | null
     const [selectedTag, setSelectedTag] = useState(null);
 
     const toggleCategory = (category) => {
-        if (activeCategory === category) {
-            setActiveCategory(null); // 같은 버튼 다시 클릭하면 닫기
+        if (category === '') { // ALL 버튼 클릭 시
+            setActiveCategory(null);
+            setSelectedTag(null);
+        } else if (activeCategory === category) {
+            setActiveCategory(null);
             setSelectedTag(null);
         } else {
             setActiveCategory(category);
@@ -93,7 +151,10 @@ function Productlist() {
         setSelectedTag(tag);
     };
 
-    const categoriesToShow = activeCategory === 'type' ? types : seasons;
+    const categoriesToShow = activeCategory === 'type' ? types
+        : activeCategory === 'season' ? seasons
+            : [];
+
 
     return (<>
 
@@ -117,9 +178,9 @@ function Productlist() {
                 }}
                 className="no-scrollbar"
             >
-                {extended.map((thumb, idx) => (
+                {extended.map((item) => (
                     <div
-                        key={`${thumb.id}-${idx}`}
+                        key={item.id}
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
@@ -127,36 +188,47 @@ function Productlist() {
                             flex: '0 0 auto',
                         }}
                     >
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <Card style={{ width: '18rem', margin: '60px 20px 60px 0px' }}>
-                                <Card.Img variant="top" src="/www.jpg"
+                        <div style={{ display: 'flex', justifyContent: 'center' }}
+                            onClick={() => navigate(`/product/detail/${item.id}`)}>
+                            <Card style={{ width: '18rem', marginRight: "20px" }}>
+                                <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
                                     style={{
                                         width: '100%',
-                                        height: '180px',         // 원하는 높이 고정
+                                        height: '250px',         // 원하는 높이 고정
                                         objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
                                         borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
                                     }} />
                                 <Card.Body>
-                                    <Card.Title>Powder Whisper</Card.Title>
+                                    <Card.Title>{item.name}</Card.Title>
                                     <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
                                         <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
                                         <br />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                            {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                                <span
-                                                    key={idx}
-                                                    style={{
-                                                        padding: '4px 10px',
-                                                        backgroundColor: '#ebebebff',
-                                                        borderRadius: '20px',
-                                                        fontSize: '0.72em',
-                                                        color: '#555',
-                                                        border: '1px solid transparent',
-                                                    }}
-                                                >
-                                                    {tag}
-                                                </span>
-                                            ))}
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: '6px',
+                                                marginTop: '20px',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            {(item.keyword || '')
+                                                .split(',')
+                                                .map((tag, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        style={{
+                                                            padding: '4px 10px',
+                                                            backgroundColor: '#ebebebff',
+                                                            borderRadius: '20px',
+                                                            fontSize: '0.72em',
+                                                            color: '#555',
+                                                            border: '1px solid transparent',
+                                                        }}
+                                                    >
+                                                        #{tag.trim()}
+                                                    </span>
+                                                ))}
                                         </div>
                                     </Card.Text>
                                 </Card.Body>
@@ -167,17 +239,19 @@ function Productlist() {
         </div>
         {/* 베스트향수 / 상단  */}
 
-        <div style={{ textAlign: 'center', margin: '50px 0px 10px 50px', fontSize: '70px', fontFamily: "'Gowun Batang', serif" }}>scentelier
+        <div style={{ textAlign: 'center', marginTop: '50px', fontSize: '65px', fontFamily: "'Gowun Batang', serif" }}>scentelier
         </div>
 
         <div className="d-flex justify-content-center" style={{
-            margin: '40px 0px 0px 100px'
+            marginTop: 10
         }} >
-            <Form className="d-flex" onSubmit="">
+            <Form className="d-flex" onSubmit={handleSubmit}>
                 <FormControl
                     type="text"
                     placeholder="Search"
-                    className="me-2"
+                    className="mb-3"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     style={{
                         padding: '6px 10px',
                         fontSize: '14px',
@@ -206,24 +280,27 @@ function Productlist() {
                 </button>
             </Form>
         </div>
-        <div>#태그 #태그 #태그</div>
 
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column', // 위아래로 쌓기
-            justifyContent: 'center', // 수직 가운데 정렬
-            alignItems: 'center',     // 수평 가운데 정렬
-            margin: '70px',
-        }}>
+        {tags()}
+        {/* --------------------------------------카테고리 ------------------------------------ */}
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column', // 위아래 쌓기
+                justifyContent: 'center',
+                alignItems: 'center',
+                margin: '70px',
+            }}
+        >
             <div style={{ display: 'flex', gap: '20px', marginLeft: '10px' }}>
                 <div
                     onClick={() => toggleCategory('')}
                     style={{
                         cursor: 'pointer',
                         fontSize: '30px',
-                        fontWeight: activeCategory === 'season' ? '700' : '500',
+                        fontWeight: activeCategory === null ? '700' : '500', // ALL 선택 시 bold
                         paddingBottom: '5px',
-                        marginRight: '70px'
+                        marginRight: '70px',
                     }}
                 >
                     ALL
@@ -235,8 +312,7 @@ function Productlist() {
                         fontSize: '30px',
                         fontWeight: activeCategory === 'type' ? '700' : '500',
                         paddingBottom: '30px',
-                        marginRight: '70px'
-
+                        marginRight: '70px',
                     }}
                 >
                     TYPE
@@ -248,38 +324,32 @@ function Productlist() {
                         fontSize: '30px',
                         fontWeight: activeCategory === 'season' ? '700' : '500',
                         paddingBottom: '5px',
-
                     }}
                 >
                     SEASON
                 </div>
-
-
             </div>
 
-            {/* 버튼 그룹이 한 곳에 나오도록 */}
-            {activeCategory && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                    {categoriesToShow.map((tag, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => handleTagClick(tag)}
-                            style={{
-                                padding: '6px 14px',
-                                backgroundColor: selectedTag === tag ? '#67ab9f' : '#f0f0f0',
-                                color: selectedTag === tag ? '#fff' : '#808080ff',
-                                border: 'none',
-                                borderRadius: '20px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                            }}
-                        >
-                            {tag}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div >
+            {/* 하위 카테고리 태그 출력 */}
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {categoriesToShow.map((tag) => (
+                    <button
+                        key={tag}
+                        onClick={() => handleTagClick(tag)}
+                        style={{
+                            padding: '6px 12px',
+                            borderRadius: '20px',
+                            border: '1px solid #ccc',
+                            backgroundColor: selectedTag === tag ? '#ddd' : '#f9f9f9',
+                            cursor: 'pointer',
+                            fontSize: '1rem',
+                        }}
+                    >
+                        {tag}
+                    </button>
+                ))}
+            </div>
+        </div>
 
 
         {/* 예시 상품*/}

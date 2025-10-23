@@ -29,7 +29,7 @@ function AppRoutes() {
         <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/product/list' element={<ProductList />} />
-            <Route path='/product/detail' element={<ProductDetail />} />
+            <Route path='/product/detail/:id' element={<ProductDetail />} />
             <Route path='/perfume/finder' element={<PerfumeFinder />} />
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />

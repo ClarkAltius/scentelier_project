@@ -28,4 +28,10 @@ public class OrderController {
         List<Products> products = orderService.getBestList();
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/list2")
+    public ResponseEntity<List<Products>> getBestList2() {
+        List<Products> products = orderService.getBestList2();
+        return ResponseEntity.ok(products);
+    }
 }

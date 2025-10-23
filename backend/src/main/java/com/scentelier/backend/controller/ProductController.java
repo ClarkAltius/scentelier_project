@@ -5,6 +5,7 @@ import com.scentelier.backend.service.OrderService;
 import com.scentelier.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 //페이징 임포트
@@ -65,6 +66,20 @@ public class ProductController {
         //pageable 객체는 Spring이 자동으로 생성!
         Page<Products> productsPage = productService.findAll(pageable);
         return ResponseEntity.ok(productsPage);
+    }
+
+    //상품 상세
+
+    @GetMapping("detail/{id}")
+    public ResponseEntity<Products> detail(@PathVariable Long id) {
+        Products product = this.productService.ProductById(id);
+
+        if (product == null) {//404응답
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            //200 ok응답
+            return ResponseEntity.ok(product);
+        }
     }
 
 }
