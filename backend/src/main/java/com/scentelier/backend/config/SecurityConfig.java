@@ -1,6 +1,7 @@
 package com.scentelier.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scentelier.backend.dto.UserResponseDto;
 import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -72,9 +73,17 @@ public class SecurityConfig {
 
                             if(userOptional.isPresent()){
                                 Users user = userOptional.get();
-                                // 프론트로 비밀번호는 보내지 않도록 조치
-                                user.setPassword(null);
-                                responseData.put("member", user);
+
+                                UserResponseDto dto = new UserResponseDto(
+                                        user.getId(),
+                                        user.getEmail(),
+                                        user.getUsername(),
+                                        user.getRole(),
+                                        user.getAddress(),
+                                        user.getPhone()
+                                );
+
+                                responseData.put("member", dto);
                             } else {
                                 responseData.put("member", null);
                             }
