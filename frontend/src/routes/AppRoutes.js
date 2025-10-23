@@ -15,6 +15,7 @@ import ProductInsertForm from "../pages/ProductInsertForm.js";
 import Inquiry from "../pages/Inquiry.js";
 import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
+import PrivateRoute from './PrivateRoute.js';
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -33,13 +34,21 @@ function AppRoutes() {
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
             <Route path='/payments' element={<Payments />} />
             <Route path='/login' element={<Login />} />
-            <Route path='/cart/list' element={<CartList />} />
             <Route path='/order/list' element={<OrderList />} />
             <Route path='/logout' element={<Logout />} />
             <Route path='/inquiry' element={<Inquiry />} />
             <Route path='/mypage' element={<MyPage />} />
             <Route path='/findpass' element={<Findpass />} />
 
+            {/**로그인 사용자 전용 */}
+            <Route
+                path="/cart/list"
+                element={
+                    <PrivateRoute>
+                        <CartList />
+                    </PrivateRoute>
+                }
+            />
             {/**관리자 전용 경로 */}
             <Route
                 path='/admin'
