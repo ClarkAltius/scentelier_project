@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+//페이징 임포트
+import org.springframework.data.domain.Page; 
+import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,5 +58,13 @@ public class ProductController {
         }
     }
 
+    //상품 목록 보기 API
+
+    @GetMapping("/list")
+    public ResponseEntity<Page<Products>> getProductList(Pageable pageable){
+        //pageable 객체는 Spring이 자동으로 생성!
+        Page<Products> productsPage = productService.findAll(pageable);
+        return ResponseEntity.ok(productsPage);
+    }
 
 }

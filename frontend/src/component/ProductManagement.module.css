@@ -128,3 +128,53 @@
         transform: translateY(0);
     }
 }
+
+/* 로딩, 에러 메시지 */
+.loading,
+.error {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+}
+
+.error {
+    color: red;
+}
+
+/* 제품 없음 메시지 */
+.emptyCell {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+
+/* 제품 이미지 */
+.productThumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* 페이징 컨트롤 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.pagination button:disabled {
+    background-color: #f5f5f5;
+    color: #aaa;
+    cursor: not-allowed;
+}
