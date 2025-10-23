@@ -17,4 +17,9 @@ public class OrderService {
         List<Products> products = orderRepository.findBestList();
         return products != null ? products : Collections.emptyList();
     }
+
+    public List<Products> getBestList2() {
+        List<Products> products = orderRepository.findBestList2();
+        return products != null ? products : Collections.emptyList();
+    }
 }

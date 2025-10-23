@@ -26,4 +26,9 @@ public class ProductService {
     public Page<Products> findAll(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
+
+    public Products ProductById(Long id) {
+        Optional<Products> product = this.productRepository.findById(id);
+        return product.orElse(null);
+    }
 }

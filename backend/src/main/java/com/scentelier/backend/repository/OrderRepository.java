@@ -19,4 +19,15 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         """, nativeQuery = true)
     List<Products> findBestList();
 
+    @Query(value = """
+           SELECT o.*, p.*
+               FROM orders o
+               JOIN order_product op ON o.order_id = op.order_id
+               JOIN products p ON op.product_id = p.product_id
+               WHERE o.order_date >= CURDATE() - INTERVAL 30 DAY
+               ORDER BY o.order_date DESC
+                   LIMIT 5;
+        """, nativeQuery = true)
+    List<Products> findBestList2();
+
 }

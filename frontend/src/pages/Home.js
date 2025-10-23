@@ -4,12 +4,14 @@ import Card from 'react-bootstrap/Card';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/config';
+import { useNavigate } from 'react-router-dom';
 
 
 
 function Home() {
     const containerRef = useRef();
     const [best, setBest] = useState([]);
+    const navigator = useNavigate();
 
 
     //썸네일 목록 - 3번 반복해 무한 루프 효과
@@ -308,6 +310,7 @@ function Home() {
             {/* -----------------------------리스트 ---------------------------- */}
 
             <button
+                onClick={() => navigator(`/product/list`)}
                 style={{
                     marginRight: '5px',
                     padding: '10px 20px',
@@ -318,7 +321,8 @@ function Home() {
                     color: '#808080ff',                  // 텍스트 노란색
                     border: '2px solid #808080ff',       // 테두리 노란색
                     borderRadius: '5px',
-                }}>
+                }}
+            >
                 View All
             </button>
         </>
