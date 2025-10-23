@@ -9,7 +9,8 @@ function Productlist() {
     const [extended, setExtended] = useState([]);
     const [best, setBest] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-
+    const [product, setProduct] = useState([]);
+    const [visibleCount, setVisibleCount] = useState(6);
     const navigate = useNavigate();
 
 
@@ -19,8 +20,9 @@ function Productlist() {
     useEffect(() => {
         const container = containerRef.current;
 
-        const url = `${API_BASE_URL}/order/list2`
-        axios.get(url)
+        const url1 = `${API_BASE_URL}/order/list2`
+        const url2 = `${API_BASE_URL}/product/list?page=0&size=24`
+        axios.get(url1)
             .then((response) => {
                 console.log("응답받은 데이터 :");
                 console.log(response.data);
@@ -31,6 +33,16 @@ function Productlist() {
                 console.error('데이터 가져오기 실패:', error);
             })
 
+
+        axios.get(url2)
+            .then((response) => {
+                console.log("응답받은 데이터2 :");
+                console.log(response.data.content);
+                setProduct(response.data.content);
+            })
+            .catch(error => {
+                console.error('데이터 가져오기 실패:', error);
+            })
         if (!container) return;
 
         const singleWidth = container.scrollWidth / 3;
@@ -83,8 +95,30 @@ function Productlist() {
             container.removeEventListener('wheel', onWheel);
         };
 
-
     }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            // 현재 스크롤 위치 + 화면 높이 >= 문서 전체 높이 - 100 (임계점 설정)
+            if (
+                window.innerHeight + window.scrollY >=
+                document.documentElement.scrollHeight - 100
+            ) {
+                // 아직 상품이 더 남아있으면 6개씩 더 보여줌
+                setVisibleCount((prev) => {
+                    if (prev < product.length) {
+                        return prev + 6;
+                    }
+                    return prev;
+                });
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        // 클린업 함수: 컴포넌트 언마운트 시 이벤트 제거
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [product.length]);
 
 
     // --------------------------------------------------------------------------------
@@ -135,10 +169,7 @@ function Productlist() {
     const [selectedTag, setSelectedTag] = useState(null);
 
     const toggleCategory = (category) => {
-        if (category === '') { // ALL 버튼 클릭 시
-            setActiveCategory(null);
-            setSelectedTag(null);
-        } else if (activeCategory === category) {
+        if (activeCategory === category) {
             setActiveCategory(null);
             setSelectedTag(null);
         } else {
@@ -151,9 +182,28 @@ function Productlist() {
         setSelectedTag(tag);
     };
 
-    const categoriesToShow = activeCategory === 'type' ? types
-        : activeCategory === 'season' ? seasons
-            : [];
+    const categoriesToShow =
+        activeCategory === 'type'
+            ? types
+            : activeCategory === 'season'
+                ? seasons
+                : [];
+
+
+    const displayedProducts = product.slice(0, visibleCount);
+
+    // const filteredItems =
+    //     activeCategory === null
+    //         ? product
+    //         : product.filter((item) => {
+    //             if (activeCategory === 'type') {
+    //                 return !selectedTag || item.type === selectedTag;
+    //             }
+    //             if (activeCategory === 'season') {
+    //                 return !selectedTag || item.season === selectedTag;
+    //             }
+    //             return true;
+    //         });
 
 
     return (<>
@@ -294,7 +344,7 @@ function Productlist() {
         >
             <div style={{ display: 'flex', gap: '20px', marginLeft: '10px' }}>
                 <div
-                    onClick={() => toggleCategory('')}
+                    onClick={() => toggleCategory(null)}
                     style={{
                         cursor: 'pointer',
                         fontSize: '30px',
@@ -352,57 +402,90 @@ function Productlist() {
         </div>
 
 
-        {/* 예시 상품*/}
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
-                <Card.Img variant="top" src="/www.jpg"
-                    style={{
-                        width: '100%',
-                        height: '300px',         // 원하는 높이 고정
-                        objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                        borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                    }} />
-                <Card.Body>
-                    <Card.Title>Powder Whisper</Card.Title>
-                    <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
-                        <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                        <br />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                            {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                <span
-                                    key={idx}
-                                    style={{
-                                        padding: '4px 10px',
-                                        backgroundColor: '#ebebebff',
-                                        borderRadius: '20px',
-                                        fontSize: '0.85em',
-                                        color: '#555',
-                                        border: '1px solid transparent',
-                                    }}
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </Card.Text>
-                    <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
-                </Card.Body>
-            </Card></div>
 
-        <button
+        {/* 상품 목록 */}
+        <div
             style={{
-                marginRight: '5px',
-                padding: '10px 20px',
-                fontSize: '16px',
-                cursor: 'pointer',
-                height: 'fit-content',
-                backgroundColor: 'transparent',   // 배경 투명
-                color: '#808080ff',                  // 텍스트 노란색
-                border: '2px solid #808080ff',       // 테두리 노란색
-                borderRadius: '5px',
-            }}>
-            View All
-        </button>
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "40px",
+                marginTop: "60px",
+                padding: "0px 150px 0px 150px"
+            }}
+        >
+            {displayedProducts.map((item, index) => (
+                <Card
+                    key={index}
+                    style={{
+                        width: "25rem",
+                        flex: "1 1 calc(33.333% - 80px)",
+                        boxSizing: "border-box",
+                    }}
+                >
+                    <Card.Img
+                        variant="top"
+                        src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
+                        style={{
+                            width: "100%",
+                            height: "300px",
+                            objectFit: "cover",
+                            borderRadius: "4px 4px 0 0",
+                        }}
+                    />
+                    <Card.Body>
+                        <Card.Title style={{ textAlign: "center" }}>
+                            {item.name}
+                        </Card.Title>
+                        <Card.Text style={{ margin: "10px", textAlign: "center" }}>
+                            <span style={{ fontSize: "1.3em", fontWeight: "bold" }}>
+                                {item.price?.toLocaleString() ?? "38,000"}원
+                            </span>
+                            <br />
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: "6px",
+                                    marginTop: "20px",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                {item.keyword
+                                    ? item.keyword.split(",").map((tag, idx) => (
+                                        <span
+                                            key={idx}
+                                            style={{
+                                                padding: "4px 10px",
+                                                backgroundColor: "#ebebebff",
+                                                borderRadius: "20px",
+                                                fontSize: "0.85em",
+                                                color: "#555",
+                                                border: "1px solid transparent",
+                                            }}
+                                        >
+                                            #{tag}
+                                        </span>
+                                    ))
+                                    : null}
+                            </div>
+                        </Card.Text>
+                        <Button
+                            style={{
+                                backgroundColor: "transparent",
+                                color: "#808080ff",
+                                border: "2px solid hsla(0, 0%, 50%, 1.00)",
+                                margin: "20px auto 0 auto",
+                                display: "block",
+                            }}
+                        >
+                            add to cart
+                        </Button>
+                    </Card.Body>
+                </Card>
+            ))}
+        </div>
+
 
         {/* 향수찾기 */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
