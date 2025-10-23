@@ -76,7 +76,7 @@ public class CartController {
         return ResponseEntity.ok("요청하신 상품이 장바구니에 추가되었습니다.") ;
     }
 
-    @GetMapping("/list/{memberId}")
+    @GetMapping("/list/{userId}")
     public ResponseEntity<List<CartItemResponseDto>> getCartProducts(@PathVariable Long userId) {
         Optional<Users> optionalUsers = userService.findUserById(userId);
         if (optionalUsers.isEmpty()) {

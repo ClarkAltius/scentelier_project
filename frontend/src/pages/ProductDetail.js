@@ -4,9 +4,10 @@ import './../App.css'
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
+import { useAuth } from "../component/AuthContext";
 
 function ProductDetail() {
-
+    const { user } = useAuth();
     const [key, setKey] = useState('detail');
     const [quantity, setQuantity] = useState(1);
     const [total, setTotal] = useState();
@@ -37,7 +38,7 @@ function ProductDetail() {
             setTotal(product.price * quantity);
         }
 
-    }, [id, product, quantity])
+    }, [id])
 
     const totalPrice = (product?.price ?? 0) * quantity;
 
@@ -52,6 +53,33 @@ function ProductDetail() {
         );
     }
 
+    const addToCart = async () => {
+        if (quantity < 1 || isNaN(quantity)) {
+            alert(`구매 수량은 1개 이상이어야 합니다.`);
+            return;
+        }
+        try {
+            const url = `${API_BASE_URL}/cart/insert`;
+            const parameters = {
+                userId: user.id,
+                productId: id,
+                quantity: quantity
+            };
+
+            const response = await axios.post(url, parameters, { withCredentials: true });
+
+            alert(response.data);
+            navigate('/product/list'); // 상품 목록 페이지로 이동
+
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+
+            if (error.response) {
+                alert('장바구니 추가 실패');
+                console.log(error.response.data);
+            }
+        }
+    }
 
 
 
@@ -120,7 +148,11 @@ function ProductDetail() {
 
 
                     <button style={{ backgroundColor: '#000000ff', color: 'white', width: '40%', height: '55px', margin: '30px' }}>BUY IT NOW</button>
-                    <button style={{ backgroundColor: '#ffffffff', width: '30%', height: '55px' }} >CART</button>
+                    <button onClick={() => { if (!user) { alert('로그인이 필요한 서비스입니다.'); 
+                                return navigate('/user/login'); } else { addToCart(); }}}
+                            style={{ backgroundColor: '#ffffffff', width: '30%', height: '55px' }}>
+                            CART
+                        </button>
                 </Col>
             </Row>
         </Container >
