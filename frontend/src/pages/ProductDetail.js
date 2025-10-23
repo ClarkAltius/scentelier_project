@@ -37,7 +37,7 @@ function ProductDetail() {
             setTotal(product.price * quantity);
         }
 
-    }, [id, product, quantity])
+    }, [id, quantity])
 
     const totalPrice = (product?.price ?? 0) * quantity;
 

@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 function Home() {
     const containerRef = useRef();
     const [best, setBest] = useState([]);
-    const navigator = useNavigate();
+    const navigate = useNavigate();
 
 
     //썸네일 목록 - 3번 반복해 무한 루프 효과
@@ -271,7 +271,8 @@ function Home() {
             {/* -----------------------------리스트 ---------------------------- */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: "center" }}>
                 {best.map((item) => {
-                    return (<Card style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
+                    return (<Card onClick={() => navigate(`/product/detail/${item.id}`)}
+                        style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
                         <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
                             style={{
                                 width: '100%',
@@ -310,7 +311,7 @@ function Home() {
             {/* -----------------------------리스트 ---------------------------- */}
 
             <button
-                onClick={() => navigator(`/product/list`)}
+                onClick={() => navigate(`/product/list`)}
                 style={{
                     marginRight: '5px',
                     padding: '10px 20px',
