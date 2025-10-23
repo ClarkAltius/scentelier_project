@@ -17,7 +17,7 @@ function Productlist() {
     // 썸네일 목록 - 3번 반복해 무한 루프 효과
 
 
-    useEffect(() => {
+    useEffect(() => {// 베스트상품 스크롤 관련
         const container = containerRef.current;
 
         const url1 = `${API_BASE_URL}/order/list2`
@@ -97,7 +97,7 @@ function Productlist() {
 
     }, []);
 
-    useEffect(() => {
+    useEffect(() => { // 하단 상품  스크롤 관련
         const handleScroll = () => {
             // 현재 스크롤 위치 + 화면 높이 >= 문서 전체 높이 - 100 (임계점 설정)
             if (
@@ -121,7 +121,9 @@ function Productlist() {
     }, [product.length]);
 
 
-    // --------------------------------------------------------------------------------
+
+
+    // ---------------------------검색관련---------------------------------
 
     const handleSubmit = (e) => {//검색
         e.preventDefault();
@@ -162,48 +164,46 @@ function Productlist() {
     }
 
 
+    // ---------------------------카테고리---------------------------------
+
     const types = ['Powdery', 'Woody', 'Crystal', 'Chypre', 'Citrus', 'Fruity', 'Green'];
     const seasons = ['SPRING', 'SUMMER', 'FALL', 'WINTER'];
 
     const [activeCategory, setActiveCategory] = useState(null); // 'type' | 'season' | null
     const [selectedTag, setSelectedTag] = useState(null);
+    const [filteredProducts, setFilteredProducts] = useState(product);
 
     const toggleCategory = (category) => {
-        if (activeCategory === category) {
-            setActiveCategory(null);
-            setSelectedTag(null);
-        } else {
-            setActiveCategory(category);
-            setSelectedTag(null);
-        }
-    };
-
-    const handleTagClick = (tag) => {
-        setSelectedTag(tag);
+        setActiveCategory(category);
+        setSelectedTag(null);  // 카테고리 바뀌면 선택된 태그 초기화
     };
 
     const categoriesToShow =
-        activeCategory === 'type'
-            ? types
-            : activeCategory === 'season'
-                ? seasons
-                : [];
+        activeCategory === 'all' ? [] :
+            activeCategory === 'type' ? types :
+                activeCategory === 'season' ? seasons :
+                    [];
 
+    const handleTagClick = (tag) => {
+        setSelectedTag(tag);
+        console.log("선택한 태그", tag)
 
-    const displayedProducts = product.slice(0, visibleCount);
+        if (activeCategory === 'all') {
+            return setFilteredProducts(product);
+        } else {
+            const filtered = product.filter((item) => {
+                if (activeCategory === 'type') {
+                    return item.category === tag; // type이 tag랑 같은 것만
+                } else if (activeCategory === 'season') {
+                    return item.season === tag; // season이 tag랑 같은 것만
+                }
+                return true; // 혹시 모를 기본값
+            });
+            setFilteredProducts(filtered);
+        }
+    };
 
-    // const filteredItems =
-    //     activeCategory === null
-    //         ? product
-    //         : product.filter((item) => {
-    //             if (activeCategory === 'type') {
-    //                 return !selectedTag || item.type === selectedTag;
-    //             }
-    //             if (activeCategory === 'season') {
-    //                 return !selectedTag || item.season === selectedTag;
-    //             }
-    //             return true;
-    //         });
+    const displayedProducts = filteredProducts.slice(0, visibleCount);
 
 
     return (<>
@@ -333,6 +333,8 @@ function Productlist() {
 
         {tags()}
         {/* --------------------------------------카테고리 ------------------------------------ */}
+
+
         <div
             style={{
                 display: 'flex',
@@ -344,7 +346,7 @@ function Productlist() {
         >
             <div style={{ display: 'flex', gap: '20px', marginLeft: '10px' }}>
                 <div
-                    onClick={() => toggleCategory(null)}
+                    onClick={() => handleTagClick("all")}
                     style={{
                         cursor: 'pointer',
                         fontSize: '30px',
@@ -404,6 +406,7 @@ function Productlist() {
 
 
         {/* 상품 목록 */}
+
         <div
             style={{
                 display: "flex",
@@ -421,7 +424,9 @@ function Productlist() {
                         width: "25rem",
                         flex: "1 1 calc(33.333% - 80px)",
                         boxSizing: "border-box",
+
                     }}
+                    onClick={() => navigate(`/product/detail/${item.id}`)}
                 >
                     <Card.Img
                         variant="top"
@@ -485,6 +490,7 @@ function Productlist() {
                 </Card>
             ))}
         </div>
+
 
 
         {/* 향수찾기 */}
