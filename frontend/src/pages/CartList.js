@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Row, Image, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
+import { useAuth } from "../component/AuthContext";
 import axios from "axios";
 
 // 배송 정책
@@ -28,7 +29,8 @@ const normalizeCartItem = (raw) => {
   };
 };
 
-function CartList({ user }) {
+function CartList(props) {
+  const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [selectedTotal, setSelectedTotal] = useState(0);
   const [shipping, setShipping] = useState(0);
@@ -53,10 +55,11 @@ function CartList({ user }) {
 
   // 데이터 로드
   useEffect(() => {
-    if (!user?.id) return;
+    fetchCartItems();
+  }, [user?.id]);
 
-    (async () => {
-      try {
+  const fetchCartItems = async () => {
+    try {
         const url = `${API_BASE_URL}/cart/list/${user.id}`;
         const res = await axios.get(url, { withCredentials: true });
         const normalized = (res.data ?? []).map((x) =>
@@ -66,11 +69,10 @@ function CartList({ user }) {
       } catch (e) {
         console.error(e);
         alert("카트 정보가 없어서 상품 목록으로 이동합니다.");
-        navigate("/productlist");
+        navigate("/product/list");
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+
+  };
 
   // 체크박스
   const toggleAll = (checked) => updateItems(items.map((p) => ({ ...p, checked })));

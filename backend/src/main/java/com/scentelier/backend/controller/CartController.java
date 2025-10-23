@@ -1,6 +1,7 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.dto.CartItemDto;
+import com.scentelier.backend.dto.CartItemResponseDto;
 import com.scentelier.backend.entity.CartItems;
 import com.scentelier.backend.entity.Carts;
 import com.scentelier.backend.entity.Products;
@@ -11,11 +12,10 @@ import com.scentelier.backend.service.ProductService;
 import com.scentelier.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -74,6 +74,29 @@ public class CartController {
         }
 
         return ResponseEntity.ok("요청하신 상품이 장바구니에 추가되었습니다.") ;
+    }
+
+    @GetMapping("/list/{memberId}")
+    public ResponseEntity<List<CartItemResponseDto>> getCartProducts(@PathVariable Long userId) {
+        Optional<Users> optionalUsers = userService.findUserById(userId);
+        if (optionalUsers.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Users users = optionalUsers.get();
+        Carts cart = cartService.findByUsers(users);
+
+        if (cart == null) cart = new Carts();
+
+        List<CartItemResponseDto> cartItems = new ArrayList<>();
+
+        for (CartItems ci : cart.getItems()) {
+            cartItems.add(new CartItemResponseDto(ci));
+        }
+
+        System.out.println("카트 상품 개수 : " + cartItems.size());
+
+        return ResponseEntity.ok(cartItems); // 전체 카트 상품 반환
     }
 
 }
