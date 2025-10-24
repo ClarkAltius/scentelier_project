@@ -3,7 +3,7 @@ import styles from './Topbar.module.css';
 const viewTitles = {
     dashboard: '대시보드',
     products: '상품 관리',
-    stock: '재고 관리',
+    stock: '재고 발주',
     orders: '주문 관리',
     inquiries: '고객 문의',
 };

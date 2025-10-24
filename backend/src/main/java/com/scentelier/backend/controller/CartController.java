@@ -54,7 +54,7 @@ public class CartController {
         CartItems existingCartItems = null;
         if(cart.getItems() != null) {
             for (CartItems ci : cart.getItems()) {
-                if (ci.getProduct().getId().equals(dto.getProductId())) {
+                if (ci.getProduct().getId().equals(products.getId())) {
                     existingCartItems = ci;
                     break;
                 }

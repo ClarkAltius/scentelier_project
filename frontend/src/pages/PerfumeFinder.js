@@ -1,78 +1,45 @@
-import { useEffect, useRef } from "react";
-import { Card } from "react-bootstrap";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { Button, Card, Form, FormControl } from "react-bootstrap";
+import { API_BASE_URL } from "../config/config";
+import { useNavigate } from "react-router-dom";
 
 
 
 function PerfumeTest() {
-    const containerRef = useRef();
+    const [product, setProduct] = useState([]);
+    const navigate = useNavigate();
+    const [selectedType, setSelectedType] = useState(null);
 
-    // 썸네일 목록 - 3번 반복해 무한 루프 효과
-    const thumbnails = [
-        { id: 1, src: '/type/Chypre.jpg', alt: '썸네일 1', label: '# Chypre' },
-        { id: 2, src: '/type/Citrus.jpg', alt: '썸네일 2', label: '# Citrus' },
-        { id: 3, src: '/type/Floral.jpg', alt: '썸네일 3', label: '# Floral' },
-        { id: 4, src: '/type/Fruity.jpg', alt: '썸네일 4', label: '# Fruity' },
-        { id: 5, src: '/type/Green.jpg', alt: '썸네일 5', label: '# Green' },
-        { id: 6, src: '/type/Powder.jpg', alt: '썸네일 6', label: '# Powder' },
-        { id: 7, src: '/type/Woody.jpg', alt: '썸네일 7', label: '# Woody' },
-        { id: 8, src: '/type/Crystal.jpg', alt: '썸네일 8', label: 'Crystal' },
-    ];
-    const extended = [...thumbnails, ...thumbnails, ...thumbnails];
 
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+        const url2 = `${API_BASE_URL}/product/list?page=0&size=24`
+        axios.get(url2)
+            .then((response) => {
+                console.log("응답받은 데이터2 :");
+                console.log(response.data.content);
+                setProduct(response.data.content);
+            })
+            .catch(error => {
+                console.error('데이터 가져오기 실패:', error);
+            })
 
-        const singleWidth = container.scrollWidth / 3;
-        container.scrollLeft = singleWidth;
+    }, [selectedType]);
 
-        let scrollInterval;
-        let scrollTimeout;
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const types = ['Powdery', 'Floral', 'Woody', 'Crystal', 'Chypre', 'Citrus', 'Fruity', 'Green']
 
-        const startAutoScroll = () => {
-            scrollInterval = setInterval(() => {
-                if (container.scrollLeft >= singleWidth * 2) {
-                    container.scrollLeft = singleWidth;
-                } else {
-                    container.scrollLeft += 3;//한 번에 <씩 이동해서 더 빨라짐
-                }
-            }, 30);//마다 실행해서 좀 더 부드럽고 빠르게
-        };
+    const handleButtonClick = (type) => {
+        setSelectedType(type);
+        const filtered = product.filter((item) =>
+            item.category === type);
+        setFilteredProducts(filtered);
+    };
 
-        const stopAutoScroll = () => {
-            clearInterval(scrollInterval);
-        };
+    const Test = () => {
+        console.log(filteredProducts)
+    }
 
-        const resetAutoScrollTimeout = () => {
-            clearTimeout(scrollTimeout);
-            stopAutoScroll();
-            scrollTimeout = setTimeout(() => {
-                startAutoScroll();
-            }, 10); // 1초 후 자동 스크롤 재개
-        };
-
-        const onScroll = () => {
-            resetAutoScrollTimeout();
-        };
-
-        const onWheel = (e) => {
-            e.preventDefault();
-            container.scrollLeft += e.deltaY; // 휠 세로 이동을 가로로 바꿈
-            resetAutoScrollTimeout();
-        };
-
-        container.addEventListener('scroll', onScroll);
-        container.addEventListener('wheel', onWheel, { passive: false });
-
-        startAutoScroll();
-
-        return () => {
-            clearInterval(scrollInterval);
-            clearTimeout(scrollTimeout);
-            container.removeEventListener('scroll', onScroll);
-            container.removeEventListener('wheel', onWheel);
-        };
-    }, []);
     return (<>
         <div style={{ margin: 30, textAlign: 'center', color: '#6B4C3B' }}>
             <h2
@@ -109,7 +76,80 @@ function PerfumeTest() {
             />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+        {/* ------------------------추천향수 --------------------------------------- */}
+
+        <div>
+            <h1 style={{ fontFamily: "'Nanum Myeongjo', serif", color: "#65bba8ff" }}>
+                <strong>What’s your perfume type?</strong>
+                <br /><span style={{ fontSize: "22px" }}>__당신에게 어울리는 향수를 추천해드립니다.</span></h1>
+
+            <div className="button-container">
+                {types.map((item) => (
+                    <button
+                        key={item}
+                        onClick={() => handleButtonClick(item)}
+                        className={selectedType === item ? 'selected' : ''}
+                        style={{ margin: "15px 0px 10px 0px" }}
+                    >
+                        {item}
+                    </button>
+                ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                {filteredProducts.map((item) => (
+                    <div
+                        key={item.id}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            flex: '0 0 auto',
+                        }}
+                        className={selectedType === item ? 'selected' : ''}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'center' }}
+                            onClick={() => navigate(`/product/detail/${item.id}`)}>
+                            <Card style={{ width: '18rem', marginRight: "20px", height: 'auto' }}>
+                                <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
+                                    style={{
+                                        width: '100%',
+                                        height: '250px',         // 원하는 높이 고정
+                                        objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
+                                        borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
+                                    }} />
+                                <Card.Body style={{ height: '150px' }}>
+                                    <Card.Title style={{ textAlign: 'center' }}>{item.name}</Card.Title>
+                                    <Card.Text
+                                        style={{
+                                            margin: '10px',
+                                            textAlign: 'center',
+                                            maxHeight: '120px',
+                                        }}
+                                    >
+                                        <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>{item.price.toLocaleString()}원</span><br />
+                                        <Button
+                                            style={{
+                                                backgroundColor: "transparent",
+                                                color: "#808080ff",
+                                                border: "2px solid hsla(0, 0%, 50%, 1.00)",
+                                                margin: "15px auto 0 auto",
+                                                display: "block",
+                                                fontSize: "12px",
+                                            }}
+                                        >
+                                            add to cart
+                                        </Button>
+                                    </Card.Text>
+                                </Card.Body>
+                            </Card></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+        {/* ---------------------------배너-------------------------------------------- */}
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
             <Card style={{ width: '80rem', height: '24rem', margin: '0px 55px 0px 55px', borderColor: '#dbdbdbff' }}>
                 <Card.Body style={{
                     display: 'flex'
@@ -194,76 +234,6 @@ function PerfumeTest() {
                 </Card.Body>
             </Card>
         </div>
-
-        <div style={{ textAlign: 'left', margin: '50px 0px 10px 50px', fontSize: '40px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>_Best Perfume<span style={{ fontSize: '20px' }}>__ Scentelier의 베스트 향수를 만나보세요.</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div
-                ref={containerRef}
-                style={{
-                    display: 'flex',
-                    overflowX: 'auto',
-                    scrollBehavior: 'smooth',
-                    gap: '10px',
-                    padding: '10px',
-                    width: '90%',
-                    whiteSpace: 'nowrap',
-
-                    // 스크롤바 없애기
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                }}
-                className="no-scrollbar"
-            >
-                {extended.map((thumb, idx) => (
-                    <div
-                        key={`${thumb.id}-${idx}`}
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            flex: '0 0 auto',
-                        }}
-                    >
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <Card style={{ width: '18rem', margin: '60px 20px 60px 0px' }}>
-                                <Card.Img variant="top" src="/www.jpg"
-                                    style={{
-                                        width: '100%',
-                                        height: '180px',         // 원하는 높이 고정
-                                        objectFit: 'cover',      // 이미지 영역에 꽉 차게, 잘라서 맞춤
-                                        borderRadius: '4px 4px 0 0' // 카드 상단 모서리 둥글게 (선택사항)
-                                    }} />
-                                <Card.Body>
-                                    <Card.Title>Powder Whisper</Card.Title>
-                                    <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
-                                        <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
-                                        <br />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                            {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                                <span
-                                                    key={idx}
-                                                    style={{
-                                                        padding: '4px 10px',
-                                                        backgroundColor: '#ebebebff',
-                                                        borderRadius: '20px',
-                                                        fontSize: '0.72em',
-                                                        color: '#555',
-                                                        border: '1px solid transparent',
-                                                    }}
-                                                >
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card></div>
-                    </div>
-                ))}
-            </div>
-        </div>
-
     </>
     );
 }
