@@ -45,7 +45,7 @@ function Sidebar({ activeView, setActiveView }) {
                         className={`${styles.navLink} ${activeView === 'stock' ? styles.active : ''}`}
                         onClick={(e) => handleNavClick(e, 'stock')}>
                         <Warehouse className={styles.icon} />
-                        <span className={styles.navText}>재고 관리</span>
+                        <span className={styles.navText}>재고 발주</span>
                     </a>
                 </li>
                 <li className={styles.navItem}>
