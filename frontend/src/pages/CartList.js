@@ -16,14 +16,16 @@ const normalizeCartItem = (raw) => {
   const quantity = Number(raw.quantity ?? raw.qty ?? 1);
   const checked = Boolean(raw.checked ?? true);
   const product = raw.product ?? raw.productDto ?? {};
+  const custom_id = raw.customId ?? raw.custom_id;
 
   return {
     cartItemId: cart_item_id,
     productId: product_id,
+    customId: custom_id,
     name: product.name ?? raw.name ?? "상품명",
     price: Number(product.price ?? raw.price ?? 0),
     originalPrice: Number(product.original_price ?? raw.originalPrice ?? product.price ?? 0),
-    image: product.image_url ?? product.imageUrl ?? raw.image_url ?? raw.imageUrl ?? raw.image,
+    image: product.image_url ?? product.imageUrl ?? raw.image_url ?? raw.imageUrl ?? raw.image ?? null,
     quantity,
     checked,
   };
@@ -199,6 +201,14 @@ function CartList() {
   const goProducts = () => navigate("/product/list");
   const goFinder = () => navigate("/perfume/finder"); // 프로젝트 라우팅에 맞게 수정해도 됨
 
+  const goToPayment = (selectedItems) => {
+    if (!selectedItems.length) {
+      alert("주문할 상품을 선택해 주세요.");
+      return;
+    }
+    navigate("/payments", { state: { products: selectedItems } });
+  };
+
   // -------------------------------------------------------------------
   return (
     <>
@@ -237,7 +247,7 @@ function CartList() {
             variant="outline-success"
             size="sm"
             style={{ borderRadius: 0, minWidth: 140, fontWeight: 600 }}
-            onClick={() => order(items.filter((p) => p.checked))}
+            onClick={() => goToPayment(items.filter((p) => p.checked))}
           >
             선택상품주문
           </Button>
@@ -378,7 +388,7 @@ function CartList() {
                 variant="outline-success"
                 size="lg"
                 style={{ borderRadius: "0", fontWeight: "600" }}
-                onClick={() => order(items)}
+                onClick={() => goToPayment(items)}
               >
                 전체상품주문
               </Button>
@@ -386,7 +396,7 @@ function CartList() {
                 variant="outline-dark"
                 size="lg"
                 style={{ borderRadius: "0", fontWeight: "600" }}
-                onClick={() => order(items.filter((p) => p.checked))}
+                onClick={() =>  goToPayment(items.filter((p) => p.checked))}
               >
                 선택상품주문
               </Button>
@@ -491,7 +501,7 @@ function CartList() {
             variant="success"
             size="lg"
             style={{ borderRadius: 8, fontWeight: 700 }}
-            onClick={() => order(items.filter((p) => p.checked))}
+            onClick={() => goToPayment(items.filter((p) => p.checked))}
           >
             선택상품주문
           </Button>

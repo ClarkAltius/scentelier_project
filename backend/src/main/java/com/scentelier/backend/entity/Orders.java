@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter @ToString
@@ -48,6 +49,7 @@ public class Orders {
     private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private Payment paymentMethod;
 
     @CreationTimestamp
@@ -56,5 +58,5 @@ public class Orders {
     private LocalDate orderDate;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderProduct> orderProducts;
+    private List<OrderProduct> orderProducts = new ArrayList<>();
 }

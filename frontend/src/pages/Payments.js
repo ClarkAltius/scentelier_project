@@ -1,49 +1,55 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Modal } from "react-bootstrap";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CreditCard, Wallet, Banknote, Truck, Package } from "lucide-react";
-import { mockCartItems } from "../data/mockData";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
 import { useAuth } from "../component/AuthContext";
 
 function Payments(props) {
-    const products = mockCartItems;
-    const { user } = useAuth();
-    // const products = props.cartItems;
-
+    const location = useLocation();
     const navigate = useNavigate();
+
+    const products = location.state?.products || [];
+    console.log(products);
+    const { user } = useAuth();
 
     const [method, setMethod] = useState("Card");
     const [showModal, setShowModal] = useState(false);
     const [delivery, setDelivery] = useState({
-        receiver: '',
+        recipientName: '',
         phone: '',
         address: '',
         detail: '',
     });
 
     useEffect(() => {
-        if(!user) {
-            navigate("/");
-        }else{
-            setDelivery({
-                receiver: user.username,
-                phone: user.phone,
-                address: user.address,
-                detail: ''
-            });
+        if (!user) {
+            navigate("/login");
+            return;
         }
-    }, [user]);
+        if (!location.state?.products?.length) {
+            alert("선택한 상품이 없습니다. 장바구니로 이동합니다.");
+            navigate("/cart");
+            return;
+        }
+        setDelivery({
+            recipientName: user.username,
+            phone: user.phone,
+            address: user.address,
+            detail: ''
+        });
+    }, [user, location.state]);
+
 
     const totalPrice = products.reduce((sum, item) => 
         sum + item.price * (item.quantity || 1), 0);
 
     const paymentMethods = [
-        { id: "Card", name: "신용/체크카드", icon: <CreditCard size={28} /> },
-        { id: "KakaoPay", name: "카카오페이", icon: <Wallet size={28} /> },
-        { id: "NaverPay", name: "네이버페이", icon: <Wallet size={28} /> },
-        { id: "Bank", name: "계좌이체", icon: <Banknote size={28} /> },
+        { id: "CARD", name: "신용/체크카드", icon: <CreditCard size={28} /> },
+        { id: "KAKAO_PAY", name: "카카오페이", icon: <Wallet size={28} /> },
+        { id: "NAVER_PAY", name: "네이버페이", icon: <Wallet size={28} /> },
+        { id: "CASH", name: "계좌이체", icon: <Banknote size={28} /> },
     ];
 
     const handleChange = (e) => {
@@ -51,27 +57,35 @@ function Payments(props) {
     };
 
     const handleSubmit = async () => {
-        if (!delivery.receiver || !delivery.phone || !delivery.address) {
+        if (!delivery.recipientName || !delivery.phone || !delivery.address) {
             alert("배송지 정보를 모두 입력해주세요.");
             return;
         }
         const url = `${API_BASE_URL}/order`;
         const orderData = {
-            users: user.id,
+            userId: user.id,
             recipientName: delivery.recipientName,
-            address: delivery.address,
+            phone: delivery.phone,
+            address: delivery.address+'/'+delivery.detail,
             totalPrice: totalPrice,
+            status: 'PAID',
             paymentMethod: method,
             orderProducts: [
-                ...products.filter((product) => product.isCustom === false).map((p) => ({
-                products: { id: p.id },
-                quantity: p.quantity,
-                price: p.price,
+                ...products
+                    .filter((product) => !product.isCustom)
+                    .map((p) => ({
+                    cartItemId: p.cartItemId,
+                    productId: p.productId,   // ✅ 이렇게
+                    quantity: p.quantity,
+                    price: p.price,
                 })),
-                ...products.filter((product) => product.isCustom === true).map((c) => ({
-                customPerfume: { id: c.id },
-                quantity: c.quantity,
-                price: c.price,
+                ...products
+                    .filter((product) => product.isCustom)
+                    .map((c) => ({
+                    cartItemId: c.cartItemId,
+                    customId: c.customId,     // ✅ 이렇게
+                    quantity: c.quantity,
+                    price: c.price,
                 })),
             ],
         };
@@ -102,7 +116,7 @@ function Payments(props) {
                                             type="text"
                                             name="receiver"
                                             placeholder="홍길동"
-                                            value={delivery.receiver}
+                                            value={delivery.recipientName}
                                             onChange={handleChange}
                                         />
                                     </Col>
@@ -152,9 +166,9 @@ function Payments(props) {
                         </Card.Header>
                         <Card.Body>
                             <h5>일반 상품</h5>
-                            {products.filter((product) => product.isCustom === false).map((p, idx) => (
+                            {products.filter((product) => !product.customId).map((p, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
-                                    <span key={`p-${p.id}`}>
+                                    <span key={`p-${p.cartItemId}`}>
                                     {p.name} — {p.quantity}개
                                     </span>
                                     <span>
@@ -163,9 +177,9 @@ function Payments(props) {
                                 </div>
                             ))}
                             <h5 className="mt-3">커스텀 향수</h5>
-                            {products.filter((product) => product.isCustom === true).map((c, idx) => (
+                            {products.filter((product) => !product.productId).map((c, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
-                                    <span key={`c-${c.id}`}>
+                                    <span key={`c-${c.cartItemId}`}>
                                     {c.name} — {c.quantity}개
                                     </span>
                                     <span>
