@@ -246,7 +246,7 @@ function Home() {
                                 </p>
                                 <button
                                     style={{
-                                        marginRight: '5px',
+                                        marginRight: '50px',
                                         padding: '10px 20px',
                                         fontSize: '16px',
                                         cursor: 'pointer',
@@ -255,7 +255,8 @@ function Home() {
                                         color: '#67AB9F',                  // 텍스트 노란색
                                         border: '2px solid #67AB9F',       // 테두리 노란색
                                         borderRadius: '5px',
-                                    }}>
+                                    }}
+                                    onClick={() => navigate(`/perfume/finder`)}>
                                     TEST NOW
                                 </button>
                             </div>
