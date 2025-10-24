@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-function ProductManagement() {
+function ProductManagement({ setActiveView }) {
     const [products, setProducts] = useState([]); //mock 데이터에서 실제 상품 데이터로 변경
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true); //로딩 스테이트
@@ -66,7 +66,7 @@ function ProductManagement() {
 
     // CRUD 기능 플레이스홀더
     const handleAddNew = () => {
-        navigate('/product/insert');
+        setActiveView('productInsert');
     };
 
     const handleEdit = (productId) => {

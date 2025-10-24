@@ -23,7 +23,7 @@ const normalizeCartItem = (raw) => {
     name: product.name ?? raw.name ?? "상품명",
     price: Number(product.price ?? raw.price ?? 0),
     originalPrice: Number(product.original_price ?? raw.originalPrice ?? product.price ?? 0),
-    image: product.image_url ?? product.imageUrl ?? raw.image_url ?? raw.image,
+    image: product.image_url ?? product.imageUrl ?? raw.image_url ?? raw.imageUrl ?? raw.image,
     quantity,
     checked,
   };
@@ -263,7 +263,7 @@ function CartList() {
             {items.map((p) => {
               const imgSrc = p.image?.startsWith("http")
                 ? p.image
-                : `${API_BASE_URL}/images/${p.image ?? ""}`;
+                : `${API_BASE_URL}/uploads/products/${p.image ?? ""}`;
               const discount = p.originalPrice > p.price ? p.originalPrice - p.price : 0;
               const lineTotal = Number(p.price) * Number(p.quantity);
 
