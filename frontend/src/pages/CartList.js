@@ -29,7 +29,7 @@ const normalizeCartItem = (raw) => {
   };
 };
 
-function CartList(props) {
+function CartList() {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [selectedTotal, setSelectedTotal] = useState(0);
@@ -55,53 +55,78 @@ function CartList(props) {
 
   // 데이터 로드
   useEffect(() => {
-    fetchCartItems();
-  }, [user?.id]);
+  if (!user?.id) return;
+  fetchCartItems();
+    }, [user?.id]);
+
 
   const fetchCartItems = async () => {
-    try {
-        const url = `${API_BASE_URL}/cart/list/${user.id}`;
-        const res = await axios.get(url, { withCredentials: true });
-        const normalized = (res.data ?? []).map((x) =>
-          normalizeCartItem({ checked: true, ...x })
-        );
-        updateItems(normalized);
-      } catch (e) {
-        console.error(e);
-        alert("카트 정보가 없어서 상품 목록으로 이동합니다.");
-        navigate("/product/list");
-      }
+  try {
+    const url = `${API_BASE_URL}/cart/list/${user.id}`;
+    const res = await axios.get(url, { withCredentials: true });
 
-  };
+    // 받아온 데이터를 정규화해서 items에 반영
+    const normalized = (res.data ?? []).map((x) =>
+      normalizeCartItem({ checked: true, ...x })
+    );
+    updateItems(normalized);
+
+  } catch (error) {
+    console.log('오류 정보', error);
+    // alert('카트 정보가 없어서 상품 목록으로 이동합니다.');
+    updateItems([]);
+    // navigate('/product/list');  상품목록으로 이동 네이게이터
+  }
+};
+
 
   // 체크박스
-  const toggleAll = (checked) => updateItems(items.map((p) => ({ ...p, checked })));
-  const toggleOne = (cartItemId) =>
+  const toggleAll = (checked) => updateItems(items.map((p) => ({ ...p, checked }))); // 전체 선택,해제
+  const toggleOne = (cartItemId) => // 개별 선택, 해제
     updateItems(items.map((p) => (p.cartItemId === cartItemId ? { ...p, checked: !p.checked } : p)));
 
   // 수량 조절
-  const inc = (id) =>
+  const inc = (id) => // 수량 증가 + 버튼 기능
     updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Number(p.quantity) + 1 } : p)));
-  const dec = (id) =>
+  const dec = (id) => // 수량 감소 - 버튼 기능
     updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Math.max(1, Number(p.quantity) - 1) } : p)));
-  const inputQty = (id, v) => {
+  const inputQty = (id, v) => { // 직접입력한 수량
     const q = Math.max(1, Number(v) || 1);
     updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: q } : p)));
   };
 
   // 서버 수량 수정
+
   const saveQuantity = async (cartItemId) => {
-    const target = items.find((p) => p.cartItemId === cartItemId);
-    if (!target) return;
-    try {
-      const url = `${API_BASE_URL}/cart/edit/${cartItemId}?quantity=${target.quantity}`;
-      await axios.patch(url, {}, { withCredentials: true });
-      alert("수량이 변경되었습니다.");
-    } catch (e) {
-      console.error(e);
-      alert("수량 변경에 실패했습니다.");
-    }
-  };
+  const target = items.find((p) => p.cartItemId === cartItemId);
+  if (!target) return;
+
+  try {
+    const res = await axios.patch(
+      `${API_BASE_URL}/cart/edit/${cartItemId}`,
+      null,
+      { params: { quantity: target.quantity }, withCredentials: true }
+    );
+
+    console.log("서버 응답:", res.data);
+    alert("✅ 수량이 변경되었습니다.");
+  } catch (error) {
+    console.error("❌ 수량 변경 오류:", error);
+    alert("수량 변경 중 문제가 발생했습니다.");
+  }
+};
+  // const saveQuantity = async (cartItemId) => {
+  //   const target = items.find((p) => p.cartItemId === cartItemId);
+  //   if (!target) return;
+  //   try {
+  //     const url = `${API_BASE_URL}/cart/edit/${cartItemId}?quantity=${target.quantity}`;
+  //     await axios.patch(url, {}, { withCredentials: true });
+  //     alert("수량이 변경되었습니다.");
+  //   } catch (e) {
+  //     console.error(e);
+  //     alert("수량 변경에 실패했습니다.");
+  //   }
+  // };
 
   // 삭제
   const removeOne = async (cartItemId) => {
@@ -110,8 +135,8 @@ function CartList(props) {
       const url = `${API_BASE_URL}/cart/delete/${cartItemId}`;
       await axios.delete(url, { withCredentials: true });
       updateItems(items.filter((p) => p.cartItemId !== cartItemId));
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       alert("삭제 중 오류가 발생했습니다.");
     }
   };
@@ -133,8 +158,8 @@ function CartList(props) {
       );
       updateItems(items.filter((p) => !p.checked));
       alert("선택한 상품이 삭제되었습니다.");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       alert("선택 삭제 중 오류가 발생했습니다.");
     }
   };
@@ -171,8 +196,8 @@ function CartList(props) {
   const allChecked = items.length > 0 && items.every((p) => p.checked);
 
 
-  const goProducts = () => navigate("/productlist");
-  const goQuiz = () => navigate("/quiz"); // 프로젝트 라우팅에 맞게 수정해도 됨
+  const goProducts = () => navigate("/product/list");
+  const goFinder = () => navigate("/perfume/finder"); // 프로젝트 라우팅에 맞게 수정해도 됨
 
   // -------------------------------------------------------------------
   return (
@@ -407,7 +432,7 @@ function CartList(props) {
             variant="outline-dark"
             size="lg"
             style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}
-            onClick={goQuiz}
+            onClick={goFinder}
           >
             나만의 향 찾기 테스트
           </Button>
