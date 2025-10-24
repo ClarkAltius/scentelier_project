@@ -6,12 +6,14 @@ import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -45,7 +47,7 @@ public class SecurityConfig {
                 //권한부여 규칙 설정
                 .authorizeHttpRequests(authz ->authz
                                 .requestMatchers("/member/login","/signup").permitAll()
-                               .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**","/order/**", "/cart/**").permitAll()
+                               .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**").permitAll()
                                 .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
                         
                                 // 관리자 전용 엔드포인트
@@ -101,6 +103,12 @@ public class SecurityConfig {
                                 })
 
                                 .permitAll() // 로그인 관련 url에 접근 허용하기
+                )// 예외 처리 설정
+                .exceptionHandling(exceptions -> exceptions
+                        // 인증되지 않은 사용자가 보호된 리소스에 접근하려 할 때
+                        // 로그인 페이지로 리디렉션하는 대신 401 Unauthorized 상태 코드를 반환.
+                        // (SPA/API 클라이언트(React)에 적합한 방식)
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 );
         return http.build();
     }

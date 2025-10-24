@@ -32,7 +32,6 @@ function AppRoutes() {
             <Route path='/product/detail/:id' element={<ProductDetail />} />
             <Route path='/perfume/finder' element={<PerfumeFinder />} />
             <Route path='/perfume/blending' element={<PerfumeBlending />} />
-            <Route path='/payments' element={<Payments />} />
             <Route path='/login' element={<Login />} />
             <Route path='/order/list' element={<OrderList />} />
             <Route path='/logout' element={<Logout />} />
@@ -46,6 +45,14 @@ function AppRoutes() {
                 element={
                     <PrivateRoute>
                         <CartList />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/payments"
+                element={
+                    <PrivateRoute>
+                        <Payments />
                     </PrivateRoute>
                 }
             />

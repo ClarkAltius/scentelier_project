@@ -1,33 +1,36 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.entity.Products;
-import com.scentelier.backend.service.OrderService;
 import com.scentelier.backend.service.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 //페이징 임포트
-import org.springframework.data.domain.Page; 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/product")
 public class ProductController {
+
 
     @Value("${file.upload-dir}")
     private String productImageLocation; // 기본값 : null
 
     @Autowired
     private ProductService productService;
+
 
     // 상품 등록
     @PostMapping("/insert")
@@ -62,7 +65,7 @@ public class ProductController {
     //상품 목록 보기 API
 
     @GetMapping("/list")
-    public ResponseEntity<Page<Products>> getProductList(Pageable pageable){
+    public ResponseEntity<Page<Products>> getProductList(Pageable pageable) {
         //pageable 객체는 Spring이 자동으로 생성!
         Page<Products> productsPage = productService.findAll(pageable);
         return ResponseEntity.ok(productsPage);
@@ -82,4 +85,22 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        try {
+            boolean isDeleted = this.productService.deleteProduct(id);
+
+            if(isDeleted){
+                return ResponseEntity.ok(id+ "상품이 삭제 되었습니다.");
+            }else {
+                return ResponseEntity.badRequest().body(id+ "상품이 존재하지 않습니다.");
+            }
+        }catch (DataIntegrityViolationException err){
+            String message = "해당 상품은 장바구니에 포함되어 있거나, \n 이미 매출이 발생한 상품입니다.";
+            return ResponseEntity.badRequest().body(message);
+        }catch (Exception err){
+            return ResponseEntity.internalServerError().body("오류 발생" + err.getMessage());
+        }
+
+    }
 }

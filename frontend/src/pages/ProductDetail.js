@@ -81,7 +81,32 @@ function ProductDetail() {
         }
     }
 
+    const handleDirectOrder = () => {
+        if (!product) return;
 
+        if (!user) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+
+        // 단건 주문으로 결제 페이지로 이동
+        navigate("/payments", {
+        state: {
+            products: [
+            {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity,
+                imageUrl: product.imageUrl,
+                isCustom: false
+            },
+            ],
+            from: "productDetail",
+        },
+        });
+    };
 
 
     return (<>
@@ -147,7 +172,7 @@ function ProductDetail() {
                     </div>
 
 
-                    <button style={{ backgroundColor: '#000000ff', color: 'white', width: '40%', height: '55px', margin: '30px' }}>BUY IT NOW</button>
+                    <button onClick={handleDirectOrder} style={{ backgroundColor: '#000000ff', color: 'white', width: '40%', height: '55px', margin: '30px' }}>BUY IT NOW</button>
                     <button onClick={() => { if (!user) { alert('로그인이 필요한 서비스입니다.'); 
                                 return navigate('/user/login'); } else { addToCart(); }}}
                             style={{ backgroundColor: '#ffffffff', width: '30%', height: '55px' }}>

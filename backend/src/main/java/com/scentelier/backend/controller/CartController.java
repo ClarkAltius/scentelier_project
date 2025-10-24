@@ -29,14 +29,14 @@ public class CartController {
 
     @PostMapping("/insert")
     public ResponseEntity<String> addToCart(@RequestBody CartItemDto dto){
-        Optional<Users> memberOptional = userService.findUserById(dto.getUserId());
+        Optional<Users> UserOptional = userService.findUserById(dto.getUserId());
         Optional<Products> productOptional = productService.findProductsById(dto.getProductId()) ;
 
-        if(memberOptional.isEmpty() || productOptional.isEmpty()){
+        if(UserOptional.isEmpty() || productOptional.isEmpty()){
             return ResponseEntity.badRequest().body("회원 또는 상품 정보가 올바르지 않습니다.");
         }
 
-        Users users = memberOptional.get();
+        Users users = UserOptional.get();
         Products products = productOptional.get();
 
         if(products.getStock() < dto.getQuantity()){
@@ -54,7 +54,7 @@ public class CartController {
         CartItems existingCartItems = null;
         if(cart.getItems() != null) {
             for (CartItems ci : cart.getItems()) {
-                if (ci.getProduct().getId().equals(ci.getId())) {
+                if (ci.getProduct().getId().equals(products.getId())) {
                     existingCartItems = ci;
                     break;
                 }

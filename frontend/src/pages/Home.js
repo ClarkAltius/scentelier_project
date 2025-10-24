@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../component/AuthContext";
 
 
 
@@ -12,6 +13,7 @@ function Home() {
     const containerRef = useRef();
     const [best, setBest] = useState([]);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
 
     //썸네일 목록 - 3번 반복해 무한 루프 효과
@@ -97,9 +99,30 @@ function Home() {
 
     }, []);
 
-    // ------------------------ 베스트 향수 ------------------------------------
+    // ------------------------ 장바구니 ------------------------------------
 
+    const addToCart = async (e, product) => {
+        e.stopPropagation();
+        try {
+            const url = `${API_BASE_URL}/cart/insert`;
+            const parameters = {
+                userId: user.id,
+                productId: product,
+                quantity: 1
+            };
 
+            const response = await axios.post(url, parameters, { withCredentials: true });
+
+            alert(response.data);
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+
+            if (error.response) {
+                alert('장바구니 추가 실패');
+                console.log(error.response.data);
+            }
+        }
+    }
 
 
     return (
@@ -246,7 +269,7 @@ function Home() {
                                 </p>
                                 <button
                                     style={{
-                                        marginRight: '5px',
+                                        marginRight: '50px',
                                         padding: '10px 20px',
                                         fontSize: '16px',
                                         cursor: 'pointer',
@@ -255,7 +278,8 @@ function Home() {
                                         color: '#67AB9F',                  // 텍스트 노란색
                                         border: '2px solid #67AB9F',       // 테두리 노란색
                                         borderRadius: '5px',
-                                    }}>
+                                    }}
+                                    onClick={() => navigate(`/perfume/finder`)}>
                                     TEST NOW
                                 </button>
                             </div>
@@ -268,7 +292,7 @@ function Home() {
 
             <div style={{ textAlign: 'center', margin: '50px 0px 10px 50px', fontSize: '50px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>_Best Perfume<span style={{ fontSize: '20px' }}>__ Scentelier의 베스트 향수를 만나보세요.</span>
             </div>
-            {/* -----------------------------리스트 ---------------------------- */}
+            {/* -----------------------------베스트리스트 ---------------------------- */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: "center" }}>
                 {best.map((item) => {
                     return (<Card onClick={() => navigate(`/product/detail/${item.id}`)}
@@ -286,24 +310,40 @@ function Home() {
                                 <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
                                 <br />
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
-                                    {['#파우더리', '#플로럴', '#부드러움'].map((tag, idx) => (
-                                        <span
-                                            key={idx}
-                                            style={{
-                                                padding: '4px 10px',
-                                                backgroundColor: '#ebebebff',
-                                                borderRadius: '20px',
-                                                fontSize: '0.85em',
-                                                color: '#555',
-                                                border: '1px solid transparent',
-                                            }}
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
+                                    {item.keyword
+                                        ? item.keyword.split(",").map((tag, idx) => (
+                                            <span
+                                                key={idx}
+                                                style={{
+                                                    padding: "4px 10px",
+                                                    backgroundColor: "#ebebebff",
+                                                    borderRadius: "20px",
+                                                    fontSize: "0.85em",
+                                                    color: "#555",
+                                                    border: "1px solid transparent",
+                                                }}
+                                            >
+                                                #{tag}
+                                            </span>
+                                        ))
+                                        : null}
                                 </div>
                             </Card.Text>
-                            <Button style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
+                            <Button
+                                key={item.id}
+                                onClick={(e) => {
+                                    if (!user) {
+                                        e.stopPropagation();
+
+                                        alert('로그인이 필요한 서비스입니다.');
+                                        navigate('/login');
+                                        return; // 로그인 페이지로 이동 후 종료
+                                    }
+
+                                    // 로그인된 경우에만 장바구니 추가 실행
+                                    addToCart(e, item.id);
+                                }}
+                                style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
                         </Card.Body>
                     </Card>)
                 })}

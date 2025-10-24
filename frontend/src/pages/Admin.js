@@ -9,6 +9,7 @@ import ProductManagement from '../component/ProductManagement';
 import StockManagement from '../component/StockManagement';
 import OrderManagement from '../component/OrderManagement';
 import CustomerInquiries from '../component/InquiryManagement';
+import ProductInsertForm from './ProductInsertForm';
 
 function Admin() {
 
@@ -20,10 +21,11 @@ function Admin() {
     const renderView = () => {
         const views = {
             'dashboard': <Dashboard />,
-            'products': <ProductManagement />,
+            'products': <ProductManagement setActiveView={setActiveView} />,
             'stock': <StockManagement />,
             'orders': <OrderManagement />,
-            'inquiries': <CustomerInquiries />
+            'inquiries': <CustomerInquiries />,
+            'productInsert': <ProductInsertForm setActiveView={setActiveView} />
         };
         return views[activeView] || <Dashboard />;
     };
@@ -33,7 +35,7 @@ function Admin() {
 
         <div className={styles.adminPageWrapper}>
             <Sidebar activeView={activeView} setActiveView={setActiveView} />
-            <div className={styles.mainContent}>
+            <div className={styles.mainContent} >
                 {/* Just render the Topbar component directly */}
                 <Topbar activeView={activeView} />
                 {/* Admin Main content. Active View. */}

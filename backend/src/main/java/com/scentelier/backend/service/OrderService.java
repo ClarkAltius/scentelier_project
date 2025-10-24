@@ -1,7 +1,9 @@
 package com.scentelier.backend.service;
 
+import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +23,9 @@ public class OrderService {
     public List<Products> getBestList2() {
         List<Products> products = orderRepository.findBestList2();
         return products != null ? products : Collections.emptyList();
+    }
+
+    public void save(Orders orders) {
+        orderRepository.save(orders);
     }
 }

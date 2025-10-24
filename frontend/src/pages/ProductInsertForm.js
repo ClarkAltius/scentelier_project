@@ -4,8 +4,9 @@ import { Button, Container, Form, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
 
-function ProductInsertForm() {
+function ProductInsertForm({ setActiveView }) {
   const comment = "상품 등록";
+  const cancelComment = "상품 등록 취소";
   const navigate = useNavigate();
 
   const initial_value = {
@@ -18,6 +19,7 @@ function ProductInsertForm() {
     keyword: "",
     season: "",
   };
+
 
   const [product, setProduct] = useState(initial_value);
   const [keywords, setKeywords] = useState([]);
@@ -67,11 +69,15 @@ function ProductInsertForm() {
 
       setProduct(initial_value);
       //상품 추가 후 상품 페이지가 아니라 관리자 페이지로 이동하도록 변경했습니다. 2025-10-22 전일환
-      navigate("/admin");
+      setActiveView('products');
     } catch (error) {
       console.error(error.response?.data);
       alert("상품 등록에 실패하였습니다.");
     }
+  };
+
+  const CancelAction = () => {
+    setActiveView('products');
   };
 
   // Enter로 태그 추가
@@ -213,9 +219,13 @@ function ProductInsertForm() {
             </Form.Group>
 
             <div className="text-center">
+              <Button variant="warning" onClick={CancelAction} size="lg" className="px-3">
+                {cancelComment}
+              </Button>
               <Button variant="success" type="submit" size="lg" className="px-5">
                 {comment}
               </Button>
+
             </div>
           </Form>
         </Card.Body>

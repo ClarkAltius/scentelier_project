@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-function ProductManagement() {
+function ProductManagement({ setActiveView }) {
     const [products, setProducts] = useState([]); //mock 데이터에서 실제 상품 데이터로 변경
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true); //로딩 스테이트
@@ -66,33 +66,34 @@ function ProductManagement() {
 
     // CRUD 기능 플레이스홀더
     const handleAddNew = () => {
-        navigate('/product/insert');
+        setActiveView('productInsert');
     };
 
     const handleEdit = (productId) => {
         console.log(`TODO: Open 'Edit' modal for product ${productId}`);
 
-        try {
-            axios.delete(`api/products/${productId}`);
-
-            setProducts((prevProducts) =>
-                prevProducts.filter((p) => p.id !== productId)
-            );
-            alert('상품이 삭제되었습니다.');
-        } catch (error) {
-            console.error('삭제 중 오류 :', error);
-            alert('상품 삭제 중 오류가 발생하였습니다.');
-        }
     };
 
-    const handleDelete = (productId) => {
-        if (window.confirm('정말 삭제하시겠습니까?')) {
-            setProducts((prevProducts) => prevProducts.filter((p) => p.id !== productId));
-            console.log(`TODO: Open 'Delete' confirmation for product ${productId}`);
-            // Example of how you'd update state (once confirmed):
-            // setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-        }
-    };
+const handleDelete = async (productId) => {
+
+ if (!window.confirm('정말 삭제하시겠습니까?')) 
+    return;
+
+  const del = products;
+  setProducts(prev => prev.filter(p => p.id !== productId));
+
+  try {
+    await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
+      withCredentials: true,
+    });
+    alert('상품이 삭제되었습니다.');    
+  } catch (error) {
+    console.error('삭제 중 오류:', error);
+    setProducts(del);
+    alert('상품 삭제 중 오류가 발생하였습니다.');
+  }
+};
+
 
 
     //페이지 렌더링 용 함수
