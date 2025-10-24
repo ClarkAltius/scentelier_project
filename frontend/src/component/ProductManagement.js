@@ -86,7 +86,7 @@ const handleDelete = async (productId) => {
     await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
       withCredentials: true,
     });
-    alert('상품이 삭제되었습니다.');
+    alert('상품이 삭제되었습니다.');    
   } catch (error) {
     console.error('삭제 중 오류:', error);
     setProducts(del);

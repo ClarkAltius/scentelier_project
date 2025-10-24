@@ -26,9 +26,9 @@ public class ProductService {
         return productRepository.findById(productId);
     }
 
-    //상품 리스트 전체 가져오기 서비스
+    //상품 리스트 pageable로 전체 가져오기 서비스
     public Page<Products> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable);
+        return productRepository.findAllByIsDeletedFalse(pageable); //삭제 x 인 상품만
     }
 
     public Products ProductById(Long id) {
@@ -46,7 +46,7 @@ public class ProductService {
 
     public boolean deleteProduct(Long id) {
     if(productRepository.existsById(id)){
-        this.productRepository.deleteById(id);
+        this.productRepository.deleteById(id);  // 상품 실제 삭제 요청. 실제 상품 삭제가 아닌 소프트 딜리트 필요
         return true;
     }else{
         return false;
