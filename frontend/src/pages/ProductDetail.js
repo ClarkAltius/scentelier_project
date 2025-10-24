@@ -95,12 +95,11 @@ function ProductDetail() {
         state: {
             products: [
             {
-                id: product.id,
+                productId: product.id,
                 name: product.name,
                 price: product.price,
                 quantity: quantity,
-                imageUrl: product.imageUrl,
-                isCustom: false
+                imageUrl: product.imageUrl
             },
             ],
             from: "productDetail",

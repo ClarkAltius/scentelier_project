@@ -166,7 +166,7 @@ function Payments(props) {
                         </Card.Header>
                         <Card.Body>
                             <h5>일반 상품</h5>
-                            {products.filter((product) => !product.customId).map((p, idx) => (
+                            {products.filter((product) => !!product.productId).map((p, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`p-${p.cartItemId}`}>
                                     {p.name} — {p.quantity}개
@@ -177,7 +177,7 @@ function Payments(props) {
                                 </div>
                             ))}
                             <h5 className="mt-3">커스텀 향수</h5>
-                            {products.filter((product) => !product.productId).map((c, idx) => (
+                            {products.filter((product) => !!product.customId).map((c, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`c-${c.cartItemId}`}>
                                     {c.name} — {c.quantity}개
