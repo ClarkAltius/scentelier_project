@@ -21,7 +21,6 @@ public class CartItems {
     @NotNull(message = "장바구니 품목 수량은 0일 수 없습니다")
     private int quantity;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id", nullable = true)
     private Products product;

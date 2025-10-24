@@ -13,4 +13,8 @@ public class CartItemService {
     public void saveCartItems(CartItems ci) {
         cartItemRepository.save(ci);
     }
+
+    public void deleteCartItemById(Long cartProductId) {
+        cartItemRepository.deleteById(cartProductId);
+    }
 }

@@ -1,26 +1,83 @@
 package com.scentelier.backend.controller;
 
-import com.scentelier.backend.entity.Orders;
-import com.scentelier.backend.entity.Products;
-import com.scentelier.backend.entity.Users;
-import com.scentelier.backend.service.OrderService;
+import com.scentelier.backend.dto.OrderDto;
+import com.scentelier.backend.dto.OrderProductDto;
+import com.scentelier.backend.entity.*;
+import com.scentelier.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/order")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final UserService userService;
+    private final ProductService productService;
+    private final CustomPerfumeService customPerfumeService;
+    private final CartItemService cartItemService;
+    private final IngredientService ingredientService;
+    private final CustomPerfumeIngredientService customPerfumeIngredientService;
 
-    public ResponseEntity<?> createOrder(@RequestBody Orders orders) {
-        return null;
+    @PostMapping
+    public ResponseEntity<?> createOrder(@RequestBody OrderDto dto) {
+        Optional<Users> optionalUsers = userService.findUserById(dto.getUserId());
+        if (optionalUsers.isEmpty()) {
+            throw new RuntimeException("회원이 존재하지 않습니다.");
+        }
+        Users users = optionalUsers.get();
+
+        Orders orders = new Orders();
+        orders.setUsers(users);
+        orders.setRecipientName(dto.getRecipientName());
+        orders.setPhone(dto.getPhone());
+        orders.setAddress(dto.getAddress());
+        orders.setTotalPrice(dto.getTotalPrice());
+        orders.setStatus(dto.getStatus());
+        orders.setPaymentMethod(dto.getPaymentMethod());
+        orders.setOrderDate(LocalDate.now());
+
+        List<OrderProduct> orderProductList = new ArrayList<>();
+        for (OrderProductDto item : dto.getOrderProducts()) {
+
+            OrderProduct orderProduct = new OrderProduct();
+            if (item.getProductId() != null) {
+                Products products = productService.findProductsById(item.getProductId())
+                        .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+                orderProduct.setProducts(products);
+                // 상품의 재고 수량 빼기
+                products.setStock(products.getStock() - item.getQuantity());
+                productService.save(products);
+            } else if (item.getCustomId() != null) {
+                CustomPerfume customPerfume = customPerfumeService.findCustomPerfumeById(item.getCustomId())
+                        .orElseThrow(() -> new RuntimeException("커스텀 향수가 존재하지 않습니다."));
+                orderProduct.setCustomPerfume(customPerfume);
+                customPerfumeIngredientService.reduceIngredientStock(customPerfume, item.getQuantity());
+            }
+            // 카트에 담겨있던 품목을 삭제
+            Long cartItemId = item.getCartItemId();
+
+            if (cartItemId != null) {
+                cartItemService.deleteCartItemById(cartItemId);
+            }
+
+            orderProduct.setOrders(orders);
+            orderProduct.setQuantity(item.getQuantity());
+            orderProduct.setPrice(item.getPrice());
+
+            orderProductList.add(orderProduct);
+        }
+        orders.setOrderProducts(orderProductList);
+        orderService.save(orders);
+
+        return ResponseEntity.ok(Map.of("message", "주문이 성공적으로 생성되었습니다."));
     }
 
     @GetMapping("/list")

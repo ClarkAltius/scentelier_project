@@ -7,5 +7,6 @@ import lombok.Setter;
 public class CartItemDto {
     private Long userId;
     private Long productId;
+    private Long customId;
     private int quantity;
 }
