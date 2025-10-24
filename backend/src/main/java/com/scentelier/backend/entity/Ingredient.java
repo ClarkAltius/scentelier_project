@@ -35,7 +35,7 @@ public class Ingredient {
     private String  description;
 
     @Column(nullable = false)//값입력필수
-    private BigDecimal stock;
+    private int stock;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted;

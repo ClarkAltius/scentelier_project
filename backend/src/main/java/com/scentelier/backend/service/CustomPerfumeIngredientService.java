@@ -35,7 +35,7 @@ public class CustomPerfumeIngredientService {
                 throw new RuntimeException("재료 재고가 부족합니다: " + ingredient.getName());
             }
 
-            ingredient.setStock(ingredient.getStock().subtract(BigDecimal.valueOf(usedAmount)));
+            ingredient.setStock(ingredient.getStock()-usedAmount);
         }
     }
 }

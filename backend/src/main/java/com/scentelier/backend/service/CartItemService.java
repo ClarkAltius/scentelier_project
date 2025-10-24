@@ -5,6 +5,8 @@ import com.scentelier.backend.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CartItemService {
@@ -14,8 +16,25 @@ public class CartItemService {
         cartItemRepository.save(ci);
     }
 
-    public void deleteCartItemById(Long cartProductId) {
-        cartItemRepository.deleteById(cartProductId);
+    public void deleteCartItemById(Long cartItemId) {
+        cartItemRepository.deleteById(cartItemId);
+    }
+
+    public void saveCartProduct(CartItems cp) {
+        this.cartItemRepository.save(cp);
+    }
+
+    public Optional<CartItems> findCartProductById(Long cartItemId) {
+        return cartItemRepository.findById(cartItemId);
+    }
+
+
+    public void delete(Long cartItemId) {
+        cartItemRepository.deleteById(cartItemId);
+    }
+
+    public void deleteCartProductById(Long cartItemId) {
+        cartItemRepository.deleteById(cartItemId);
     }
 }
 
