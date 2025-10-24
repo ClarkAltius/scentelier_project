@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './OrderManagement.module.css'; // Assuming you create a CSS module for styling
 import { Search, Filter, Eye, Edit, XCircle } from 'lucide-react'; // Import icons
+import { API_BASE_URL } from '../config/config';
+import axios from 'axios';
 
 /**
  * OrderManagement Component
@@ -11,7 +13,7 @@ import { Search, Filter, Eye, Edit, XCircle } from 'lucide-react'; // Import ico
  * and perform actual order modifications.
  */
 function OrderManagement() {
-    // === STATE VARIABLES ===
+    // === 스테이트 변수 ===
 
     // Holds the list of orders displayed. Initially populated with mock data.
     // In the future, this will be populated by an API call.
@@ -32,82 +34,27 @@ function OrderManagement() {
     // Error state to display messages if API calls fail.
     const [error, setError] = useState(null);
 
-    // === MOCK DATA ===
-    // Placeholder data representing customer orders.
-    // Replace this with an API call in useEffect.
-    const mockOrders = [
-        {
-            id: 101,
-            customerName: '홍길동',
-            customerEmail: 'hong@example.com',
-            orderDate: '2025-10-20',
-            totalAmount: 59000,
-            status: 'PENDING', // Possible statuses: PENDING, PAID, SHIPPED, DELIVERED, CANCELLED
-            items: [{ productId: 1, name: 'Midnight Blossom', quantity: 1, price: 59000 }],
-            shippingAddress: '서울특별시 강남구 테헤란로 123, 101호'
-        },
-        {
-            id: 102,
-            customerName: '김철수',
-            customerEmail: 'kim@example.com',
-            orderDate: '2025-10-21',
-            totalAmount: 96000,
-            status: 'SHIPPED',
-            items: [{ productId: 2, name: 'Citrus Garden', quantity: 2, price: 48000 }],
-            shippingAddress: '부산광역시 해운대구 우동 456, 202호'
-        },
-        {
-            id: 103,
-            customerName: '박영희',
-            customerEmail: 'park@example.com',
-            orderDate: '2025-10-21',
-            totalAmount: 67000,
-            status: 'DELIVERED',
-            items: [{ productId: 3, name: 'Woodland Whisper', quantity: 1, price: 67000 }],
-            shippingAddress: '대구광역시 중구 동성로 789, 303호'
-        },
-        // Add more mock orders as needed
-    ];
 
-    // === LIFECYCLE HOOKS ===
+    //주문 리스트 가져오기
 
-    /**
-     * useEffect Hook: Fetches orders when the component mounts.
-     *
-     * Currently, it just sets mock data after a short delay to simulate loading.
-     * TODO: Replace this with an actual API call to fetch orders from the backend.
-     * Handle loading and error states appropriately.
-     * Example:
-     * const fetchOrders = async () => {
-     * setIsLoading(true);
-     * setError(null);
-     * try {
-     * // Assuming your API endpoint is '/api/admin/orders'
-     * // const response = await axios.get(`${API_BASE_URL}/api/admin/orders`);
-     * // setOrders(response.data);
-     * // --- Mock implementation ---
-     * await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-     * setOrders(mockOrders);
-     * // --- End Mock ---
-     * } catch (err) {
-     * console.error("Failed to fetch orders:", err);
-     * setError("주문 목록을 불러오는 데 실패했습니다.");
-     * setOrders([]); // Clear orders on error
-     * } finally {
-     * setIsLoading(false);
-     * }
-     * };
-     * fetchOrders();
-     */
     useEffect(() => {
-        setIsLoading(true);
-        // Simulate fetching data
-        setTimeout(() => {
-            setOrders(mockOrders);
-            setIsLoading(false);
-        }, 500); // 0.5 second delay
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array means this runs once on mount
+        const fetchOrders = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, { withCredentials: true });
+                console.log(response.data);
+                setOrders(response.data.content || []);
+            } catch (err) {
+                console.error("Failed to fetch orders:", err);
+                setError("주문 목록을 불러오는 데 실패했습니다.");
+                setOrders([]); // Clear orders on error
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchOrders();
+    }, []);
 
 
     // === EVENT HANDLERS ===
@@ -213,12 +160,11 @@ function OrderManagement() {
 
     // Display loading indicator while fetching data.
     if (isLoading) {
-        return <div className={styles.loading}>Loading...</div>;
+        return <div className={styles.loading}>Loading products...</div>;
     }
 
-    // Display error message if fetching failed.
     if (error) {
-        return <div className={styles.error}>에러: {error}</div>;
+        return <div className={styles.error}>{error}</div>;
     }
 
     return (
@@ -273,14 +219,14 @@ function OrderManagement() {
                                     <td>{order.orderDate}</td>
                                     <td>₩{order.totalAmount.toLocaleString()}</td>
                                     <td>
-                                        {/* Display status with visual indicator */}
+                                        {/* 상태 + 상태 아이콘 표시*/}
                                         <span className={`${styles.statusBadge} ${styles[`status${order.status}`]}`}>
                                             {order.status}
                                         </span>
                                     </td>
                                     <td>
                                         <div className={styles.actionButtons}>
-                                            {/* Button to view order details */}
+                                            {/* 상세 보기 버튼. 기능 구현 필요 */}
                                             <button
                                                 className={`${styles.actionButton} ${styles.viewButton}`}
                                                 onClick={() => handleViewDetails(order)}
@@ -345,6 +291,7 @@ function OrderManagement() {
             )} */}
         </div>
     );
+
 }
 
 export default OrderManagement;

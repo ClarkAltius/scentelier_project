@@ -5,6 +5,8 @@ import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -27,5 +29,13 @@ public class OrderService {
 
     public void save(Orders orders) {
         orderRepository.save(orders);
+    }
+
+    public List<Orders> getOrderList() {
+        return orderRepository.findAll();
+    }
+
+    public Page<Orders> findAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable);
     }
 }
