@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, FormControl } from "react-bootstrap";
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../component/AuthContext";
+
 
 function Productlist() {
     const containerRef = useRef();
@@ -11,6 +13,8 @@ function Productlist() {
     const [product, setProduct] = useState([]);
     const [visibleCount, setVisibleCount] = useState(6);
     const navigate = useNavigate();
+    const { user } = useAuth();
+
 
 
     // 썸네일 목록 - 3번 반복해 무한 루프 효과
@@ -229,6 +233,29 @@ function Productlist() {
 
     const displayedProducts = filteredProducts.slice(0, visibleCount);
 
+    const addToCart = async (e, product) => {
+        e.stopPropagation();
+        try {
+            const url = `${API_BASE_URL}/cart/insert`;
+            const parameters = {
+                userId: user.id,
+                productId: product,
+                quantity: 1
+            };
+
+            const response = await axios.post(url, parameters, { withCredentials: true });
+
+            alert(response.data);
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+
+            if (error.response) {
+                alert('장바구니 추가 실패');
+                console.log(error.response.data);
+            }
+        }
+    }
+
 
     return (<>
 
@@ -287,6 +314,18 @@ function Productlist() {
                                     >
                                         <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>{item.price.toLocaleString()}원</span><br />
                                         <Button
+                                            onClick={(e) => {
+                                                if (!user) {
+                                                    e.stopPropagation();
+
+                                                    alert('로그인이 필요한 서비스입니다.');
+                                                    navigate('/login');
+                                                    return; // 로그인 페이지로 이동 후 종료
+                                                }
+
+                                                // 로그인된 경우에만 장바구니 추가 실행
+                                                addToCart(e, item.id);
+                                            }}
                                             style={{
                                                 backgroundColor: "transparent",
                                                 color: "#808080ff",
@@ -481,6 +520,18 @@ function Productlist() {
                             </div>
                         </Card.Text>
                         <Button
+                            onClick={(e) => {
+                                if (!user) {
+                                    e.stopPropagation();
+
+                                    alert('로그인이 필요한 서비스입니다.');
+                                    navigate('/login');
+                                    return; // 로그인 페이지로 이동 후 종료
+                                }
+
+                                // 로그인된 경우에만 장바구니 추가 실행
+                                addToCart(e, item.id);
+                            }}
                             style={{
                                 backgroundColor: "transparent",
                                 color: "#808080ff",
