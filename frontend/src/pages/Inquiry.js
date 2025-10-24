@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../config/config";
 
 const Inquiry = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
+    title: "",
+    content: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -15,45 +16,85 @@ const Inquiry = () => {
       ...formData,
       [e.target.id]: e.target.value,
     });
-
     setErrors({
       ...errors,
-      [e.target.id]: "", 
+      [e.target.id]: "",
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // --- 유효성 검사 ---
     const newErrors = {};
     let isValid = true;
 
-    if (!formData.name.trim()) {
-      newErrors.name = "이름을 입력해주세요.";
+    if (!formData.title.trim()) {
+      newErrors.title = "문의사항 제목을 입력해주세요.";
       isValid = false;
     }
 
-    if (!formData.email.trim() || !formData.email.includes("@")) {
-      newErrors.email = "이메일을 입력해주세요.";
-      isValid = false;
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = "메시지를 입력해주세요.";
+    if (!formData.content.trim()) {
+      newErrors.content = "문의사항 내용을 입력해주세요.";
       isValid = false;
     }
 
     setErrors(newErrors);
+    if (!isValid) return;
 
-    if (isValid) {
-      setSuccessMessage("문의가 성공적으로 제출되었습니다.");
-      setFormData({
-        name: "",
-        email: "",
-        message: "",
-      });
-    } else {
-      setSuccessMessage("");
+    // --- 서버로 전송 ---
+    //   try {
+    //     const response = await axios.post(`${API_BASE_URL}/api/inquiries/save`, formData);
+
+    //     if (response.data.success) {
+    //       setSuccessMessage("문의가 성공적으로 전송되었습니다!");
+    //       setFormData({ name: "", email: "", message: "" });
+    //     } else {
+    //       console.error("서버 오류:", response.data.error);
+    //       alert("문의 전송 중 오류가 발생했습니다. 다시 시도해주세요.");
+    //     }
+    //   } catch (error) {
+    //     console.error("네트워크 또는 서버 오류:", error);
+    //     alert("서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+    //   }
+    // };
+
+    // try {
+    //   await axios.post(`${API_BASE_URL}/api/inquiries/save`, formData);
+    //   alert("문의가 성공적으로 전송되었습니다!");
+    //   console.log(response.data.successMessage);
+    // } catch (error) {
+    //   console.error(error);
+
+    //   if (error.response && error.response.data && error.response.data.error) {
+    //     alert("서버 오류: " + error.response.data.error);
+    //   } else {
+    //     alert("문의 전송 중 오류가 발생했습니다.");
+    //   }
+    // }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/inquiries/save`, formData, { withCredentials: true });
+
+      if (response.data.success) {
+        alert("문의가 성공적으로 전송되었습니다!");
+        console.log(response.data.data); // 저장된 Inquiry 객체 확인 가능
+        setFormData({ title: "", content: "" });
+      } else {
+        console.error("서버 오류:", response.data.error);
+        alert("문의 전송 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
+
+    } catch (error) {
+      console.error(error);
+
+      if (error.response && error.response.data && error.response.data.error) {
+        alert("서버 오류: " + error.response.data.error);
+      } else {
+        alert("문의 전송 중 오류가 발생했습니다.");
+      }
     }
+
   };
 
   return (
@@ -62,28 +103,20 @@ const Inquiry = () => {
         <h2 style={styles.heading}>문의하기</h2>
         <form onSubmit={handleSubmit}>
           <InputGroup
-            label="이름"
-            id="name"
+            label="문의사항 제목"
+            id="title"
             type="text"
-            value={formData.name}
+            value={formData.title}
             onChange={handleChange}
-            error={errors.name}
+            error={errors.title}
           />
           <InputGroup
-            label="이메일"
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-          />
-          <InputGroup
-            label="메시지"
-            id="message"
+            label="내용"
+            id="content"
             type="textarea"
-            value={formData.message}
+            value={formData.content}
             onChange={handleChange}
-            error={errors.message}
+            error={errors.content}
           />
 
           <div style={styles.buttonWrapper}>
@@ -91,7 +124,7 @@ const Inquiry = () => {
               type="submit"
               style={styles.submitBtn}
               onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#007BFF")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#67AB9F")}
             >
               보내기
             </button>
