@@ -564,8 +564,9 @@ function Productlist() {
                             </p>
 
                             <button
+                                onClick={() => navigate(`/perfume/finder`)}
                                 style={{
-                                    marginRight: '50px',
+                                    marginRight: '49px',
                                     padding: '10px 20px',
                                     fontSize: '16px',
                                     cursor: 'pointer',
