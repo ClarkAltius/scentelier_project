@@ -99,4 +99,33 @@ public class CartController {
         return ResponseEntity.ok(cartItems); // 전체 카트 상품 반환
     }
 
+    @PatchMapping("/edit/{cartItemId}")
+    public ResponseEntity<String> updateCartItems(@PathVariable Long cartItemId, @RequestParam(required = false) Integer quantity) {
+        String message = null;
+
+        if (quantity == null) {
+            message = "장바구니 품목은 최소 1개 이상이어야 합니다.";
+            return ResponseEntity.badRequest().body(message);
+        }
+
+        Optional<CartItems> cartItemOptional = cartItemService.findCartItemById(cartItemId);
+        if (cartItemOptional.isEmpty()) {
+            message = "장바구니 품목을 찾을 수 없습니다.";
+            return ResponseEntity.badRequest().body(message);
+        }
+
+        CartItems cartItems = cartItemOptional.get();
+        cartItems.setQuantity(quantity);
+        cartItemService.saveCartItems(cartItems);
+
+        message = "카트 상품 아이디 " + cartItemId + "번이 '" + quantity + "개'로 수정 되었습니다.";
+        return ResponseEntity.ok(message);
+    }
+
+    @DeleteMapping("/delete/{cartItemId}")
+    public ResponseEntity<String> deleteCartItems(@PathVariable Long cartItemId) {
+        cartItemService.deleteCartItemById(cartItemId);
+        String message = "카트 상품 " + cartItemId + "번이 장바구니 목록에서 삭제 되었습니다.";
+        return ResponseEntity.ok(message);
+    }
 }

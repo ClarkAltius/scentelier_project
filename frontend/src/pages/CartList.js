@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
 import { useAuth } from "../component/AuthContext";
 import axios from "axios";
+import { X } from "lucide-react";
 
 // 배송 정책
-const SHIPPING_FEE = 3000;
+const SHIPPING_FEE = 0;
 const FREE_SHIPPING_THRESHOLD = Infinity; // 무료배송 조건 미정
 
 // 서버 데이터 정규화
@@ -57,29 +58,29 @@ function CartList() {
 
   // 데이터 로드
   useEffect(() => {
-  if (!user?.id) return;
-  fetchCartItems();
-    }, [user?.id]);
+    if (!user?.id) return;
+    fetchCartItems();
+  }, [user?.id]);
 
 
   const fetchCartItems = async () => {
-  try {
-    const url = `${API_BASE_URL}/cart/list/${user.id}`;
-    const res = await axios.get(url, { withCredentials: true });
+    try {
+      const url = `${API_BASE_URL}/cart/list/${user.id}`;
+      const res = await axios.get(url, { withCredentials: true });
 
-    // 받아온 데이터를 정규화해서 items에 반영
-    const normalized = (res.data ?? []).map((x) =>
-      normalizeCartItem({ checked: true, ...x })
-    );
-    updateItems(normalized);
+      // 받아온 데이터를 정규화해서 items에 반영
+      const normalized = (res.data ?? []).map((x) =>
+        normalizeCartItem({ checked: true, ...x })
+      );
+      updateItems(normalized);
 
-  } catch (error) {
-    console.log('오류 정보', error);
-    // alert('카트 정보가 없어서 상품 목록으로 이동합니다.');
-    updateItems([]);
-    // navigate('/product/list');  상품목록으로 이동 네이게이터
-  }
-};
+    } catch (error) {
+      console.log('오류 정보', error);
+      // alert('카트 정보가 없어서 상품 목록으로 이동합니다.');
+      updateItems([]);
+      // navigate('/product/list');  상품목록으로 이동 네이게이터
+    }
+  };
 
 
   // 체크박스
@@ -88,17 +89,18 @@ function CartList() {
     updateItems(items.map((p) => (p.cartItemId === cartItemId ? { ...p, checked: !p.checked } : p)));
 
   // 수량 조절
-  const inc = (id) => // 수량 증가 + 버튼 기능
-    updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Number(p.quantity) + 1 } : p)));
+  const inc = (id) => { // 수량 증가 + 버튼 기능
+    updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Number(p.quantity) + 1 } : p)))
+  };
   const dec = (id) => // 수량 감소 - 버튼 기능
     updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Math.max(1, Number(p.quantity) - 1) } : p)));
   const inputQty = (id, v) => { // 직접입력한 수량
     const q = Math.max(1, Number(v) || 1);
     updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: q } : p)));
+    saveQuantity(id);
   };
 
   // 서버 수량 수정
-
   const saveQuantity = async (cartItemId) => {
   const target = items.find((p) => p.cartItemId === cartItemId);
   if (!target) return;
@@ -109,11 +111,8 @@ function CartList() {
       null,
       { params: { quantity: target.quantity }, withCredentials: true }
     );
-
-    console.log("서버 응답:", res.data);
-    alert("✅ 수량이 변경되었습니다.");
   } catch (error) {
-    console.error("❌ 수량 변경 오류:", error);
+    console.error("수량 변경 오류:", error);
     alert("수량 변경 중 문제가 발생했습니다.");
   }
 };
@@ -163,34 +162,6 @@ function CartList() {
     } catch (error) {
       console.error(error);
       alert("선택 삭제 중 오류가 발생했습니다.");
-    }
-  };
-
-  // 주문 처리
-  const order = async (targets) => {
-    if (targets.length === 0) {
-      alert("주문할 상품을 선택해 주세요.");
-      return;
-    }
-    try {
-      const url = `${API_BASE_URL}/order`;
-      const body = {
-        memberId: user.id,
-        status: "PENDING",
-        orderItems: targets.map((p) => ({
-          cartItemId: p.cartItemId,
-          productId: p.productId,
-          quantity: p.quantity,
-        })),
-      };
-      const res = await axios.post(url, body, { withCredentials: true });
-      alert(res.data ?? "주문이 완료되었습니다.");
-
-      const removeIds = new Set(targets.map((p) => p.cartItemId));
-      updateItems(items.filter((p) => !removeIds.has(p.cartItemId)));
-    } catch (e) {
-      console.error(e);
-      alert("주문 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -302,7 +273,7 @@ function CartList() {
                         <div>
                           <div style={{ fontWeight: 600 }}>{p.name}</div>
                           <div className="mt-2 small">
-                            정상가 : {p.originalPrice.toLocaleString()}원
+                            정상가 : {p.price.toLocaleString()}원
                             <br />
                             할인가 : {discount > 0 ? `- ${discount.toLocaleString()}원` : "없음"}
                             <br />
@@ -316,7 +287,7 @@ function CartList() {
                           onClick={() => removeOne(p.cartItemId)}
                           title="삭제"
                         >
-                          ✕
+                          <X />
                         </Button>
                       </div>
 
@@ -329,12 +300,13 @@ function CartList() {
                           min={1}
                           value={p.quantity}
                           onChange={(e) => inputQty(p.cartItemId, e.target.value)}
+                          onBlur={() => saveQuantity(p.cartItemId)}
                           style={{ width: 80, textAlign: "center" }}
                         />
-                        <Button variant="light" onClick={() => inc(p.cartItemId)}>
+                        <Button variant="light" onClick={() => {inc(p.cartItemId); saveQuantity(p.cartItemId);}}>
                           +
                         </Button>
-
+                        {/** 
                         <Button
                           variant="outline-dark"
                           className="ms-3"
@@ -342,6 +314,7 @@ function CartList() {
                         >
                           변경
                         </Button>
+                        */}
                       </div>
                     </Col>
                   </Row>
@@ -368,8 +341,8 @@ function CartList() {
                 <Col className="text-end">{selectedTotal.toLocaleString()}원</Col>
               </Row>
               <Row>
-                <Col>총 배송비</Col>
-                <Col className="text-end">{shipping.toLocaleString()}원</Col>
+                <Col>배송비</Col>
+                <Col className="text-end">무료</Col>
               </Row>
               <hr />
               <Row>

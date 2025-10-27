@@ -20,21 +20,12 @@ public class CartItemService {
         cartItemRepository.deleteById(cartItemId);
     }
 
-    public void saveCartProduct(CartItems cp) {
-        this.cartItemRepository.save(cp);
-    }
-
-    public Optional<CartItems> findCartProductById(Long cartItemId) {
-        return cartItemRepository.findById(cartItemId);
-    }
-
-
     public void delete(Long cartItemId) {
         cartItemRepository.deleteById(cartItemId);
     }
 
-    public void deleteCartProductById(Long cartItemId) {
-        cartItemRepository.deleteById(cartItemId);
+    public Optional<CartItems> findCartItemById(Long cartItemId) {
+        return cartItemRepository.findById(cartItemId);
     }
 }
 
