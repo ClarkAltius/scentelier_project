@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Collapse, Table, Spinner, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import {CheckCircle, Truck, Package, XCircle, Info, ChevronDown, ChevronUp, AlertTriangle, ScrollText, CircleCheckBig } from "lucide-react";
+import { CheckCircle, Truck, Package, XCircle, Info, ChevronDown, ChevronUp, AlertTriangle, ScrollText, CircleCheckBig } from "lucide-react";
 import { useAuth } from "../component/AuthContext";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
@@ -58,9 +58,11 @@ const OrderList = () => {
         const params = { params: { userId: user.id, role: user.role }, withCredentials: true, };
         const res = await axios.get(url, params);
         const normalized = (res.data ?? []).map(normalizeOrder);
+        console.log("Role: " + user.role);
         setOrders(normalized);
       } catch (err) {
         console.error(err);
+        console.log("Role: " + user.role);
         setError("주문 내역을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
@@ -196,9 +198,8 @@ const OrderList = () => {
         return (
           <Card
             key={order.orderId}
-            className={`mb-3 shadow-sm border-0 ${
-              order.status === "CANCELLED" ? "opacity-50" : ""
-            }`}
+            className={`mb-3 shadow-sm border-0 ${order.status === "CANCELLED" ? "opacity-50" : ""
+              }`}
             style={{
               borderLeft: `6px solid ${statusStyle.color}`,
               borderRadius: "12px",
@@ -290,14 +291,14 @@ const OrderList = () => {
 
                     {(order.status === "SHIPPED" ||
                       order.status === "DELIVERED") && (
-                      <Button
-                        variant="outline-success"
-                        size="sm"
-                        onClick={() => handleOrderAction(order.orderId, "confirm")}
-                      >
-                        <CircleCheckBig size={16} className="me-1" /> 수취 확인
-                      </Button>
-                    )}
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          onClick={() => handleOrderAction(order.orderId, "confirm")}
+                        >
+                          <CircleCheckBig size={16} className="me-1" /> 수취 확인
+                        </Button>
+                      )}
                   </div>
                 </Card.Body>
               </div>

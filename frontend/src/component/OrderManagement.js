@@ -7,16 +7,9 @@ import axios from 'axios';
 /**
  * OrderManagement Component
  *
- * This component provides an interface for administrators to view and manage customer orders.
- * As the backend is not yet implemented, it uses mock data and placeholder functions.
- * Future development will involve integrating with the backend API to fetch real order data
- * and perform actual order modifications.
  */
 function OrderManagement() {
     // === 스테이트 변수 ===
-
-    // Holds the list of orders displayed. Initially populated with mock data.
-    // In the future, this will be populated by an API call.
     const [orders, setOrders] = useState([]);
 
     // Stores the currently selected order for viewing details. `null` if no order is selected.
@@ -36,7 +29,6 @@ function OrderManagement() {
 
 
     //주문 리스트 가져오기
-
     useEffect(() => {
         const fetchOrders = async () => {
             setIsLoading(true);
@@ -93,48 +85,57 @@ function OrderManagement() {
         alert(`주문 상세 보기:\n주문 번호: ${order.id}\n고객명: ${order.customerName}\n총액: ${order.totalAmount}원\n상태: ${order.status}\n\n(실제 앱에서는 모달 창 등으로 표시됩니다.)`);
     };
 
-    /**
-     * handleUpdateStatus: Placeholder for updating the status of an order.
-     * @param {number} orderId - The ID of the order to update.
-     * @param {string} newStatus - The new status to set (e.g., 'SHIPPED', 'DELIVERED').
-     *
-     * TODO: Implement API call to the backend to update the order status.
-     * Update the local 'orders' state upon successful API response.
-     * Provide user feedback (e.g., success message, loading indicator).
-     * Consider adding confirmation prompts.
-     */
-    const handleUpdateStatus = (orderId, newStatus) => {
-        console.log(`TODO: Update status of order ${orderId} to ${newStatus}`);
-        // Example state update (optimistic or after API success):
-        // setOrders(prevOrders =>
-        //     prevOrders.map(order =>
-        //         order.id === orderId ? { ...order, status: newStatus } : order
-        //     )
-        // );
-        alert(`[Placeholder] 주문 #${orderId} 상태를 ${newStatus}(으)로 변경합니다.`);
-    };
 
-    /**
-     * handleCancelOrder: Placeholder for cancelling an order.
-     * @param {number} orderId - The ID of the order to cancel.
-     *
-     * TODO: Implement API call to the backend to cancel the order.
-     * Handle potential refund logic if applicable.
-     * Update the local 'orders' state (e.g., set status to 'CANCELLED' or remove).
-     * Provide user feedback and confirmation prompts.
-     */
-    const handleCancelOrder = (orderId) => {
-        if (window.confirm(`정말로 주문 #${orderId}을(를) 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-            console.log(`TODO: Cancel order ${orderId}`);
-            // Example state update:
-            // setOrders(prevOrders =>
-            //     prevOrders.map(order =>
-            //         order.id === orderId ? { ...order, status: 'CANCELLED' } : order
-            //     )
-            // );
-            alert(`[Placeholder] 주문 #${orderId}을(를) 취소합니다.`);
+    // 상태 변경 핸들러
+    const handleUpdateStatus = async (orderId, newStatus) => {
+        if (!window.confirm(`정말로 #${orderId}의 상태를 ${newStatus}로 변경하시겠습니다?`)) {
+            return;
+        }
+        const payload = { status: newStatus };
+        try {
+            await axios.patch(
+                `${API_BASE_URL}/api/admin/orders/${orderId}`,
+                payload,
+                { withCredentials: true }
+            );
+            // Upon response update local state
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order.id === orderId ? { ...order, status: newStatus } : order
+                )
+            );
+            alert(`주문 #${orderId} 상태가 ${newStatus}(으)로 변경되었습니다.`);
+        } catch (err) {
+            console.log("상태 변경 실패: " + err);
+            alert("주문 상태 변경에 실패했습니다.")
         }
     };
+
+    // 주문 취소 로직
+    const handleCancelOrder = async (orderId) => {
+        if (window.confirm(`정말로 주문 #${orderId}을(를) 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+            const newStatus = "CANCELLED";
+            const payload = { status: newStatus };
+
+            try {
+                await axios.patch(
+                    `${API_BASE_URL}/api/admin/orders/${orderId}`,
+                    payload,
+                    { withCredentials: true });
+
+                // API 콜이 성공적일 경우 로컬 스테이트 업데이트
+                setOrders(prevOrders =>
+                    prevOrders.map(order =>
+                        order.id === orderId ? { ...order, status: newStatus } : order
+                    )
+                );
+                alert(`주문 #${orderId}이(가) 취소되었습니다.`);
+            } catch (err) {
+                console.error("Failed to cancel order:", err);
+                alert("주문 취소에 실패했습니다. 서버 오류가 발생했습니다.");
+            };
+        };
+    }
 
 
     // === DERIVED STATE & FILTERING/SEARCHING LOGIC ===
@@ -156,13 +157,12 @@ function OrderManagement() {
     });
 
 
-    // === RENDER LOGIC ===
+    // === 렌더링 로직 ===
 
-    // Display loading indicator while fetching data.
+    // 데이터 fetch 도중엔 로딩 표기
     if (isLoading) {
         return <div className={styles.loading}>Loading products...</div>;
     }
-
     if (error) {
         return <div className={styles.error}>{error}</div>;
     }
@@ -176,7 +176,7 @@ function OrderManagement() {
                     <Search size={18} className={styles.searchIcon} />
                     <input
                         type="text"
-                        placeholder="Search by Order ID, Name, Email..."
+                        placeholder="ID, Name, Email... 검색"
                         value={searchTerm}
                         onChange={handleSearchChange}
                     />
@@ -256,14 +256,14 @@ function OrderManagement() {
                                                 </button>
                                             )}
 
-                                            {/* Button to cancel the order (conditionally shown) */}
+                                            {/* 주문 취소하기. change status to cancelled. this is a patch */}
                                             {order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && (
                                                 <button
                                                     className={`${styles.actionButton} ${styles.cancelButton}`}
                                                     onClick={() => handleCancelOrder(order.id)}
                                                     title="Cancel Order"
                                                 >
-                                                    <XCircle size={16} /> Cancel
+                                                    <XCircle size={16} /> 취소
                                                 </button>
                                             )}
                                         </div>

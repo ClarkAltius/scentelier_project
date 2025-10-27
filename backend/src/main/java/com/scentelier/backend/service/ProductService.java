@@ -11,7 +11,12 @@ import com.scentelier.backend.dto.ProductStockDto;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import jakarta.transaction.Transactional;
 
+// 주문 취소 리스너용
+import com.scentelier.backend.event.OrderCancelledEvent;
+import com.scentelier.backend.entity.OrderProduct;
+import org.springframework.context.event.EventListener;
 
 @Service
 public class ProductService {
@@ -45,14 +50,38 @@ public class ProductService {
 
 
     public boolean deleteProduct(Long id) {
-    if(productRepository.existsById(id)){
-        this.productRepository.deleteById(id);  // 상품 실제 삭제 요청. 실제 상품 삭제가 아닌 소프트 딜리트 필요
-        return true;
-    }else{
-        return false;
+        if(productRepository.existsById(id)){
+            this.productRepository.deleteById(id);  // 상품 실제 삭제 요청. 실제 상품 삭제가 아닌 소프트 딜리트 필요
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @EventListener
+    @Transactional
+    public void handleOrderCancellation(OrderCancelledEvent event) {
+        System.out.println("주문 취소 heard: " + event.getCancelledOrder().getId());
+
+        // 취소된 주문에서 모든 제품 찾기
+        for (OrderProduct item : event.getCancelledOrder().getOrderProducts()) {
+
+            // 제품 찾기
+            Products product = item.getProducts();
+            if (product != null) {
+                // 구 수량, 취소 수량 판별
+                int currentStock = product.getStock();
+                int restockAmount = item.getQuantity();
+
+                // 구 수량, 취소 수량 합산
+                product.setStock(currentStock + restockAmount);
+
+                // 새로운 수량 저장
+                productRepository.save(product);
+                System.out.println("Restocked " + restockAmount + " of product " + product.getName());
+            }
+        }
     }
 }
-
-    }
 
 

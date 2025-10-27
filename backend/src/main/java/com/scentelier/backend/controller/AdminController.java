@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import com.scentelier.backend.dto.OrderUpdateDto;
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -68,6 +68,16 @@ public class AdminController {
     public ResponseEntity<List<InquiryDto>> getInquiries(){
         List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
         return ResponseEntity.ok(inquiryList);
+    }
+
+    @PatchMapping("/orders/{orderId}")
+    public ResponseEntity<OrderAdminDto> updateOrderStatus(
+            @PathVariable Long orderId,
+            @Valid@RequestBody OrderUpdateDto updateDto)
+    {
+        OrderAdminDto updatedOrder = orderService.updateOrderStatus(orderId, updateDto.getStatus());
+
+        return ResponseEntity.ok(updatedOrder);
     }
 }
 
