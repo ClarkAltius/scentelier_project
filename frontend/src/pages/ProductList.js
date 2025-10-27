@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, FormControl } from "react-bootstrap";
 import { API_BASE_URL } from "../config/config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
 
 
@@ -125,13 +125,15 @@ function Productlist() {
 
     // ---------------------------카테고리---------------------------------
 
-    const types = ['Powdery', 'Woody', 'Crystal', 'Chypre', 'Citrus', 'Fruity', 'Green'];
+    const types = ['Powdery', 'Woody', 'Crystal', 'Chypre', 'Citrus', 'Fruity', 'Green', 'Floral'];
     const seasons = ['SPRING', 'SUMMER', 'FALL', 'WINTER'];
 
     const [activeCategory, setActiveCategory] = useState('all');
     const [selectedTag, setSelectedTag] = useState(null);
     const [filteredProducts, setFilteredProducts] = useState(product);
     const [searchTerm, setSearchTerm] = useState("");
+
+    const [searchParams] = useSearchParams();
 
 
     const toggleCategory = (category) => {
@@ -166,6 +168,19 @@ function Productlist() {
 
         setFilteredProducts(filtered);
     };
+
+    //-------------------------------------------------------------------
+
+    useEffect(() => {
+        const typeParam = searchParams.get("type");
+
+        if (typeParam) {
+            setActiveCategory("type");  // 타입 카테고리 선택
+            handleTagClick(typeParam, "type"); // 해당 타입 필터링
+        }
+    }, [searchParams]); // URL이 바뀔 때마다 실행
+
+
 
     // ---------------------------검색관련---------------------------------
 

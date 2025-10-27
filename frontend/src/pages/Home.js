@@ -18,14 +18,14 @@ function Home() {
 
     //썸네일 목록 - 3번 반복해 무한 루프 효과
     const thumbnails = [
-        { id: 1, src: `${API_BASE_URL}/uploads/type/Chypre.jpg`, alt: '썸네일 1', label: '# Chypre' },
-        { id: 2, src: `${API_BASE_URL}/uploads/type/Citrus.jpg`, alt: 'Citrus', label: '# Citrus' },
-        { id: 3, src: `${API_BASE_URL}/uploads/type/Floral.jpg`, alt: 'Floral', label: '# Floral' },
-        { id: 4, src: `${API_BASE_URL}/uploads/type/Fruity.jpg`, alt: 'Fruity', label: '# Fruity' },
-        { id: 5, src: `${API_BASE_URL}/uploads/type/Green.jpg`, alt: 'Green', label: '# Green' },
-        { id: 6, src: `${API_BASE_URL}/uploads/type/Powdery.jpg`, alt: 'Powdery', label: '# Powdery' },
-        { id: 7, src: `${API_BASE_URL}/uploads/type/Woody.jpg`, alt: 'Woody', label: '# Woody' },
-        { id: 8, src: `${API_BASE_URL}/uploads/type/Crystal.jpg`, alt: 'Crystal', label: '# Crystal' }
+        { id: 1, src: `${API_BASE_URL}/uploads/type/Chypre.jpg`, alt: '썸네일 1', label: 'Chypre' },
+        { id: 2, src: `${API_BASE_URL}/uploads/type/Citrus.jpg`, alt: 'Citrus', label: 'Citrus' },
+        { id: 3, src: `${API_BASE_URL}/uploads/type/Floral.jpg`, alt: 'Floral', label: 'Floral' },
+        { id: 4, src: `${API_BASE_URL}/uploads/type/Fruity.jpg`, alt: 'Fruity', label: 'Fruity' },
+        { id: 5, src: `${API_BASE_URL}/uploads/type/Green.jpg`, alt: 'Green', label: 'Green' },
+        { id: 6, src: `${API_BASE_URL}/uploads/type/Powdery.jpg`, alt: 'Powdery', label: 'Powdery' },
+        { id: 7, src: `${API_BASE_URL}/uploads/type/Woody.jpg`, alt: 'Woody', label: 'Woody' },
+        { id: 8, src: `${API_BASE_URL}/uploads/type/Crystal.jpg`, alt: 'Crystal', label: 'Crystal' }
     ];
     const extended = [...thumbnails, ...thumbnails, ...thumbnails];
 
@@ -124,6 +124,10 @@ function Home() {
         }
     }
 
+    const handleTypeClick = (type) => {
+        navigate(`/product/list?type=${type}`);
+    };
+
 
     return (
         <>
@@ -204,12 +208,14 @@ function Home() {
                             <img
                                 src={thumb.src}
                                 alt={thumb.alt}
+                                onClick={() => handleTypeClick(`${thumb.label}`)}
                                 style={{
                                     width: 300,
                                     height: 400,
                                     objectFit: 'cover',
                                     borderRadius: '6px',
                                     border: '2px solid transparent',
+                                    cursor: "pointer"
                                 }}
                             />
                             <span
@@ -220,7 +226,7 @@ function Home() {
                                     textAlign: 'center',
                                 }}
                             >
-                                {thumb.label}
+                                #{thumb.label}
                             </span>
                         </div>
                     ))}

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, FormControl } from "react-bootstrap";
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../component/AuthContext";
 
 
 
@@ -10,6 +11,7 @@ function PerfumeTest() {
     const [product, setProduct] = useState([]);
     const navigate = useNavigate();
     const [selectedType, setSelectedType] = useState(null);
+    const { user } = useAuth();
 
 
     useEffect(() => {
@@ -214,6 +216,16 @@ function PerfumeTest() {
                             </p>
 
                             <button
+                                onClick={(e) => {
+                                    if (!user) {
+                                        e.stopPropagation();
+
+                                        alert('로그인이 필요한 서비스입니다.');
+                                        navigate('/login');
+                                        return; // 로그인 페이지로 이동 후 종료
+                                    }
+                                    navigate('/perfume/blending');
+                                }}
                                 style={{
                                     marginRight: '50px',
                                     padding: '10px 20px',

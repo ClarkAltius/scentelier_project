@@ -1,5 +1,6 @@
 package com.scentelier.backend.service;
 
+import com.scentelier.backend.Embeddable.CustomPerfumeIngredientId;
 import com.scentelier.backend.entity.CustomPerfume;
 import com.scentelier.backend.entity.CustomPerfumeIngredient;
 import com.scentelier.backend.entity.Ingredient;
@@ -38,4 +39,5 @@ public class CustomPerfumeIngredientService {
             ingredient.setStock(ingredient.getStock()-usedAmount);
         }
     }
+
 }

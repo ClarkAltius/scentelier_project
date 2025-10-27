@@ -14,6 +14,15 @@ function MenuItems() {
         navigate('/');
     };
 
+    const handleDesignClick = () => {
+        if (user) {
+            navigate("/perfume/blending"); // 로그인된 경우
+        } else {
+            alert('로그인이 필요한 서비스입니다.');
+            navigate("/login"); // 로그인 안 되어 있으면 로그인 페이지로
+        }
+    };
+
     return (
         <Navbar bg="light" variant="light" expand="lg" fixed="top" className="shadow-sm mb-3">
             <Container>
@@ -33,7 +42,7 @@ function MenuItems() {
                 <Nav className="me-auto">
                     <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Product</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
-                    <Nav.Link onClick={() => navigate('/perfume/blending')} style={{ color: '#808080ff' }}>Design</Nav.Link>
+                    <Nav.Link onClick={handleDesignClick} style={{ color: '#808080ff' }}>Design</Nav.Link>
                 </Nav>
                 <Nav>
                     {user ? (

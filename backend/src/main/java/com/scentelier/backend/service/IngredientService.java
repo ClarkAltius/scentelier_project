@@ -25,4 +25,9 @@ public class IngredientService {
                 .collect(Collectors.toList());
 
     }
+
+    public List<Ingredient> findAll() {
+        System.out.println("향료 리스트 "+ingredientRepository.findAll());
+        return ingredientRepository.findAll();
+    }
 }
