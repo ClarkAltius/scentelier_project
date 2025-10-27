@@ -4,6 +4,7 @@ import com.scentelier.backend.dto.IngredientStockDto;
 import com.scentelier.backend.entity.Ingredient;
 import com.scentelier.backend.repository.IngredientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +28,8 @@ public class IngredientService {
     }
 
     public List<Ingredient> findAll() {
-        System.out.println("향료 리스트 "+ingredientRepository.findAll());
+        List<Ingredient> ingredients = ingredientRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+        System.out.println("향료 리스트 " + ingredients);
         return ingredientRepository.findAll();
     }
 }

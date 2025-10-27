@@ -54,7 +54,13 @@ function PerfumeBlending() {
             try {
                 const url = `${API_BASE_URL}/api/perfume/list`;
                 const response = await axios.get(url);
-                setIngredients(response.data);
+
+                // name 기준 오름차순 정렬
+                const sortedIngredients = response.data.sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                );
+
+                setIngredients(sortedIngredients);
             } catch (error) {
                 console.error("❌ 데이터 로딩 실패:", error);
             } finally {
@@ -64,6 +70,7 @@ function PerfumeBlending() {
 
         fetchIngredients();
     }, []);
+
 
 
     // 타입 선택 시
