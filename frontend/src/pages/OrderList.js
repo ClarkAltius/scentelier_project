@@ -137,7 +137,15 @@ const OrderList = () => {
 
       if (!newStatus) return;
 
-      await axios.put(`${API_BASE_URL}/orders/update/status/${orderId}?status=${newStatus}`, {}, { withCredentials: true });
+    if (newStatus === "CANCELLED") {
+      const isConfirmed = window.confirm("주문을 취소하시겠습니까?");
+      if (!isConfirmed) return;
+    } else if (newStatus === "DELIVERED") {
+      const isConfirmed = window.confirm("수취 확인 하시겠습니까?");
+      if (!isConfirmed) return;
+    }
+
+      await axios.put(`${API_BASE_URL}/order/update/status/${orderId}?status=${newStatus}`, {}, { withCredentials: true });
 
       // 상태 변경 후 UI 업데이트
       setOrders((prev) =>
@@ -260,7 +268,7 @@ const OrderList = () => {
                         >
                           <td>{item.productName}</td>
                           <td>{item.quantity}</td>
-                          <td>{item.price.toLocaleString()}원</td>
+                          <td>{(item.price*item.quantity).toLocaleString()}원</td>
                         </tr>
                       ))}
                     </tbody>

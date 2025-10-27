@@ -183,7 +183,7 @@ function Payments(props) {
                                     {c.name} — {c.quantity}개
                                     </span>
                                     <span>
-                                        (₩{(c.price*c.quantity).toLocaleString()})
+                                        ₩{(c.price*c.quantity).toLocaleString()}
                                     </span>
                                 </div>
                             ))}

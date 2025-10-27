@@ -131,4 +131,15 @@ public class OrderController {
         return ResponseEntity.ok(responseDtos);
     }
 
+    @PutMapping("/update/status/{orderId}")
+    public ResponseEntity<String> statusChange(@PathVariable Long orderId, @RequestParam OrderStatus status) {
+        int effected = -1;
+        effected = orderService.updateUserOrderStatus(orderId, status);
+        if (effected > 0) {
+            String message = "주문 번호 " + orderId + "의 주문 상태가 변경 되었습니다.";
+            return ResponseEntity.ok(message);
+        } else {
+            return ResponseEntity.badRequest().body("error");
+        }
+    }
 }

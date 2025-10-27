@@ -82,4 +82,7 @@ public class OrderService {
     }
 
 
+    public int updateUserOrderStatus(Long orderId, OrderStatus status) {
+        return orderRepository.updateOrderStatus(orderId, status);
+    }
 }
