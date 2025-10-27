@@ -95,6 +95,7 @@
     vertical-align: middle;
     font-size: 14px;
     white-space: nowrap;
+    color: #374151;
     /* Prevent text wrapping initially */
 }
 

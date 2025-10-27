@@ -1,11 +1,14 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.dto.IngredientStockDto;
+import com.scentelier.backend.dto.InquiryDto;
 import com.scentelier.backend.dto.OrderAdminDto;
 import com.scentelier.backend.dto.ProductStockDto;
+import com.scentelier.backend.entity.Inquiry;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.service.IngredientService;
+import com.scentelier.backend.service.InquiryService;
 import com.scentelier.backend.service.OrderService;
 import com.scentelier.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +23,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AdminController {
 
     private final IngredientService ingredientService;
     private final ProductService productService;
     private final OrderService orderService;
+    private final InquiryService inquiryService;
 
     @Autowired
-    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService) {
+    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService) {
         this.productService = productService;
         this.ingredientService = ingredientService;
         this.orderService = orderService;
+        this.inquiryService = inquiryService;
     }
 
 
@@ -54,16 +59,15 @@ public class AdminController {
 
     @GetMapping("/orders")
     public ResponseEntity<?> getOrders(Pageable pageable) {
-
-        // 1. Fetch your entities from the service/repository
-        //    Your React code expects a 'content' field, so you're likely using Pagination.
         Page<Orders> orderPage = orderService.findAllOrders(pageable);
-
-        // 2. Map the Page of entities to a Page of DTOs
         Page<OrderAdminDto> dtoPage = orderPage.map(OrderAdminDto::new);
-
-        // 3. Return the DTO Page. Jackson can serialize this perfectly.
         return ResponseEntity.ok(dtoPage);
+    }
+
+   @GetMapping("/inquiries")
+    public ResponseEntity<List<InquiryDto>> getInquiries(){
+        List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
+        return ResponseEntity.ok(inquiryList);
     }
 }
 
