@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import styles from './InquiryManagement.module.css'; // Create this CSS module for styling
-import { Search, Filter, Eye, MessageSquare, CheckCircle, Archive } from 'lucide-react'; // Import icons
+import styles from './InquiryManagement.module.css';
+import { Search, Filter, Eye, MessageSquare, CheckCircle, Archive } from 'lucide-react';
+import { API_BASE_URL } from '../config/config';
+import axios from 'axios';
 
 /**
  * InquiryManagement Component
  *
- * This component provides an interface for administrators to view, manage,
- * and respond to customer inquiries.
- * As the backend is not yet implemented, it uses mock data and placeholder functions.
- * Future development will involve integrating with the backend API to fetch real inquiry data
- * and perform actions like replying and changing status.
  */
 function InquiryManagement() {
     // === STATE VARIABLES ===
@@ -36,68 +33,6 @@ function InquiryManagement() {
     // Error state to display messages if API calls fail.
     const [error, setError] = useState(null);
 
-    // === MOCK DATA ===
-    // Placeholder data representing customer inquiries.
-    // Replace this with an API call in useEffect.
-    // Status types typically: PENDING, ANSWERED, CLOSED (or similar based on your backend)
-    // Type types: PRODUCT, DELIVERY, PAYMENT, OTHER (as defined in backend/constant/Type.java)
-    const mockInquiries = [
-        {
-            id: 201,
-            userName: '박민지',
-            userEmail: 'park@example.com',
-            title: '상품 재고 문의',
-            content: 'Midnight Blossom 향수 재입고는 언제 되나요?',
-            type: 'PRODUCT', // PRODUCT, DELIVERY, PAYMENT, OTHER
-            createdAt: '2025-10-20T10:30:00Z',
-            status: 'PENDING', // PENDING, ANSWERED, CLOSED
-            productId: 1, // Optional: Associated product ID
-            answer: null // Placeholder for the admin's answer
-        },
-        {
-            id: 202,
-            userName: '이현우',
-            userEmail: 'lee@example.com',
-            title: '배송 지연 문의',
-            content: '주문번호 102번 배송이 늦어지고 있습니다. 확인 부탁드립니다.',
-            type: 'DELIVERY',
-            createdAt: '2025-10-19T15:00:00Z',
-            status: 'ANSWERED',
-            answer: {
-                adminName: '김관리자',
-                answeredAt: '2025-10-20T09:00:00Z',
-                content: '고객님 안녕하세요, 배송 지연으로 불편을 드려 죄송합니다. 현재 택배사 물량 증가로 지연되고 있으며, 금일 중 출고 예정입니다.'
-            }
-        },
-        {
-            id: 203,
-            userName: '최유나',
-            userEmail: 'choi@example.com',
-            title: '결제 오류 문의',
-            content: '카카오페이 결제 시 오류가 발생합니다.',
-            type: 'PAYMENT',
-            createdAt: '2025-10-18T11:00:00Z',
-            status: 'CLOSED',
-            answer: {
-                adminName: '김관리자',
-                answeredAt: '2025-10-18T14:00:00Z',
-                content: '결제 시스템 점검 후 정상화되었습니다. 다시 시도해 보시기 바랍니다.'
-            }
-        },
-        {
-            id: 204,
-            userName: '정재현',
-            userEmail: 'jung@example.com',
-            title: '기타 문의',
-            content: '향수 커스텀 시 향료 추천 받을 수 있나요?',
-            type: 'OTHER',
-            createdAt: '2025-10-21T09:00:00Z',
-            status: 'PENDING',
-            answer: null
-        },
-        // Add more mock inquiries
-    ];
-
     // === LIFECYCLE HOOKS ===
 
     /**
@@ -108,25 +43,22 @@ function InquiryManagement() {
      * Add parameters for pagination, sorting, filtering if needed.
      */
     useEffect(() => {
-        setIsLoading(true);
-        setError(null);
-        // Simulate fetching data
-        setTimeout(() => {
+        setIsLoading(true); // 로딩 활성화
+        setError(null); // 에러 초기화
+        setTimeout(async () => {
             try {
-                // TODO: Replace with actual API call:
-                // const response = await axios.get(`${API_BASE_URL}/api/admin/inquiries`);
-                // setInquiries(response.data); // Assuming the API returns an array of inquiries
-                setInquiries(mockInquiries); // Use mock data for now
+                const response = await axios.get(`${API_BASE_URL}/api/admin/inquiries`, { withCredentials: true }); //admin API 엔드포인트
+                setInquiries(response.data);
+                // console.log(response.data); //디버깅
             } catch (err) {
                 console.error("Failed to fetch inquiries:", err);
                 setError("문의 목록을 불러오는 데 실패했습니다.");
-                setInquiries([]);
+                setInquiries([]); //초기화
             } finally {
                 setIsLoading(false);
             }
-        }, 500); // Simulate network delay
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Runs once on mount
+        }, 500)
+    }, []);
 
     // === EVENT HANDLERS ===
 
@@ -157,6 +89,7 @@ function InquiryManagement() {
      * TODO: Implement a modal or dedicated view component (`InquiryDetailsModal`)
      * to show the full inquiry content and provide a reply textarea.
      */
+
     const handleViewDetails = (inquiry) => {
         setSelectedInquiry(inquiry);
         console.log("Viewing/Replying to inquiry:", inquiry.id);
@@ -226,7 +159,7 @@ function InquiryManagement() {
         const matchesType = filterType === 'All' || inquiry.type === filterType;
         const matchesSearch = searchTerm === '' ||
             inquiry.id.toString().includes(searchTerm) ||
-            inquiry.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            inquiry.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
             inquiry.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
             inquiry.title.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesStatus && matchesType && matchesSearch;
@@ -299,7 +232,7 @@ function InquiryManagement() {
                                 <tr key={inquiry.id}>
                                     <td>#{inquiry.id}</td>
                                     <td>
-                                        <div>{inquiry.userName}</div>
+                                        <div>{inquiry.username}</div>
                                         <div className={styles.customerEmail}>{inquiry.userEmail}</div>
                                     </td>
                                     <td className={styles.titleCell}>{inquiry.title}</td>
