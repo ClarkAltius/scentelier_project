@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.scentelier.backend.dto.OrderUpdateDto;
 import jakarta.validation.Valid;
+import com.scentelier.backend.dto.OrderResponseDto;
+
 
 import java.util.List;
 
@@ -69,7 +71,12 @@ public class AdminController {
         List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
         return ResponseEntity.ok(inquiryList);
     }
-
+    // 주문 상세 조회 (관리자 페이지)
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
+        OrderResponseDto orderResponseDto = orderService.getOrderDetail(id);
+        return ResponseEntity.ok(orderResponseDto);
+    }
     @PatchMapping("/orders/{orderId}")
     public ResponseEntity<OrderAdminDto> updateOrderStatus(
             @PathVariable Long orderId,
@@ -79,5 +86,6 @@ public class AdminController {
 
         return ResponseEntity.ok(updatedOrder);
     }
+
 }
 

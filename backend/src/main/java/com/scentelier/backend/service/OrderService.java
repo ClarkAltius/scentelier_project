@@ -2,6 +2,7 @@ package com.scentelier.backend.service;
 
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.dto.OrderAdminDto;
+import com.scentelier.backend.dto.OrderResponseDto;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.OrderRepository;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import com.scentelier.backend.event.OrderCancelledEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import com.scentelier.backend.dto.OrderResponseDto;
 
 @Service
 @RequiredArgsConstructor
@@ -62,15 +64,10 @@ public class OrderService {
             throw new IllegalArgumentException("Invalid status value: " + newStatus);
         }
 
-        // (Add your state machine logic here if you want)
-
         order.setStatus(newOrderStatus);
         Orders savedOrder = orderRepository.save(order);
 
-        // --- Add this logic ---
-        // If the order was cancelled, publish an event
         if (newOrderStatus == OrderStatus.CANCELLED) {
-            // This sends the "broadcast"
             eventPublisher.publishEvent(new OrderCancelledEvent(savedOrder));
         }
 
@@ -81,6 +78,17 @@ public class OrderService {
         return orderRepository.findByUsers_IdOrderByOrderDateDesc(userId);
     }
 
+    public OrderResponseDto getOrderDetail(Long orderId) {
+        // 1. Find the order, or throw an error
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
+
+        // 2. Use the *existing* DTO to package the full details
+        OrderResponseDto orderResponseDto = new OrderResponseDto(order);
+
+        // 3. Return the detailed DTO
+        return orderResponseDto;
+    }
 
     public int updateUserOrderStatus(Long orderId, OrderStatus status) {
         return orderRepository.updateOrderStatus(orderId, status);

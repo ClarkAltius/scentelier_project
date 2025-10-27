@@ -9,23 +9,21 @@ public class OrderAdminDto {
     private Long id;
     private String customerName;
     private String customerEmail;
-    private String orderDate; // Or LocalDate, Instant, etc.
+    private String orderDate;
     private java.math.BigDecimal totalAmount;
     private String status;
 
-    // --- Constructors ---
-
     public OrderAdminDto() {}
 
-    // A helpful constructor to map from your Entity
+    // 엔티티에 매핑 해주는 constructor
     public OrderAdminDto(Orders order) {
         this.id = order.getId();
-        this.orderDate = order.getOrderDate().toString(); // Format as needed
+        this.orderDate = order.getOrderDate().toString();
         this.totalAmount = order.getTotalPrice();
-        this.status = order.getStatus().toString(); // Assuming status is an enum
+        this.status = order.getStatus().toString();
 
-        // Safely get user info
-        if (order.getUsers() != null) { // From your JSON, the field is 'users'
+        // 사용자 정보
+        if (order.getUsers() != null) {
             this.customerName = order.getUsers().getUsername();
             this.customerEmail = order.getUsers().getEmail();
         }

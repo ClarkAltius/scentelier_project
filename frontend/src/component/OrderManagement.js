@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import styles from './OrderManagement.module.css'; // Assuming you create a CSS module for styling
-import { Search, Filter, Eye, Edit, XCircle } from 'lucide-react'; // Import icons
+import styles from './OrderManagement.module.css';
+import { Search, Filter, Eye, Edit, XCircle } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import axios from 'axios';
+import OrderDetailsModal from './OrderDetailsModal';
+
 
 /**
  * OrderManagement Component
@@ -26,6 +28,9 @@ function OrderManagement() {
 
     // Error state to display messages if API calls fail.
     const [error, setError] = useState(null);
+
+    // 모달 표기용 스테이트
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
 
 
     //주문 리스트 가져오기
@@ -78,11 +83,14 @@ function OrderManagement() {
      * including items, customer info, shipping address, payment details, etc.
      */
     const handleViewDetails = (order) => {
-        setSelectedOrder(order);
+        setSelectedOrder(order);    // 1. Set the data for the order we clicked on.
+        setShowDetailsModal(true);  // 2. Set the modal visibility to 'true' (open it).
         console.log("Viewing details for order:", order.id);
-        // In a real app, this would likely open a modal:
-        // setShowDetailsModal(true);
-        alert(`주문 상세 보기:\n주문 번호: ${order.id}\n고객명: ${order.customerName}\n총액: ${order.totalAmount}원\n상태: ${order.status}\n\n(실제 앱에서는 모달 창 등으로 표시됩니다.)`);
+    };
+
+    const handleCloseModal = () => {
+        setShowDetailsModal(false);
+        setSelectedOrder(null); // It's good practice to clear the selected order when closing.
     };
 
 
@@ -281,17 +289,19 @@ function OrderManagement() {
 
             {/* TODO: Add Pagination controls here if the order list can be long */}
 
-            {/* TODO: Implement a Modal component for viewing order details */}
-            {/* {selectedOrder && (
-                <OrderDetailsModal
-                    order={selectedOrder}
-                    onClose={() => setSelectedOrder(null)}
-                    onUpdateStatus={handleUpdateStatus} // Pass update handler to modal if needed
-                />
-            )} */}
-        </div>
-    );
+            {/* We render our new component here.
+                - order={selectedOrder}: Passes the currently selected order data.
+                - show={showDetailsModal}: Passes the boolean telling it to be open or closed.
+                - handleClose={handleCloseModal}: Passes the function it should call to close itself.
+            */}
+            <OrderDetailsModal
+                order={selectedOrder}
+                show={showDetailsModal}
+                handleClose={handleCloseModal}
+            />
 
+        </div> // This is the closing tag for <div className={styles.orderManagementPage}>
+    );
 }
 
 export default OrderManagement;
