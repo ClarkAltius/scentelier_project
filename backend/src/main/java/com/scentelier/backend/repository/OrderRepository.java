@@ -30,4 +30,5 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         """, nativeQuery = true)
     List<Products> findBestList2();
 
+    List<Orders> findByUsers_IdOrderByOrderDateDesc(Long userId);
 }

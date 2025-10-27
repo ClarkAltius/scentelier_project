@@ -13,7 +13,7 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,11 +53,10 @@ public class Orders {
     private Payment paymentMethod;
 
     @CreationTimestamp
-    @Column(name = "order_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate orderDate;
+    @Column(name = "order_date", updatable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime orderDate;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> orderProducts = new ArrayList<>();
-
 }

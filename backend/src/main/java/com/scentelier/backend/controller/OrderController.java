@@ -1,7 +1,10 @@
 package com.scentelier.backend.controller;
 
+import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.constant.Role;
 import com.scentelier.backend.dto.OrderDto;
 import com.scentelier.backend.dto.OrderProductDto;
+import com.scentelier.backend.dto.OrderResponseDto;
 import com.scentelier.backend.entity.*;
 import com.scentelier.backend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +45,6 @@ public class OrderController {
         orders.setTotalPrice(dto.getTotalPrice());
         orders.setStatus(dto.getStatus());
         orders.setPaymentMethod(dto.getPaymentMethod());
-        orders.setOrderDate(LocalDate.now());
 
         List<OrderProduct> orderProductList = new ArrayList<>();
         for (OrderProductDto item : dto.getOrderProducts()) {
@@ -90,6 +92,43 @@ public class OrderController {
     public ResponseEntity<List<Products>> getBestList2() {
         List<Products> products = orderService.getBestList2();
         return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/ordered")
+    public ResponseEntity<List<OrderResponseDto>> getOrderList(@RequestParam Long userId, @RequestParam Role role) {
+        List<Orders> orders = null;
+
+        if(role == Role.ADMIN) {
+            // orders = orderService.findAllOrders(OrderStatus.PENDING);
+        } else {
+            orders = orderService.findByUserId(userId);
+        }
+
+        List<OrderResponseDto> responseDtos = new ArrayList<>();
+
+        for (Orders bean : orders) {
+            OrderResponseDto dto = new OrderResponseDto();
+            dto.setOrderId(bean.getId());
+            dto.setOrderDate(bean.getOrderDate());
+            dto.setStatus(bean.getStatus().name());
+            dto.setRecipientName(bean.getRecipientName());
+            dto.setAddress(bean.getAddress());
+            dto.setTotalPrice(bean.getTotalPrice());
+            dto.setTrackingNumber(bean.getTrackingNumber());
+            dto.setPaymentMethod(bean.getPaymentMethod().name());
+
+            List<OrderResponseDto.OrderItem> orderItems = new ArrayList<>();
+            for (OrderProduct op : bean.getOrderProducts()) {
+                OrderResponseDto.OrderItem oi
+                        = new OrderResponseDto.OrderItem(op.getProducts().getId(), op.getProducts().getName(), op.getQuantity(), op.getPrice());
+                orderItems.add(oi);
+            }
+            dto.setOrderItems(orderItems);
+
+            responseDtos.add(dto);
+        }
+
+        return ResponseEntity.ok(responseDtos);
     }
 
 }

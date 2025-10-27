@@ -38,4 +38,8 @@ public class OrderService {
     public Page<Orders> findAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable);
     }
+
+    public List<Orders> findByUserId(Long userId) {
+        return orderRepository.findByUsers_IdOrderByOrderDateDesc(userId);
+    }
 }
