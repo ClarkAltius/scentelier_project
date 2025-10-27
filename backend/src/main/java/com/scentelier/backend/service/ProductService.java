@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,13 +51,16 @@ public class ProductService {
     }
 
 
-    public boolean deleteProduct(Long id) {
-        if(productRepository.existsById(id)){
-            this.productRepository.deleteById(id);  // 상품 실제 삭제 요청. 실제 상품 삭제가 아닌 소프트 딜리트 필요
-            return true;
-        }else{
-            return false;
+    @Transactional
+    public boolean softDelete(Long id) {
+        Optional<Products> opt = productRepository.findById(id); // 삭제여부 무관하게 찾아야 하면 findAnyById 사용 가능
+        if (opt.isEmpty()) return false;
+        Products p = opt.get();
+        if (!p.isDeleted()) {
+            p.setDeleted(true);
+            p.setDeletedAt(LocalDate.now());
         }
+        return true;
     }
 
     @EventListener
@@ -82,6 +87,7 @@ public class ProductService {
             }
         }
     }
+
 }
 
 

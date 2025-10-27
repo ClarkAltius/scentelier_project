@@ -87,20 +87,21 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
+        log.info("[SOFTDELETE] /product/{} reached", id);
         try {
-            boolean isDeleted = this.productService.deleteProduct(id);
+            boolean isDeleted = this.productService.softDelete(id);
 
-            if(isDeleted){
-                return ResponseEntity.ok(id+ "상품이 삭제 되었습니다.");
-            }else {
-                return ResponseEntity.badRequest().body(id+ "상품이 존재하지 않습니다.");
+            if (isDeleted) {
+                return ResponseEntity.ok(id + "상품이 삭제 되었습니다.");
+            } else {
+                return ResponseEntity.badRequest().body(id + "상품이 존재하지 않습니다.");
             }
-        }catch (DataIntegrityViolationException err){
+        } catch (org.springframework.dao.DataIntegrityViolationException err) {
             String message = "해당 상품은 장바구니에 포함되어 있거나, \n 이미 매출이 발생한 상품입니다.";
             return ResponseEntity.badRequest().body(message);
-        }catch (Exception err){
-            return ResponseEntity.internalServerError().body("오류 발생" + err.getMessage());
+        } catch (Exception err) {
+            return ResponseEntity.internalServerError().body("오류 발생: " + err.getMessage());
         }
+    }
 
     }
-}
