@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './ProductManagement.module.css';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, X } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,11 +11,15 @@ function ProductManagement({ setActiveView }) {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true); //로딩 스테이트
     const [error, setError] = useState(null); // 에러 표기용 스테이트
+    const [selectedIds, setSelectedIds] =useState([]); // 체크박스용 스테이트
+
+    const isAllSelected = products.length > 0 && selectedIds.length === products.length; // 모든 행 선택 
 
     //페이지네이션 대비
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
+    
 
     //상품 로딩 기능. 페이지네이션 기능 포함
     useEffect(() => {
@@ -62,6 +66,30 @@ function ProductManagement({ setActiveView }) {
         }
     };
 
+    // 개별 선택 토글
+    const handleSelect = (id) => {
+        setSelectedIds(prev  =>
+        prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
+    };
+
+    // 전체 선택 토글
+    const handleSelectAll = () => {
+        if(isAllSelected) {
+            setSelectedIds([]);
+        
+        }else{
+            setSelectedIds(products.map((p) => p.id));
+        }
+    };
+    
+
+    // 페이지 바뀌면 선택초기화
+    useEffect(()=>{
+        setSelectedIds([]);
+    }, [page]);
+
+
 
 
     // CRUD 기능 플레이스홀더
@@ -80,7 +108,7 @@ const handleDelete = async (productId) => {
     return;
 
   const del = products;
-  setProducts(prev => prev.filter(p => p.id !== productId));
+  setProducts((prev) => prev.filter((p) => !selectedIds.includes(p.id)));
 
   try {
     await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
@@ -94,8 +122,55 @@ const handleDelete = async (productId) => {
   }
 };
 
+    const handleSelectDelete = async () => {
+        if (selectedIds.length === 0 ) return ;
 
+        if(!window.confirm(`선택된 ${selectedIds.length}개의 상품을 삭제하시겠습니까?`))
 
+            return alert('상품 삭제가 취소되었습니다');
+
+        setProducts((prev) => prev.filter((products)=>!selectedIds.includes(products.id)));
+
+        const del = products;
+        
+        try{
+            const result = await Promise.allSettled(
+                selectedIds.map((id)=>
+                axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`,{
+                    withCredentials:true
+                })
+            )
+            );
+            const successCount = result.filter((result)=>result.status === 'fulfilled').length ;
+            const failCount = result.length - successCount;
+
+        if(failCount > 0){
+            // 실패한부분 롤백
+        const failedIds = result
+            .map((r,idx) => ({r, id: selectedIds[idx]}))
+            .filter((x)=> x.r.status=== 'rejected')
+            .map((x) => x.id);
+
+            
+            setProducts((curr)=>{
+
+                const failedItems =  del.filter((item) => failedIds.includes(item.id));
+                const survivors = curr.filter((item)=> !failedIds.includes(item.id));
+                return[...survivors, ...failedItems].sort((a,b)=>a.id - b.id);
+        });
+
+        alert(`일부 항목 삭제 실패: 성공 ${successCount}개, 실패 ${failCount}개`);
+        }else{
+            alert(`선택한 ${successCount}개 상품을 삭제했습니다.`);
+        }
+        setSelectedIds([]);
+        }catch(err){
+            console.error('선택 삭제 오류 :',err);
+            setProducts(del); // 전면 롤백
+            alert('선택 삭제 중 오류가 발생했습니다');
+        }
+    };
+    
     //페이지 렌더링 용 함수
     const renderTable = () => {
         if (isLoading) {
@@ -113,6 +188,14 @@ const handleDelete = async (productId) => {
                 <table className={styles.productTable}>
                     <thead>
                         <tr>
+                            <th>
+                                <input 
+                                    type="checkbox"
+                                    checked={isAllSelected}
+                                    onChange={handleSelectAll}
+                                    aria-label="전체 선택"
+                                />
+                            </th>
                             <th>이미지</th>
                             <th>상품명</th>
                             <th>카테고리</th>
@@ -124,20 +207,33 @@ const handleDelete = async (productId) => {
                     <tbody>
                         {products.length === 0 ? (
                             <tr>
-                                <td colSpan="6" className={styles.emptyCell}>
+                                <td colSpan="7" className={styles.emptyCell}>
                                     상품이 없습니다. '신규 상품 추가' 버튼을 눌러 상품을 등록해주세요.
                                 </td>
                             </tr>
                         ) : (
                             products.map((product) => (
-                                <tr key={product.id}>
+                                <tr key={product.id} onClick={(e)=>{
+                                    if(e.target.closest('button') || e.target.tagName === 'INPUT') return;
+                                    handleSelect(product.id);
+                                }} style={{ cursor:'pointer'}}>
                                     <td>
+                                        <input 
+                                            type="checkbox"
+                                            checked={selectedIds.includes(product.id)}
+                                            onChange={()=> handleSelect(product.id)}
+                                            aria-label={`${product.name} 선택`}
+                                        />
+                                        </td>
+
+                                        <td>
                                         <img
                                             // 백엔드 이미지 경로
                                             src={`${API_BASE_URL}/uploads/products/${product.imageUrl}`}
                                             alt={product.name}
                                             className={styles.productThumbnail}
                                         />
+                                        
                                     </td>
                                     <td>{product.name}</td>
                                     <td>{product.category}</td>
@@ -157,6 +253,7 @@ const handleDelete = async (productId) => {
                                             >
                                                 <Trash2 size={16} />
                                             </button>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -176,6 +273,18 @@ const handleDelete = async (productId) => {
                     <Plus size={20} />
                     신규 상품 추가
                 </button>
+
+            {/* 선택 삭제 버튼 */}
+                <button
+                    className={styles.deleteButton}
+                    onClick={handleSelectDelete}
+                    disabled={selectedIds.length === 0}
+                    title={selectedIds.length === 0 ? '선택된 상품이 없습니다' : `${selectedIds.length}개 삭제`}
+                    style={{marginRight:12}}
+                 >  
+                 < Trash2 size={18} />
+                 <span style={{marginRight:6}}>선택 삭제</span>
+                 </button>
             </div>
 
             {/* 로딩, 에러 혹은 표 내용물 표기 */}

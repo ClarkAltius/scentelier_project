@@ -10,11 +10,15 @@ import StockManagement from '../component/StockManagement';
 import OrderManagement from '../component/OrderManagement';
 import CustomerInquiries from '../component/InquiryManagement';
 import ProductInsertForm from './ProductInsertForm';
+import InquiryDetail from '../component/InquiryDetail';
 
 function Admin() {
 
     //useEffect. 액티브뷰 패널용 state
     const [activeView, setActiveView] = useState('dashboard');
+
+    // 문의사항 id 관리
+    const [selectedInquiryId, setSelectedInquiryId] = useState(null);
 
     //render view 함수
 
@@ -24,8 +28,9 @@ function Admin() {
             'products': <ProductManagement setActiveView={setActiveView} />,
             'stock': <StockManagement />,
             'orders': <OrderManagement />,
-            'inquiries': <CustomerInquiries />,
-            'productInsert': <ProductInsertForm setActiveView={setActiveView} />
+            'inquiries': <CustomerInquiries setActiveView={setActiveView} setSelectedInquiryId={setSelectedInquiryId} />,
+            'productInsert': <ProductInsertForm setActiveView={setActiveView} />,
+            'inquiryDetail': <InquiryDetail setActiveView={setActiveView} inquiryId={selectedInquiryId} />
         };
         return views[activeView] || <Dashboard />;
     };
@@ -39,11 +44,9 @@ function Admin() {
                 {/* Just render the Topbar component directly */}
                 <Topbar activeView={activeView} />
                 {/* Admin Main content. Active View. */}
-
                 <div style={{ padding: '20px' }}>
                     {renderView()}
                 </div>
-
             </div>
         </div>
     );

@@ -6,6 +6,7 @@ const viewTitles = {
     stock: '재고 발주',
     orders: '주문 관리',
     inquiries: '고객 문의',
+    inquiryDetail: '상세 고객 문의'
 };
 function Topbar({ activeView }) {
 

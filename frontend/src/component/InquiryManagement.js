@@ -8,7 +8,7 @@ import axios from 'axios';
  * InquiryManagement Component
  *
  */
-function InquiryManagement() {
+function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
     // === STATE VARIABLES ===
 
     // Holds the list of inquiries displayed. Initially populated with mock data.
@@ -37,10 +37,6 @@ function InquiryManagement() {
 
     /**
      * useEffect Hook: Fetches inquiries when the component mounts.
-     *
-     * Currently, it sets mock data.
-     * TODO: Replace with API call to fetch inquiries (e.g., GET /api/admin/inquiries).
-     * Add parameters for pagination, sorting, filtering if needed.
      */
     useEffect(() => {
         setIsLoading(true); // 로딩 활성화
@@ -82,49 +78,14 @@ function InquiryManagement() {
         }
     };
 
-    /**
-     * handleViewDetails: Sets the selected inquiry to display details/reply form.
-     * @param {object} inquiry - The inquiry object to view/reply to.
-     *
-     * TODO: Implement a modal or dedicated view component (`InquiryDetailsModal`)
-     * to show the full inquiry content and provide a reply textarea.
-     */
-
     const handleViewDetails = (inquiry) => {
-        setSelectedInquiry(inquiry);
-        console.log("Viewing/Replying to inquiry:", inquiry.id);
-        // Example: setShowDetailsModal(true);
-        alert(`문의 상세 보기/답변하기:\nID: ${inquiry.id}\n제목: ${inquiry.title}\n상태: ${inquiry.status}\n\n(실제 앱에서는 모달 창 등으로 표시됩니다.)`);
-    };
 
-    /**
-     * handleReply: Placeholder for submitting a reply to an inquiry.
-     * @param {number} inquiryId - The ID of the inquiry being replied to.
-     * @param {string} replyContent - The content of the admin's reply.
-     *
-     * TODO: Implement API call (e.g., POST /api/admin/inquiries/{inquiryId}/reply)
-     * to submit the reply and update the inquiry status (likely to 'ANSWERED').
-     * Update local state on success. Handle errors. Close the details/reply modal.
-     */
-    const handleReply = (inquiryId, replyContent) => {
-        if (!replyContent || replyContent.trim() === '') {
-            alert("답변 내용을 입력해주세요.");
+        if (!setSelectedInquiryId) {
+            console.error("setSelectedInquiryId function was not passed to InquiryManagement");
             return;
         }
-        console.log(`TODO: Submit reply for inquiry ${inquiryId}. Content:`, replyContent);
-        // Example state update:
-        // setInquiries(prevInquiries =>
-        //     prevInquiries.map(inq =>
-        //         inq.id === inquiryId ? {
-        //             ...inq,
-        //             status: 'ANSWERED',
-        //             answer: { adminName: 'Admin', answeredAt: new Date().toISOString(), content: replyContent }
-        //         } : inq
-        //     )
-        // );
-        // setSelectedInquiry(null); // Close modal on success
-        alert(`[Placeholder] 문의 #${inquiryId}에 답변을 등록합니다.`);
-        setSelectedInquiry(null); // Close placeholder
+        setSelectedInquiryId(inquiry.id);
+        setActiveView('inquiryDetail');
     };
 
     /**
@@ -134,8 +95,11 @@ function InquiryManagement() {
      * TODO: Implement API call (e.g., PUT /api/admin/inquiries/{inquiryId}/status)
      * to update the status to 'CLOSED'. Update local state. Add confirmation.
      */
-    const handleMarkAsClosed = (inquiryId) => {
+    const handleMarkAsClosed = async (inquiryId) => {
         if (window.confirm(`정말로 문의 #${inquiryId}을(를) 종결 처리하시겠습니까?`)) {
+            const url = `${API_BASE_URL}/api/admin/inquiry/${inquiryId}`;
+            await axios.patch(url, { withCredentials: true });
+
             console.log(`TODO: Mark inquiry ${inquiryId} as CLOSED`);
             // Example state update:
             // setInquiries(prevInquiries =>
@@ -245,13 +209,13 @@ function InquiryManagement() {
                                     </td>
                                     <td>
                                         <div className={styles.actionButtons}>
-                                            {/* Button to view/reply */}
+                                            {/* Button to view*/}
                                             <button
                                                 className={`${styles.actionButton} ${styles.viewButton}`}
                                                 onClick={() => handleViewDetails(inquiry)}
                                                 title="View Details / Reply"
                                             >
-                                                <Eye size={16} /> View / Reply
+                                                <Eye size={16} /> 상세보기
                                             </button>
 
                                             {/* Button to mark as closed (if not already closed) */}
@@ -261,7 +225,7 @@ function InquiryManagement() {
                                                     onClick={() => handleMarkAsClosed(inquiry.id)}
                                                     title="Mark as Closed"
                                                 >
-                                                    <CheckCircle size={16} /> Close
+                                                    <CheckCircle size={16} /> 완료처리
                                                 </button>
                                             )}
                                         </div>
@@ -270,7 +234,7 @@ function InquiryManagement() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className={styles.noResults}>No inquiries found matching your criteria.</td>
+                                <td colSpan="7" className={styles.noResults}>카테고리에 해당하는 문의사항이 없습니다.</td>
                             </tr>
                         )}
                     </tbody>

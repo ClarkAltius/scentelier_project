@@ -1,5 +1,6 @@
 package com.scentelier.backend.repository;
 import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import jakarta.transaction.Transactional;
@@ -40,4 +41,5 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     @Transactional
     @Query("update Orders o set o.status=:status where o.id=:orderId")
     int updateOrderStatus(@Param("orderId") Long orderId, @Param("status") OrderStatus status);
+
 }

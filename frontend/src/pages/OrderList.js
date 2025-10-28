@@ -297,14 +297,23 @@ const OrderList = () => {
                       </Button>
                     )}
 
-                    {(order.status === "SHIPPED" ||
-                      order.status === "DELIVERED") && (
+                    {(order.status === "SHIPPED") && (
                         <Button
                           variant="outline-success"
                           size="sm"
                           onClick={() => handleOrderAction(order.orderId, "confirm")}
                         >
                           <CircleCheckBig size={16} className="me-1" /> 수취 확인
+                        </Button>
+                      )}
+
+                      {(order.status === "DELIVERED") && (
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          onClick={() => navigate('/reviews/write')}
+                        >
+                          <CircleCheckBig size={16} className="me-1" /> 리뷰 작성
                         </Button>
                       )}
                   </div>

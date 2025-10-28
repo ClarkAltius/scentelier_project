@@ -2,7 +2,6 @@ package com.scentelier.backend.dto;
 
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.constant.Payment;
-import com.scentelier.backend.entity.OrderProduct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

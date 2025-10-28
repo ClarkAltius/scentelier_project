@@ -1,9 +1,6 @@
 package com.scentelier.backend.controller;
 
-import com.scentelier.backend.dto.IngredientStockDto;
-import com.scentelier.backend.dto.InquiryDto;
-import com.scentelier.backend.dto.OrderAdminDto;
-import com.scentelier.backend.dto.ProductStockDto;
+import com.scentelier.backend.dto.*;
 import com.scentelier.backend.entity.Inquiry;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
@@ -16,9 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.scentelier.backend.dto.OrderUpdateDto;
 import jakarta.validation.Valid;
-import com.scentelier.backend.dto.OrderResponseDto;
 
 
 import java.util.List;
@@ -71,6 +66,9 @@ public class AdminController {
         List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
         return ResponseEntity.ok(inquiryList);
     }
+
+
+
     // 주문 상세 조회 (관리자 페이지)
     @GetMapping("/orders/{id}")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
@@ -87,5 +85,21 @@ public class AdminController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    // 재고 수량 변동 API 엔드포인트
+    @PatchMapping("/products/stock/{itemId}")
+    public ResponseEntity<ProductStockDto> updateProductStock(
+            @PathVariable Long itemId,
+            @Valid @RequestBody StockUpdateDto dto){
+        ProductStockDto updateProduct = productService.updateStock(itemId, dto.getAdjustment());
+        return ResponseEntity.ok(updateProduct);
+    }
+
+    @PatchMapping("/ingredients/stock/{itemId}")
+    public ResponseEntity<IngredientStockDto> updateIngredientStock(
+            @PathVariable Long itemId,
+            @Valid @RequestBody StockUpdateDto dto){
+        IngredientStockDto updateIngredient = ingredientService.updateStock(itemId, dto.getAdjustment());
+        return ResponseEntity.ok(updateIngredient);
+    }
 }
 
