@@ -19,9 +19,6 @@ function StockManagement() {
     const [products, setProducts] = useState([]);
     const [ingredients, setIngredients] = useState([]);
 
-    // State to manage which item is currently being edited inline.
-    const [editingItem, setEditingItem] = useState(null);
-
     // State to track selected items for bulk actions.
     const [selectedItems, setSelectedItems] = useState({ products: new Set(), ingredients: new Set() });
 
@@ -29,6 +26,8 @@ function StockManagement() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 재고 변동 저장할 스테이트
+    const [adjustmentValues, setAdjustmentValues] = useState({});
 
 
     // === 훅 ===
@@ -38,7 +37,7 @@ function StockManagement() {
         // 데이터 fetch
         setTimeout(async () => {
             try {
-                // productController vs. AdminController ?
+                // productController vs. AdminController ? = AdminController 에서 하자. 
                 const productResponse = await axios.get(`${API_BASE_URL}/api/admin/products/stock`, { withCredentials: true });
 
                 if (Array.isArray(productResponse.data)) {
@@ -66,18 +65,15 @@ function StockManagement() {
 
 
     // === 이벤트 핸들러 ===
-
     const handleAdjustClick = (item, type) => {
-        setEditingItem({ id: item.id, type, stock: item.stock });
-    };
 
-    const handleStockChange = (e) => {
-        const value = Math.max(0, parseInt(e.target.value, 10) || 0);
-        setEditingItem(prev => ({ ...prev, stock: value }));
-    };
+        const newStock = adjustmentValues[item.id];
 
-    const handleCancelClick = () => {
-        setEditingItem(null);
+        if (newStock === undefined || newStock === '' || newStock < 0) {
+            alert("발주 수량을 입력해주세요");
+            return;
+        }
+        updateStockOnServer(item.id, newStock, type);
     };
 
     /**
@@ -85,18 +81,6 @@ function StockManagement() {
      * TODO: 재고 수정 API 요청 추가
      * TODO: 발주서 제작
      */
-    const handleSaveClick = () => {
-        if (!editingItem) return;
-        console.log(`TODO: API call to update ${editingItem.type} #${editingItem.id} to stock ${editingItem.stock}`);
-        alert(`[Placeholder] ${editingItem.type} #${editingItem.id}의 재고를 ${editingItem.stock}(으)로 업데이트합니다.`);
-
-        if (editingItem.type === 'product') {
-            setProducts(products.map(p => p.id === editingItem.id ? { ...p, stock: editingItem.stock } : p));
-        } else {
-            setIngredients(ingredients.map(i => i.id === editingItem.id ? { ...i, stock: editingItem.stock } : i));
-        }
-        setEditingItem(null);
-    };
 
     /**
      * 체크박스 이용, 개별 아이템 선택
@@ -129,29 +113,73 @@ function StockManagement() {
         });
     };
 
-    /**
-     * 대량주문 플레이스홀더
-     * TODO: 모달로 작성. 재고 요청 데이터를 만들어야하나?.
-     */
-    const handleBulkRestockRequest = () => {
+    // 대량 주문 기능. updateStockOnServer 반복문 처리
+    const handleBulkRestockRequest = async () => {
         const selection = selectedItems[activeView];
         if (selection.size === 0) {
             alert("재입고를 요청할 항목을 선택해주세요.");
             return;
         }
 
-        const itemsToRequest = (activeView === 'products' ? products : ingredients)
-            .filter(item => selection.has(item.id))
-            .map(item => `- ${item.name} (ID: #${item.id})`)
-            .join('\n');
+        const itemsToUpdate = [];
 
-        console.log(`TODO: Open bulk restock request modal for:\n${itemsToRequest}`);
-        alert(`[Placeholder] 다음 항목에 대한 재입고 요청이 생성됩니다:\n${itemsToRequest}`);
+        // 데이터 수집 + Validation
+        for (const itemId of selection) {
+            const newStock = adjustmentValues[itemId];
+            if (newStock === undefined || newStock === '' || newStock < 0) {
+                alert(`ID #${itemId}에 유효한 재고 수량을 입력해주세요`);
+                return; // validation 실패시 정지
+            }
+            itemsToUpdate.push({ id: itemId, stock: newStock });
+        }
+        if (itemsToUpdate.length === 0) {
+            alert("수정할 상품을 선택하지 않으셨습니다");
+            return;
+        }
 
-        // 액션 후 선택사항들 초기화
+        // 각 상품별로 API 호출
+        for (const item of itemsToUpdate) {
+            await updateStockOnServer(item.id, item.stock, activeView);
+        }
+
+        alert("선택 상품 재고수량 변경 성공");
+
+        // // 액션 후 선택사항들 초기화
         setSelectedItems(prev => ({ ...prev, [activeView]: new Set() }));
     };
 
+
+    // === API 호출 ===
+    const updateStockOnServer = async (itemId, adjustmentValue, itemType) => {
+        const endpoint = itemType === 'products' ? 'products' : 'ingredients';
+        const url = `${API_BASE_URL}/api/admin/${endpoint}/stock/${itemId}`;
+
+        try {
+            const response = await axios.patch(url, { adjustment: adjustmentValue }, { withCredentials: true });
+
+            const updatedItem = response.data;
+            const newTotalStock = updatedItem.stock;
+
+            if (itemType === 'products') {
+                setProducts((prevList) =>
+                    prevList.map(p =>
+                        p.id === itemId ? { ...p, stock: newTotalStock } : p
+                    )
+                );
+            } else {
+                setIngredients((prevList) =>
+                    prevList.map(p =>
+                        p.id === itemId ? { ...p, stock: newTotalStock } : p
+                    )
+                );
+            }
+            setAdjustmentValues(prev => ({ ...prev, [itemId]: '' }));
+            alert(`${itemType} #${itemId} 재고 ${newTotalStock}으로 변경 성공`);
+        } catch (err) {
+            console.error(`상품 재고 변경 실패`, err);
+            alert(`상품 재고 변경에 실패했습니다. 다시 시도해주세요`);
+        }
+    };
 
     // === 렌더 로직 ===
 
@@ -173,17 +201,17 @@ function StockManagement() {
                         </th>
                         <th>ID</th>
                         <th>이름</th>
-                        <th>재고</th>
+                        <th>현 재고</th>
+                        <th>재고 변동</th>
                         <th>기능</th>
                     </tr>
                 </thead>
                 <tbody>
                     {items.map((item) => {
-                        const isEditing = editingItem && editingItem.id === item.id && editingItem.type === type;
                         const isLowStock = item.stock < 10; // 10개 이하면 강조
 
                         return (
-                            <tr key={item.id} className={isLowStock && !isEditing ? styles.lowStockRow : ''}>
+                            <tr key={item.id} className={isLowStock ? styles.lowStockRow : ''}>
                                 <td className={styles.checkboxColumn}>
                                     <input
                                         type="checkbox"
@@ -195,36 +223,30 @@ function StockManagement() {
                                 <td>#{item.id}</td>
                                 <td>{item.name}</td>
                                 <td>
-                                    {isEditing ? (
-                                        <input
-                                            type="number"
-                                            className={styles.stockInput}
-                                            value={editingItem.stock}
-                                            onChange={handleStockChange}
-                                            autoFocus
-                                        />
-                                    ) : (
-                                        <span className={isLowStock ? styles.lowStockText : ''}>
-                                            {item.stock}
-                                        </span>
-                                    )}
+                                    <span className={isLowStock ? styles.lowStockText : ''}>
+                                        {item.stock}
+                                    </span>
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        className={styles.stockInput}
+                                        placeholder="발주수량"
+                                        value={adjustmentValues[item.id] || ''}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setAdjustmentValues(prev => ({
+                                                ...prev,
+                                                [item.id]: value === '' ? '' : Number(value)
+                                            }));
+                                        }}>
+                                    </input>
                                 </td>
                                 <td>
                                     <div className={styles.actionButtons}>
-                                        {isEditing ? (
-                                            <>
-                                                <button className={`${styles.actionButton} ${styles.saveButton}`} onClick={handleSaveClick} title="Save">
-                                                    <Save size={16} /> 저장
-                                                </button>
-                                                <button className={`${styles.actionButton} ${styles.cancelButton}`} onClick={handleCancelClick} title="Cancel">
-                                                    <X size={16} /> 취소
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button className={`${styles.actionButton} ${styles.adjustButton}`} onClick={() => handleAdjustClick(item, type)} title="Adjust Stock">
-                                                <Edit size={16} /> 수정
-                                            </button>
-                                        )}
+                                        <button className={`${styles.actionButton} ${styles.adjustButton}`} onClick={() => handleAdjustClick(item, type)} title="Adjust Stock">
+                                            <Edit size={16} /> 재고 수정
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -263,7 +285,6 @@ function StockManagement() {
                     </button>
                 </div>
             </div>
-
             <div className={styles.bulkActions}>
                 <button
                     className={styles.bulkRequestButton}

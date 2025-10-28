@@ -2,6 +2,8 @@ package com.scentelier.backend.service;
 
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.ProductRepository;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 import jakarta.transaction.Transactional;
 
 // 주문 취소 리스너용
@@ -88,6 +91,23 @@ public class ProductService {
         }
     }
 
+    @Transactional
+    public ProductStockDto updateStock(Long itemId, @NotNull(message = "Stock value cannot be null.") Integer newStock) {
+
+        // 데이터베이스에서 제품 탐색
+        Products product = productRepository.findById(itemId)
+                .orElseThrow(() -> new NoSuchElementException("제품이 없습니다: " + itemId));
+        // 제품 수량 설정
+        int currentStock = product.getStock();
+        product.setStock(newStock + currentStock);
+
+        // 제품 수량 저장
+        Products updateProduct = productRepository.save(product);
+
+        // DTO 반환
+        return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock());
+
+    }
 }
 
 
