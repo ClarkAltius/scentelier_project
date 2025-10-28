@@ -121,52 +121,70 @@ function PerfumeBlending() {
     };
 
     const payload = {
-        customPerfumeId: 1,
-        ingredients: [
-            { ingredientId: selectedTop.id, noteType: "TOP", amount: topValue, imgUrl: "def.jpg" },
-            { ingredientId: selectedMiddle.id, noteType: "MIDDLE", amount: middleValue, imgUrl: "def.jpg" },
-            { ingredientId: selectedLast.id, noteType: "LAST", amount: lastValue, imgUrl: "def.jpg" }
+        ingredient: [
+            { ingredientId: (selectedTop.id), noteType: "TOP", amount: topValue },
+            { ingredientId: (selectedMiddle.id), noteType: "MIDDLE", amount: middleValue },
+            { ingredientId: (selectedLast.id), noteType: "LAST", amount: lastValue }
         ]
     };
 
-    // fetch(`${API_BASE_URL}/`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(payload)
-    // })
-    //   .then(res => res.json())
-    //   .then(data => console.log(data))
-    //   .catch(err => console.error(err));
 
+    const createCustomPerfume = async () => {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/api/customPerfume/addCustom`, {
+                userId: user.id,
+                name: perfumeName,
+                volume: parseInt(selectedVolume),
+                customPerfumeInfoDto: payload.ingredient
+            });
 
+            alert(`[${response.data.name}] 향수가 저장되었습니다.`);
+            console.log(response.data);
 
+            return response.data; // ← 향수 데이터를 반환
+        } catch (error) {
+            const msg = error.response?.data?.error || error.message;
+            alert(msg);
+            return null; // 실패 시 null 반환
+        }
+    };
 
-    // const addToCart = async () => {
-    //     try {
-    //         const url = `${API_BASE_URL}/cart/insert`;
-    //         const parameters = {
-    //             userId: user.id,
-    //             productId: id,
-    //             quantity: 1
-    //         };
+    const handleAddToCart = async (e) => {
+        e.preventDefault(); // 클릭 이벤트 막기
 
-    //         const response = await axios.post(url, parameters, { withCredentials: true });
+        // 1. 커스텀 향수 생성
+        const perfume = await createCustomPerfume();
+        // console.log(perfume.id)
+        if (!perfume) return; // 실패 시 장바구니 추가 안함
 
-    //         alert(response.data);
-    //         navigate('/cart/list'); // 상품 목록 페이지로 이동
+        // 2. 장바구니에 추가
+        addToCart(perfume);
+    };
 
-    //     } catch (error) {
-    //         console.log('오류 발생 : ' + error);
+    const addToCart = async (item) => {
+        try {
+            const url = `${API_BASE_URL}/cart/insert/custom`;
+            const parameters = {
+                userId: user.id,
+                customId: item.id,
+                quantity: 1
+            };
 
-    //         if (error.response) {
-    //             alert('장바구니 추가 실패');
-    //             console.log(error.response.data);
-    //         }
-    //     }
-    // }
+            const response = await axios.post(url, parameters, { withCredentials: true });
+            alert(response.data);
+            navigate('/cart/list');
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+
+            if (error.response) {
+                alert('장바구니 추가 실패');
+            }
+        }
+    };
 
 
     return (<>
+
         <div style={{ display: "flex", justifyContent: "center", margin: "50px" }}>
             <Card style={{ width: "80%", textAlign: "center" }}>
                 <Card.Body>
@@ -300,12 +318,15 @@ function PerfumeBlending() {
                                 <Form.Label style={{ marginTop: "50px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>2. TOP</strong></span>
                                     __가장 먼저 느껴지는 첫인상, 향의 시작</Form.Label>
                                 <Form.Select
-                                    value={selectedTop}
-                                    onChange={(e) => setSelectedTop(e.target.value)}
+                                    value={selectedTop?.id || ""}
+                                    onChange={(e) => {
+                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
+                                        setSelectedTop(selected);
+                                    }}
                                 >
                                     <option value="">선택하세요</option>
-                                    {ingredients?.map((item, index) => (
-                                        <option key={index} value={item.name}>
+                                    {ingredients?.map((item) => (
+                                        <option key={item.id} value={item.id}>
                                             {item.name}
                                         </option>
                                     ))}
@@ -329,7 +350,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedTop
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedTop}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedTop.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -345,7 +366,7 @@ function PerfumeBlending() {
                                                 <div style={{
                                                     fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px"
                                                 }}>
-                                                    {ingredients.find(i => i.name === selectedTop)?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === (selectedTop.name))?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
@@ -364,12 +385,15 @@ function PerfumeBlending() {
 
                                 <Form.Label style={{ marginTop: "100px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>3. MIDDLE</strong></span>__향수의 중심, 진짜 매력을 보여주는 향</Form.Label>
                                 <Form.Select
-                                    value={selectedMiddle}
-                                    onChange={(e) => setSelectedMiddle(e.target.value)}
+                                    value={selectedMiddle?.id || ""}
+                                    onChange={(e) => {
+                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
+                                        setSelectedMiddle(selected);
+                                    }}
                                 >
                                     <option value="">선택하세요</option>
-                                    {ingredients?.map((item, index) => (
-                                        <option key={index} value={item.name}>
+                                    {ingredients?.map((item) => (
+                                        <option key={item.id} value={item.id}>
                                             {item.name}
                                         </option>
                                     ))}
@@ -393,7 +417,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedMiddle
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedMiddle}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedMiddle.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -407,7 +431,7 @@ function PerfumeBlending() {
                                             <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
 
                                                 <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
-                                                    {ingredients.find(i => i.name === selectedMiddle)?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === selectedMiddle.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
@@ -425,12 +449,15 @@ function PerfumeBlending() {
                                 <Form.Label style={{ marginTop: "100px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>4. LAST</strong></span>
                                     __마지막까지 잔잔히 남는 깊은 여운</Form.Label>
                                 <Form.Select
-                                    value={selectedLast}
-                                    onChange={(e) => setSelectedLast(e.target.value)}
+                                    value={selectedLast?.id || ""}
+                                    onChange={(e) => {
+                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
+                                        setSelectedLast(selected);
+                                    }}
                                 >
                                     <option value="">선택하세요</option>
-                                    {ingredients?.map((item, index) => (
-                                        <option key={index} value={item.name}>
+                                    {ingredients?.map((item) => (
+                                        <option key={item.id} value={item.id}>
                                             {item.name}
                                         </option>
                                     ))}
@@ -447,7 +474,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedLast
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedLast}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedLast.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -461,7 +488,7 @@ function PerfumeBlending() {
                                             <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
 
                                                 <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
-                                                    {ingredients.find(i => i.name === selectedLast)?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === selectedLast.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
@@ -510,14 +537,19 @@ function PerfumeBlending() {
                                 border: '1px solid #808080ff',
                                 color: '#808080ff',
                                 width: "120px", height: "50px"
-                            }}>save</button>
-                            <button style={{
-                                marginRight: "30px", borderRadius: '3px',
-                                backgroundColor: '#66594eff',
-                                color: "white",
-                                border: '1px solid transparent',
-                                width: "120px", height: "50px"
-                            }}>add to cart</button>
+                            }}
+                                onClick={createCustomPerfume}
+
+                            >save</button>
+                            <button
+                                onClick={handleAddToCart}
+                                style={{
+                                    marginRight: "30px", borderRadius: '3px',
+                                    backgroundColor: '#66594eff',
+                                    color: "white",
+                                    border: '1px solid transparent',
+                                    width: "120px", height: "50px"
+                                }}>add to cart</button>
                         </div>
                     </div>
 

@@ -3,6 +3,8 @@ package com.scentelier.backend.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,8 +28,9 @@ public class CustomPerfume {
     @NotBlank(message = "향수 이름을 정해주세요.")
     private String name;
 
-    @NotBlank(message = "용량을 정해 주세요.")
-    private int volume;
+    @NotNull(message = "용량을 선택해주세요.")
+    @Positive(message = "용량은 양수여야 합니다.")
+    private Integer volume;
 
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")

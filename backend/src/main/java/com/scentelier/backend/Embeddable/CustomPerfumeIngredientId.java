@@ -7,37 +7,31 @@ import java.util.Objects;
 
 @Embeddable
 public class CustomPerfumeIngredientId implements Serializable {
-    private Long customId;
-    private Long ingredientId;
 
-    // 기본 생성자, equals(), hashCode() 필수
+    private Long customId;
+    private Long ingredientId; // 필드 이름 수정
+
+    // 기본 생성자
     public CustomPerfumeIngredientId() {}
+
     public CustomPerfumeIngredientId(Long customId, Long ingredientId) {
         this.customId = customId;
         this.ingredientId = ingredientId;
     }
 
-    public Long getCustomId() {
-        return customId;
-    }
+    public Long getCustomId() { return customId; }
+    public void setCustomId(Long customId) { this.customId = customId; }
 
-    public void setCustomId(Long customId) {
-        this.customId = customId;
-    }
-
-    public Long getIngredientId() {
-        return ingredientId;
-    }
-
-    public void setIngredientId(Long ingredientId) {
-        this.ingredientId = ingredientId;
-    }
+    public Long getIngredientId() { return ingredientId; }
+    public void setIngredientId(Long ingredientId) { this.ingredientId = ingredientId; }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (!(o instanceof CustomPerfumeIngredientId)) return false;
         CustomPerfumeIngredientId that = (CustomPerfumeIngredientId) o;
-        return Objects.equals(customId, that.customId) && Objects.equals(ingredientId, that.ingredientId);
+        return Objects.equals(customId, that.customId) &&
+                Objects.equals(ingredientId, that.ingredientId);
     }
 
     @Override
@@ -45,3 +39,4 @@ public class CustomPerfumeIngredientId implements Serializable {
         return Objects.hash(customId, ingredientId);
     }
 }
+

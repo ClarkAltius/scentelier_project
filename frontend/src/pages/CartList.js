@@ -33,6 +33,10 @@ const normalizeCartItem = (raw) => {
 };
 
 function CartList() {
+  useEffect(() => {
+    // 부드럽게 올리고 싶으면 behavior: 'smooth'
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, []);
   const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [selectedTotal, setSelectedTotal] = useState(0);
@@ -102,20 +106,20 @@ function CartList() {
 
   // 서버 수량 수정
   const saveQuantity = async (cartItemId) => {
-  const target = items.find((p) => p.cartItemId === cartItemId);
-  if (!target) return;
+    const target = items.find((p) => p.cartItemId === cartItemId);
+    if (!target) return;
 
-  try {
-    const res = await axios.patch(
-      `${API_BASE_URL}/cart/edit/${cartItemId}`,
-      null,
-      { params: { quantity: target.quantity }, withCredentials: true }
-    );
-  } catch (error) {
-    console.error("수량 변경 오류:", error);
-    alert("수량 변경 중 문제가 발생했습니다.");
-  }
-};
+    try {
+      const res = await axios.patch(
+        `${API_BASE_URL}/cart/edit/${cartItemId}`,
+        null,
+        { params: { quantity: target.quantity }, withCredentials: true }
+      );
+    } catch (error) {
+      console.error("수량 변경 오류:", error);
+      alert("수량 변경 중 문제가 발생했습니다.");
+    }
+  };
   // const saveQuantity = async (cartItemId) => {
   //   const target = items.find((p) => p.cartItemId === cartItemId);
   //   if (!target) return;
@@ -233,7 +237,7 @@ function CartList() {
         </div>
       </div>
 
-    
+
       <Container className="mt-5" style={{ maxWidth: 900 }}>
         {items.length === 0 ? (
           <Alert variant="secondary" className="text-center">
@@ -242,9 +246,15 @@ function CartList() {
         ) : (
           <>
             {items.map((p) => {
-              const imgSrc = p.image?.startsWith("http")
-                ? p.image
-                : `${API_BASE_URL}/uploads/products/${p.image ?? ""}`;
+              // 1. 이미지 URL 결정
+              let imgSrc;
+              if (p.image) {
+                imgSrc = p.image.startsWith("http")
+                  ? p.image
+                  : `${API_BASE_URL}/uploads/products/${p.image}`;
+              } else {
+                imgSrc = `${API_BASE_URL}/uploads/def.jpg`; // 디폴트 이미지 경로
+              }
               const discount = p.originalPrice > p.price ? p.originalPrice - p.price : 0;
               const lineTotal = Number(p.price) * Number(p.quantity);
 
@@ -303,7 +313,7 @@ function CartList() {
                           onBlur={() => saveQuantity(p.cartItemId)}
                           style={{ width: 80, textAlign: "center" }}
                         />
-                        <Button variant="light" onClick={() => {inc(p.cartItemId); saveQuantity(p.cartItemId);}}>
+                        <Button variant="light" onClick={() => { inc(p.cartItemId); saveQuantity(p.cartItemId); }}>
                           +
                         </Button>
                         {/** 
@@ -369,7 +379,7 @@ function CartList() {
                 variant="outline-dark"
                 size="lg"
                 style={{ borderRadius: "0", fontWeight: "600" }}
-                onClick={() =>  goToPayment(items.filter((p) => p.checked))}
+                onClick={() => goToPayment(items.filter((p) => p.checked))}
               >
                 선택상품주문
               </Button>

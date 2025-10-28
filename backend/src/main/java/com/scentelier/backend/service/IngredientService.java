@@ -29,7 +29,7 @@ public class IngredientService {
 
     public List<Ingredient> findAll() {
         List<Ingredient> ingredients = ingredientRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
-        System.out.println("향료 리스트 " + ingredients);
+
         return ingredientRepository.findAll();
     }
 }
