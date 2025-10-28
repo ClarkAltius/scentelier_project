@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final OrderProductService OrderProductService;
     private final UserService userService;
     private final ProductService productService;
     private final CustomPerfumeService customPerfumeService;
@@ -136,6 +136,14 @@ public class OrderController {
         int effected = -1;
         effected = orderService.updateUserOrderStatus(orderId, status);
         if (effected > 0) {
+            if (status == OrderStatus.CANCELLED) {
+                List<OrderProduct> orderProducts = OrderProductService.findByOrderId(orderId);
+                for (OrderProduct item : orderProducts) {
+                    Products products = productService.ProductById(item.getProducts().getId());
+                    products.setStock(products.getStock()+item.getQuantity());
+                    productService.save(products);
+                }
+            }
             String message = "주문 번호 " + orderId + "의 주문 상태가 변경 되었습니다.";
             return ResponseEntity.ok(message);
         } else {
