@@ -13,6 +13,8 @@ import AdminRoute from "./AdminRoute.js";
 import Logout from "../pages/Logout.js";
 import ProductInsertForm from "../pages/ProductInsertForm.js";
 import Inquiry from "../pages/Inquiry.js";
+import MyInquiry from "../pages/MyInquiry.js";
+import InquiryDetail from "../pages/InquiryDetail.js";
 import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
 import PrivateRoute from './PrivateRoute.js';
@@ -38,6 +40,8 @@ function AppRoutes() {
             <Route path='/inquiry' element={<Inquiry />} />
             <Route path='/mypage' element={<MyPage />} />
             <Route path='/findpass' element={<Findpass />} />
+            <Route path='/myinquiry' element={<MyInquiry />} />
+            <Route path='/inquirydetail' element={<InquiryDetail />} />
 
             {/**로그인 사용자 전용 */}
             <Route

@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
+import { Row, Col } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 const Inquiry = () => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    type: "",
+    status: "PENDING"
   });
 
   const [errors, setErrors] = useState({});
+  const [submittedInquiry, setSubmittedInquiry] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+
 
   const handleChange = (e) => {
     setFormData({
@@ -36,6 +44,11 @@ const Inquiry = () => {
 
     if (!formData.content.trim()) {
       newErrors.content = "문의사항 내용을 입력해주세요.";
+      isValid = false;
+    }
+
+    if (!formData.type.trim()) {
+      newErrors.type = "문의유형을 선택해주세요.";
       isValid = false;
     }
 
@@ -73,13 +86,18 @@ const Inquiry = () => {
     //   }
     // }
 
+    // --- 서버로 전송 ---
+    setIsSubmitting(true);
     try {
       const response = await axios.post(`${API_BASE_URL}/api/inquiries/save`, formData, { withCredentials: true });
 
       if (response.data.success) {
         alert("문의가 성공적으로 전송되었습니다!");
         console.log(response.data.data); // 저장된 Inquiry 객체 확인 가능
-        setFormData({ title: "", content: "" });
+        setSubmittedInquiry(response.data.data);
+
+        //setInquiries([response.data.data, ...inquiries]);
+
       } else {
         console.error("서버 오류:", response.data.error);
         alert("문의 전송 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -101,7 +119,27 @@ const Inquiry = () => {
     <div style={styles.page}>
       <div style={styles.container}>
         <h2 style={styles.heading}>문의하기</h2>
+
+
+
+
+
         <form onSubmit={handleSubmit}>
+          {/*  드롭다운 추가 */}
+          <select
+            id="type"
+            value={formData.type}
+            onChange={handleChange}
+            style={styles.select}
+          >
+            <option value="">-- 문의 유형 --</option>
+            <option value="PRODUCT">상품</option>
+            <option value="DELIVERY">배달</option>
+            <option value="PAYMENT">결제</option>
+            <option value="ETC">기타</option>
+          </select>
+          {errors.type && <div style={styles.error}>{errors.type}</div>}
+
           <InputGroup
             label="문의사항 제목"
             id="title"
@@ -130,10 +168,21 @@ const Inquiry = () => {
             </button>
           </div>
 
+          <Col>
+            <Link to={`/myinquiry`}>
+              <div class="form-end">
+                <a class="inline-link" href="$">My 문의사항</a>
+              </div>
+            </Link>
+          </Col>
           {successMessage && (
             <div style={styles.successMessage}>{successMessage}</div>
           )}
         </form>
+
+
+
+
       </div>
     </div>
   );
