@@ -311,7 +311,7 @@ const OrderList = () => {
                         <Button
                           variant="outline-success"
                           size="sm"
-                          // onClick={() => handleOrderAction(order.orderId, "confirm")}
+                          onClick={() => navigate('/reviews/write')}
                         >
                           <CircleCheckBig size={16} className="me-1" /> 리뷰 작성
                         </Button>

@@ -16,6 +16,7 @@ import Inquiry from "../pages/Inquiry.js";
 import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
 import PrivateRoute from './PrivateRoute.js';
+import ReviewWriteForm from '../pages/ReviewWriteForm.js'
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -60,6 +61,14 @@ function AppRoutes() {
                 element={
                     <PrivateRoute>
                         <OrderList />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/reviews/write"
+                element={
+                    <PrivateRoute>
+                        <ReviewWriteForm />
                     </PrivateRoute>
                 }
             />

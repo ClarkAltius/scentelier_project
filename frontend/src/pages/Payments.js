@@ -75,7 +75,7 @@ function Payments(props) {
                     .filter((product) => !product.isCustom)
                     .map((p) => ({
                     cartItemId: p.cartItemId,
-                    productId: p.productId,   // ✅ 이렇게
+                    productId: p.productId,
                     quantity: p.quantity,
                     price: p.price,
                 })),
@@ -83,7 +83,7 @@ function Payments(props) {
                     .filter((product) => product.isCustom)
                     .map((c) => ({
                     cartItemId: c.cartItemId,
-                    customId: c.customId,     // ✅ 이렇게
+                    customId: c.customId,
                     quantity: c.quantity,
                     price: c.price,
                 })),
@@ -172,7 +172,7 @@ function Payments(props) {
                                     {p.name} — {p.quantity}개
                                     </span>
                                     <span>
-                                        (₩{(p.price*p.quantity).toLocaleString()})
+                                        ₩{(p.price*p.quantity).toLocaleString()}
                                     </span>
                                 </div>
                             ))}

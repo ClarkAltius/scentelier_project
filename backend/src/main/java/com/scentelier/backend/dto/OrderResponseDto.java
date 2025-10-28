@@ -27,7 +27,6 @@ public class OrderResponseDto {
     private String paymentMethod;
     private List<OrderItem> orderItems;
 
-
     @Data
     @AllArgsConstructor
     public static class OrderItem {

@@ -1,6 +1,7 @@
 package com.scentelier.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.constant.Payment;
 import jakarta.persistence.*;
@@ -59,4 +60,7 @@ public class Orders {
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> orderProducts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Reviews review;
 }
