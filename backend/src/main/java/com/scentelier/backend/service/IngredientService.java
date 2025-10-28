@@ -3,11 +3,15 @@ package com.scentelier.backend.service;
 import com.scentelier.backend.dto.IngredientStockDto;
 import com.scentelier.backend.entity.Ingredient;
 import com.scentelier.backend.repository.IngredientRepository;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,5 +35,18 @@ public class IngredientService {
         List<Ingredient> ingredients = ingredientRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
         System.out.println("향료 리스트 " + ingredients);
         return ingredientRepository.findAll();
+    }
+
+    @Transactional
+    public IngredientStockDto updateStock(Long itemId, @NotNull(message = "Stock value cannot be null.") Integer newStock) {
+
+        Ingredient ingredient = ingredientRepository.findById(itemId)
+                .orElseThrow(() -> new NoSuchElementException("Ingredient not found with id: " + itemId));
+
+        int currentStock = ingredient.getStock();
+        ingredient.setStock(newStock + currentStock);
+        Ingredient updatedIngredient = ingredientRepository.save(ingredient);
+
+        return new IngredientStockDto(updatedIngredient.getId(), updatedIngredient.getName(), updatedIngredient.getStock());
     }
 }

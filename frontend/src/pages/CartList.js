@@ -33,6 +33,10 @@ const normalizeCartItem = (raw) => {
 };
 
 function CartList() {
+   useEffect(() => {
+    // 부드럽게 올리고 싶으면 behavior: 'smooth'
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, []);
   const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [selectedTotal, setSelectedTotal] = useState(0);
