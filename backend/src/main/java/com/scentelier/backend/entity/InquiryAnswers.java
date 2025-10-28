@@ -22,7 +22,7 @@ public class InquiryAnswers {
     @JoinColumn(name = "inquiry_id")
     private Inquiry inquiry;
 
-    @NotBlank(message = "문의 내용은 필수 입력 사항입니다")
+    @NotBlank(message = "답변 내용은 필수 입력 사항입니다")
     private String content;
 
     @CreationTimestamp

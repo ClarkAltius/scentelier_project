@@ -66,6 +66,9 @@ public class AdminController {
         List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
         return ResponseEntity.ok(inquiryList);
     }
+
+
+
     // 주문 상세 조회 (관리자 페이지)
     @GetMapping("/orders/{id}")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
@@ -83,7 +86,6 @@ public class AdminController {
     }
 
     // 재고 수량 변동 API 엔드포인트
-
     @PatchMapping("/products/stock/{itemId}")
     public ResponseEntity<ProductStockDto> updateProductStock(
             @PathVariable Long itemId,
@@ -99,6 +101,5 @@ public class AdminController {
         IngredientStockDto updateIngredient = ingredientService.updateStock(itemId, dto.getAdjustment());
         return ResponseEntity.ok(updateIngredient);
     }
-
 }
 

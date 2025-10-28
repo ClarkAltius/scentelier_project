@@ -1,6 +1,6 @@
 package com.scentelier.backend.entity;
 
-import com.scentelier.backend.constant.Status;
+import com.scentelier.backend.constant.InquiryStatus;
 import com.scentelier.backend.constant.Type;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -38,7 +38,7 @@ public class Inquiry {
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private InquiryStatus status;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted = false;

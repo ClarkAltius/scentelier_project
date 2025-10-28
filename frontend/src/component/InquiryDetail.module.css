@@ -1,0 +1,245 @@
+/* General container */
+.container {
+    padding: 24px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Back button */
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    /* Medium gray text */
+    background-color: #f3f4f6;
+    /* Light gray background */
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.backButton:hover {
+    background-color: #e5e7eb;
+}
+
+/* Sections */
+.inquirySection,
+.answersSection,
+.newAnswerSection {
+    margin-bottom: 32px;
+}
+
+.inquirySection h2,
+.answersSection h3,
+.newAnswerSection h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    /* Dark gray */
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+/* Meta info for inquiry details */
+.metaInfo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 14px;
+    color: #6b7280;
+    /* Lighter gray */
+    margin-bottom: 16px;
+}
+
+.metaInfo span {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Content box for inquiry/answers */
+.contentBox {
+    background-color: #f9fafb;
+    /* Very light gray */
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.contentBox p {
+    margin: 0;
+    white-space: pre-wrap;
+    /* Preserve whitespace and line breaks */
+}
+
+/* Status Badge (reusing from InquiryManagement) */
+.statusBadge {
+    display: inline-block;
+    padding: 3px 10px;
+    margin-left: 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #999;
+    /* Default */
+    vertical-align: middle;
+}
+
+.statusPENDING {
+    background-color: #ffc107;
+    color: #333;
+    /* Yellow */
+}
+
+.statusANSWERED {
+    background-color: #17a2b8;
+    /* Blue/Teal */
+}
+
+.statusCLOSED {
+    background-color: #6c757d;
+    /* Grey */
+}
+
+/* Answer list styling */
+.answerList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.answerItem {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.answerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.answerHeader strong {
+    font-weight: 600;
+    color: #1f2937;
+    /* Darker gray */
+}
+
+.answerDate {
+    font-size: 12px;
+    color: #6b7280;
+    /* Lighter gray */
+}
+
+.answerItem p {
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    /* Preserve whitespace and line breaks */
+}
+
+/* New Answer Form */
+.answerTextarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #d1d5db;
+    /* Slightly darker border */
+    border-radius: 6px;
+    margin-bottom: 12px;
+    resize: vertical;
+    /* Allow vertical resizing only */
+    min-height: 120px;
+    box-sizing: border-box;
+    /* Include padding and border in width */
+}
+
+.answerTextarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    /* Blue border on focus */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.submitButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #2563eb;
+    /* Blue */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+    background-color: #1d4ed8;
+    /* Darker blue on hover */
+}
+
+.submitButton:disabled {
+    background-color: #9ca3af;
+    /* Gray when disabled */
+    cursor: not-allowed;
+}
+
+/* Loading and Error states */
+.loading,
+.error {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.error,
+.errorBanner {
+    color: #dc3545;
+    /* Red for errors */
+}
+
+.errorBanner {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
