@@ -122,14 +122,26 @@ function PerfumeBlending() {
 
     const payload = {
         ingredient: [
-            { ingredientId: (selectedTop.id), noteType: "TOP", amount: topValue },
-            { ingredientId: (selectedMiddle.id), noteType: "MIDDLE", amount: middleValue },
-            { ingredientId: (selectedLast.id), noteType: "LAST", amount: lastValue }
+            { ingredientId: (selectedTop?.id), noteType: "TOP", amount: topValue },
+            { ingredientId: (selectedMiddle?.id), noteType: "MIDDLE", amount: middleValue },
+            { ingredientId: (selectedLast?.id), noteType: "LAST", amount: lastValue }
         ]
     };
 
 
     const createCustomPerfume = async () => {
+        if (!selectedTop || !selectedMiddle || !selectedLast) {
+            alert("모든 향료를 선택해주세요!");
+            return
+        }
+
+        const total = topValue + middleValue + lastValue;
+
+        if (total !== MAX_TOTAL) {
+            alert(`향료의 비율이 ${MAX_TOTAL}이 되도록 맞춰주세요 (현재 : ${total})`);
+            return; // 조건이 안 맞으면 함수 종료
+        }
+
         try {
             const response = await axios.post(`${API_BASE_URL}/api/customPerfume/addCustom`, {
                 userId: user.id,
@@ -181,6 +193,41 @@ function PerfumeBlending() {
             }
         }
     };
+
+    const selectedIds = [
+        selectedTop && selectedTop.id,
+        selectedMiddle && selectedMiddle.id,
+        selectedLast && selectedLast.id,
+    ].filter(Boolean); // null/undefined 제거
+
+    const renderSelect = (label, selected, setSelected) => (
+        <>
+            <Form.Select
+                value={selected?.id || ""}
+                onChange={(e) => {
+                    const selectedId = e.target.value;
+                    if (!selectedId) {
+                        setSelected(null); // 선택 해제
+                    } else {
+                        const item = ingredients.find(i => i.id === parseInt(selectedId, 10));
+                        setSelected(item || null); // 안전하게 null 처리
+                    }
+                }}
+            >
+                <option value="">선택하세요</option>
+                {ingredients
+                    ?.filter((item) => {
+                        // 현재 선택된 항목은 남기고, 다른 곳에서 선택되지 않은 항목만 표시
+                        return !selectedIds.includes(item.id) || (selected && item.id === selected.id);
+                    })
+                    .map((item) => (
+                        <option key={item.id} value={item.id}>
+                            {item.name}
+                        </option>
+                    ))}
+            </Form.Select>
+        </>
+    );
 
 
     return (<>
@@ -315,22 +362,11 @@ function PerfumeBlending() {
 
                                 {/* --------------------추천조합 끝 ----------------------------------------------------*/}
 
-                                <Form.Label style={{ marginTop: "50px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>2. TOP</strong></span>
-                                    __가장 먼저 느껴지는 첫인상, 향의 시작</Form.Label>
-                                <Form.Select
-                                    value={selectedTop?.id || ""}
-                                    onChange={(e) => {
-                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
-                                        setSelectedTop(selected);
-                                    }}
-                                >
-                                    <option value="">선택하세요</option>
-                                    {ingredients?.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                <Form.Label style={{ marginTop: "40px", fontSize: "15px" }}>
+                                    <span style={{ fontSize: "20px" }}><strong>TOP</strong></span>
+                                    __향의 시작, 감각을 깨우는 첫 만남의 설렘
+                                </Form.Label>
+                                {renderSelect("TOP", selectedTop, setSelectedTop)}
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
@@ -350,7 +386,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedTop
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedTop.name}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedTop?.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -366,7 +402,7 @@ function PerfumeBlending() {
                                                 <div style={{
                                                     fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px"
                                                 }}>
-                                                    {ingredients.find(i => i.name === (selectedTop.name))?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === (selectedTop?.name))?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
@@ -383,21 +419,11 @@ function PerfumeBlending() {
 
 
 
-                                <Form.Label style={{ marginTop: "100px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>3. MIDDLE</strong></span>__향수의 중심, 진짜 매력을 보여주는 향</Form.Label>
-                                <Form.Select
-                                    value={selectedMiddle?.id || ""}
-                                    onChange={(e) => {
-                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
-                                        setSelectedMiddle(selected);
-                                    }}
-                                >
-                                    <option value="">선택하세요</option>
-                                    {ingredients?.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                <Form.Label style={{ marginTop: "100px", fontSize: "15px" }}>
+                                    <span style={{ fontSize: "20px" }}><strong>MIDDLE</strong></span>
+                                    __향수의 중심, 진짜 매력을 보여주는 향
+                                </Form.Label>
+                                {renderSelect("MIDDLE", selectedMiddle, setSelectedMiddle)}
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
@@ -417,7 +443,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedMiddle
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedMiddle.name}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedMiddle?.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -431,7 +457,7 @@ function PerfumeBlending() {
                                             <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
 
                                                 <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
-                                                    {ingredients.find(i => i.name === selectedMiddle.name)?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === selectedMiddle?.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
@@ -445,23 +471,11 @@ function PerfumeBlending() {
                                     </Card>
                                 </div>
 
-
-                                <Form.Label style={{ marginTop: "100px", fontSize: "15px", }}><span style={{ fontSize: "20px" }}><strong>4. LAST</strong></span>
-                                    __마지막까지 잔잔히 남는 깊은 여운</Form.Label>
-                                <Form.Select
-                                    value={selectedLast?.id || ""}
-                                    onChange={(e) => {
-                                        const selected = ingredients.find(item => item.id === parseInt(e.target.value));
-                                        setSelectedLast(selected);
-                                    }}
-                                >
-                                    <option value="">선택하세요</option>
-                                    {ingredients?.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                <Form.Label style={{ marginTop: "100px", fontSize: "15px" }}>
+                                    <span style={{ fontSize: "20px" }}><strong>LAST</strong></span>
+                                    __마지막까지 잔잔히 남는 깊은 여운
+                                </Form.Label>
+                                {renderSelect("LAST", selectedLast, setSelectedLast)}
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
@@ -474,7 +488,7 @@ function PerfumeBlending() {
                                                 <img
                                                     src={
                                                         selectedLast
-                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedLast.name}.jpg`
+                                                            ? `${API_BASE_URL}/uploads/ingredient/${selectedLast?.name}.jpg`
                                                             : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
                                                     }
                                                     style={{
@@ -488,12 +502,12 @@ function PerfumeBlending() {
                                             <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
 
                                                 <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
-                                                    {ingredients.find(i => i.name === selectedLast.name)?.description || "선택된 향료가 없습니다."}
+                                                    {ingredients.find(i => i.name === selectedLast?.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
 
                                             </div>
                                         </Card.Body>
-                                        <div style={{ width: "300px", margin: "50px auto" }}>
+                                        <div style={{ width: "300px", margin: "30px auto" }}>
                                             <Form.Label>Intensity: {lastValue}</Form.Label>
                                             <Form.Range className='custom-range'
                                                 value={lastValue} onChange={handleChange("last")} max={MAX_TOTAL}
@@ -501,10 +515,50 @@ function PerfumeBlending() {
                                         </div>
                                     </Card>
                                 </div>
-                                {/* <div style={{ marginTop: "30px", color: "#4b9c8bff", fontSize: "25px" }}>
-                                    <strong>( {topValue + middleValue + lastValue} / {MAX_TOTAL} )
-                                    </strong></div> */}
 
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    maxWidth: "600px",
+                                    marginTop: "70px",
+                                    fontFamily: "'Noto Sans KR', sans-serif",
+                                    gap: "20px"
+                                }}>
+                                    {/* TOP */}
+                                    <div style={{ textAlign: "center", flex: 1 }}>
+                                        <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>TOP</p>
+                                        <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
+                                            {selectedTop?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({topValue})</span>
+                                        </p>
+                                    </div>
+
+                                    {/* MIDDLE */}
+                                    <div style={{ textAlign: "center", flex: 1 }}>
+                                        <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>MIDDLE</p>
+                                        <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
+                                            {selectedMiddle?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({middleValue})</span>
+                                        </p>
+                                    </div>
+
+                                    {/* LAST */}
+                                    <div style={{ textAlign: "center", flex: 1 }}>
+                                        <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>LAST</p>
+                                        <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
+                                            {selectedLast?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({lastValue})</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+
+
+                                <div
+                                    className={`ratio-message ${topValue + middleValue + lastValue === MAX_TOTAL ? "success" : "warning"
+                                        }`}
+                                >
+                                    {topValue + middleValue + lastValue === MAX_TOTAL
+                                        ? "💚 완벽한 비율이에요!"
+                                        : "향료의 비율이 10이 되도록 맞춰주세요."}
+                                </div>
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label ><strong>5. 용량을 선택하세요</strong></Form.Label>
@@ -530,14 +584,17 @@ function PerfumeBlending() {
                                 </div>
                             </Form.Group>
                         </Form>
+
+
                         <div style={{ margin: "50px", gap: "10px" }}>
-                            <button style={{
-                                marginRight: "30px", borderRadius: '3px',
-                                backgroundColor: '#ffffffff',
-                                border: '1px solid #808080ff',
-                                color: '#808080ff',
-                                width: "120px", height: "50px"
-                            }}
+                            <button
+                                style={{
+                                    marginRight: "30px", borderRadius: '3px',
+                                    backgroundColor: '#ffffffff',
+                                    border: '1px solid #808080ff',
+                                    color: '#808080ff',
+                                    width: "120px", height: "50px"
+                                }}
                                 onClick={createCustomPerfume}
 
                             >save</button>

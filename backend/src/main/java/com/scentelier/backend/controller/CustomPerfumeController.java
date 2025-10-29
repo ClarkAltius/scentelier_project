@@ -89,14 +89,6 @@ public class CustomPerfumeController {
 
         return ResponseEntity.ok(response);
     }
-
-
-
     //-----------------------------------------------------------------
 
-    public ResponseEntity<?> customPerfumeInfo(){
-
-
-        return null;
-    }
 }
