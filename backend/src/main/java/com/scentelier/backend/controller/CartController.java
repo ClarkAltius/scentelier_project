@@ -76,7 +76,7 @@ public class CartController {
 @PostMapping("/insert/custom")
 public ResponseEntity<String> addCustomToCart(@RequestBody CartItemDto dto) {
 
-    System.out.println("ddddddddddddddddd"+dto.getCustomId());
+
     // 1. 필수 값 null 체크
     if (dto.getUserId() == null || dto.getCustomId() == null) {
         System.out.println("확인하기"+dto.getUserId()+dto.getCustomId());
