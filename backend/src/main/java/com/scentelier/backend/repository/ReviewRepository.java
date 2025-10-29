@@ -2,6 +2,8 @@ package com.scentelier.backend.repository;
 
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Reviews;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,5 +23,13 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
 
     // 사용자 리뷰 조회
     @Query("SELECT r FROM Reviews r WHERE r.user.id = :userId AND r.isDeleted = false ORDER BY r.createdAt DESC")
-    List<Reviews> findAllByUserId(@Param("userId") Long userId);
+    Page<Reviews> findAllByUserIdPaged(@Param("userId") Long userId, Pageable pageable);
+
+    // 전체 리뷰 조회
+    Page<Reviews> findAllByIsDeletedFalse(Pageable pageable);
+
+    // 상품별 리뷰 조회
+    @Query("SELECT r FROM Reviews r WHERE r.order.id IN (SELECT o.id FROM Orders o JOIN o.orderProducts op WHERE op.products.id = :productId) " +
+            "AND r.isDeleted = false ORDER BY r.createdAt DESC")
+    Page<Reviews> findAllByProductId(@Param("productId") Long productId, Pageable pageable);
 }

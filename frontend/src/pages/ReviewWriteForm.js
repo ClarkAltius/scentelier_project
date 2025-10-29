@@ -3,7 +3,7 @@ import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
 import { Star, XCircle, CheckCircle, Send } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "../component/AuthContext";
-import { API_BASE_URL } from "../config/config";
+import { createReview, getUnwrittenOrders } from "../api/reviewApi";
 
 const ReviewCreatePage = () => {
   const { user } = useAuth();
@@ -19,25 +19,8 @@ const ReviewCreatePage = () => {
   // 리뷰 안 쓴 주문 조회
   useEffect(() => {
     if (!user) return;
-
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get(
-          `${API_BASE_URL}/reviews/unwritten/${user.id}`,
-          { withCredentials: true }
-        );
-        console.log(res.data)
-        setOrders(res.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("리뷰 작성 가능한 주문 내역을 불러오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [user]);
+    getUnwrittenOrders(user.id).then(setOrders).catch(console.error);
+  }, [user.id]);
 
   const handleSubmit = async () => {
     if (!selectedOrderId) return alert("리뷰를 작성할 주문을 선택해주세요.");
@@ -46,11 +29,11 @@ const ReviewCreatePage = () => {
 
     setSubmitting(true);
     try {
-      await axios.post(
-        `${API_BASE_URL}/reviews/write/${user.id}`,
-        { orderId: selectedOrderId, rating, content },
-        { withCredentials: true }
-      );
+      await createReview(user.id, {
+        orderId: selectedOrder.orderId,
+        content,
+        rating,
+      });
       alert("리뷰가 성공적으로 작성되었습니다!");
 
       // 작성 후 주문 목록에서 제거
@@ -140,13 +123,13 @@ const ReviewCreatePage = () => {
         <Form.Label>별점</Form.Label>
         <div className="d-flex justify-content-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
-            <Star
-                key={star}
-                size={22}
-                onClick={() => setRating(star)}
-                className="cursor-pointer"
-                color={rating >= star ? "#FBBF24" : "#9CA3AF"}
-            />
+              <Star
+                  key={star}
+                  size={22}
+                  onClick={() => setRating(star)}
+                  className="cursor-pointer"
+                  color={rating >= star ? "#FBBF24" : "#9CA3AF"}
+              />
             ))}
         </div>
         </Form.Group>

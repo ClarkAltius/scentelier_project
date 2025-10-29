@@ -4,8 +4,12 @@ import com.scentelier.backend.dto.ReviewCreateDto;
 import com.scentelier.backend.dto.ReviewDto;
 import com.scentelier.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/reviews")
@@ -30,10 +34,25 @@ public class ReviewController {
         }
     }
 
-    // 작성된 리뷰 조회
+    // 사용자가 쓴 리뷰 조회
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserReviews(@PathVariable Long userId) {
-        return ResponseEntity.ok(reviewService.getUserReviews(userId));
+    public ResponseEntity<Page<ReviewDto>> getUserReviews(@PathVariable Long userId, Pageable pageable) {
+        return ResponseEntity.ok(reviewService.getUserReviewsPaged(userId, pageable));
+    }
+
+    // 전체 리뷰 조회
+    @GetMapping("/all")
+    public ResponseEntity<Page<ReviewDto>> getAllReviews(Pageable pageable) {
+        return ResponseEntity.ok(reviewService.getAllReviews(pageable));
+    }
+
+    // 특정 상품 리뷰 조회
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<Page<ReviewDto>> getReviewsByProduct(
+            @PathVariable Long productId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(reviewService.getReviewsByProduct(productId, pageable));
     }
 }
 

@@ -10,6 +10,8 @@ import com.scentelier.backend.repository.OrderRepository;
 import com.scentelier.backend.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,10 +51,22 @@ public class ReviewService {
         return convertToDto(review);
     }
 
-    // 작성된 리뷰 리스트 조회
-    public List<ReviewDto> getUserReviews(Long userId) {
-        List<Reviews> reviews = reviewRepository.findAllByUserId(userId);
-        return reviews.stream().map(this::convertToDto).collect(Collectors.toList());
+    // 사용자 리뷰 조회
+    public Page<ReviewDto> getUserReviewsPaged(Long userId, Pageable pageable) {
+        Page<Reviews> reviews = reviewRepository.findAllByUserIdPaged(userId, pageable);
+        return reviews.map(this::convertToDto);
+    }
+
+    // 전체 리뷰 조회
+    public Page<ReviewDto> getAllReviews(Pageable pageable) {
+        Page<Reviews> reviews = reviewRepository.findAllByIsDeletedFalse(pageable);
+        return reviews.map(this::convertToDto);
+    }
+
+    // 특정 상품 리뷰 조회
+    public Page<ReviewDto> getReviewsByProduct(Long productId, Pageable pageable) {
+        Page<Reviews> reviews = reviewRepository.findAllByProductId(productId, pageable);
+        return reviews.map(this::convertToDto);
     }
 
     // DTO 변환

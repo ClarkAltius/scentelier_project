@@ -19,6 +19,8 @@ import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
 import PrivateRoute from './PrivateRoute.js';
 import ReviewWriteForm from '../pages/ReviewWriteForm.js'
+import MyReviewListPage from '../pages/MyReviewListPage.js'
+import ReviewBoardPage from '../pages/ReviewBoardPage.js'
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -39,9 +41,11 @@ function AppRoutes() {
             <Route path='/logout' element={<Logout />} />
             <Route path='/inquiry' element={<Inquiry />} />
             <Route path='/mypage' element={<MyPage />} />
+            <Route path='/mypage/review' element={<MyReviewListPage />} />
             <Route path='/findpass' element={<Findpass />} />
             <Route path='/myinquiry' element={<MyInquiry />} />
             <Route path='/inquirydetail' element={<InquiryDetail />} />
+            <Route path='/review/list' element={<ReviewBoardPage />} />
 
             {/**로그인 사용자 전용 */}
             <Route
