@@ -69,6 +69,23 @@ public class ReviewService {
         return reviews.map(this::convertToDto);
     }
 
+    // 리뷰 수정
+    public ReviewDto updateReview(Long reviewId, ReviewCreateDto dto) {
+        Reviews review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+        review.setContent(dto.getContent());
+        review.setRating(dto.getRating());
+        review = reviewRepository.save(review);
+        return convertToDto(review);
+    }
+
+    // 리뷰 삭제
+    public ReviewDto deleteReview(Long reviewId) {
+        Reviews review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+        review.setDeleted(true);
+        review = reviewRepository.save(review);
+        return convertToDto(review);
+    }
+
     // DTO 변환
     private ReviewDto convertToDto(Orders order) {
         List<ReviewOrderProductDto> items = order.getOrderProducts().stream()

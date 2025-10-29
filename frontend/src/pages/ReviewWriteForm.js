@@ -128,7 +128,7 @@ const ReviewCreatePage = () => {
                   key={star}
                   size={22}
                   onClick={() => setRating(star)}
-                  className="cursor-pointer"
+                  style={{ cursor: "pointer" }}
                   color={rating >= star ? "#FBBF24" : "#9CA3AF"}
               />
             ))}
