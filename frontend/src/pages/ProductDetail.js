@@ -199,7 +199,6 @@ function ProductDetail() {
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`}
                     ></img>
-                    <p>상세보기 내용</p>
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`}
                     ></img>
