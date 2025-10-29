@@ -34,15 +34,26 @@ public class InquiryService {
         this.inquiryAnswerRepository = inquiryAnswerRepository;
         this.userRepository = userRepository;
     }
-
+//문의 저장
     public Inquiry saveInquiry(Inquiry inquiry) {
         return inquiryRepository.save(inquiry);
     }
-
-    public List<Inquiry> getAllInquiries() {
-        return inquiryRepository.findAll();
+    // 일반 유저: 삭제되지 않은 문의 조회
+    public List<Inquiry> getMyInquiries(Long userId) {
+        return inquiryRepository.findByUserIdAndIsDeletedFalse(userId);
     }
+// 모든 문의 조회
+//    public List<Inquiry> getAllInquiries() {
+//        return inquiryRepository.findAll();
+//    }
+    // 관리자용: 모든 문의 조회 + DTO 변환 (삭제 여부 포함)
+    public List<InquiryDto> findAllWithUserIncludingDeleted() {
+        List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
 
+        return inquiries.stream()
+                .map(InquiryDto::new)
+                .collect(Collectors.toList());
+    }
     public List<InquiryDto> findAllWithUser() {
         List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
 
@@ -106,4 +117,13 @@ public class InquiryService {
 
         return getInquiryDetail(inquiryId);
     }
+
+
+    //추가 수정
+public List<InquiryDto> getAllInquiriesForAdmin() {
+    List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
+    return inquiries.stream()
+            .map(InquiryDto::new)
+            .collect(Collectors.toList());
+}
 }

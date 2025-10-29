@@ -92,18 +92,18 @@ function ProductDetail() {
 
         // 단건 주문으로 결제 페이지로 이동
         navigate("/payments", {
-        state: {
-            products: [
-            {
-                productId: product.id,
-                name: product.name,
-                price: product.price,
-                quantity: quantity,
-                imageUrl: product.imageUrl
+            state: {
+                products: [
+                    {
+                        productId: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: quantity,
+                        imageUrl: product.imageUrl
+                    },
+                ],
+                from: "productDetail",
             },
-            ],
-            from: "productDetail",
-        },
         });
     };
 
@@ -172,11 +172,15 @@ function ProductDetail() {
 
 
                     <button onClick={handleDirectOrder} style={{ backgroundColor: '#000000ff', color: 'white', width: '40%', height: '55px', margin: '30px' }}>BUY IT NOW</button>
-                    <button onClick={() => { if (!user) { alert('로그인이 필요한 서비스입니다.'); 
-                                return navigate('/user/login'); } else { addToCart(); }}}
-                            style={{ backgroundColor: '#ffffffff', width: '30%', height: '55px' }}>
-                            CART
-                        </button>
+                    <button onClick={() => {
+                        if (!user) {
+                            alert('로그인이 필요한 서비스입니다.');
+                            return navigate('/user/login');
+                        } else { addToCart(); }
+                    }}
+                        style={{ backgroundColor: '#ffffffff', width: '30%', height: '55px' }}>
+                        CART
+                    </button>
                 </Col>
             </Row>
         </Container >
@@ -192,7 +196,20 @@ function ProductDetail() {
                     title="Detail"
                     className="full-width-tabs"
                 >
-                    <p>상세보기 내용</p>
+                    <img
+                        src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`}
+                        style={{ margin: 100 }}
+                    ></img>
+                    <img
+                        src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`}
+                        style={{ margin: 100 }}
+
+                    ></img>
+                    <img
+                        src={`${API_BASE_URL}/uploads/Detail/${product.name}/3.png`}
+                        style={{ margin: 100 }}
+
+                    ></img>
                 </Tab>
                 <Tab
                     eventKey="review"
