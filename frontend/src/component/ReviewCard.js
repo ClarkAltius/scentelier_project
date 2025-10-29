@@ -41,7 +41,7 @@ const ReviewCard = ({ review, type = "default", onEdit, onDelete, onClick }) => 
 
   // 카드 디자인 공통
   return (
-    <Card className="card shadow-sm border-0 rounded-4 mb-4" onClick={onClick}>
+    <Card className="card shadow border-0 rounded-4 mb-4" onClick={onClick}>
       <Card.Body>
         {/* 별점과 작성일 */}
         <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">

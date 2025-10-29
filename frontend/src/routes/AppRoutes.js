@@ -45,7 +45,7 @@ function AppRoutes() {
             <Route path='/findpass' element={<Findpass />} />
             <Route path='/myinquiry' element={<MyInquiry />} />
             <Route path='/inquirydetail' element={<InquiryDetail />} />
-            <Route path='/review/list' element={<ReviewBoardPage />} />
+            <Route path='/reviews/list' element={<ReviewBoardPage />} />
 
             {/**로그인 사용자 전용 */}
             <Route

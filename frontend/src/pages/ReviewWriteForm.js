@@ -19,7 +19,7 @@ const ReviewCreatePage = () => {
   // 리뷰 안 쓴 주문 조회
   useEffect(() => {
     if (!user) return;
-    getUnwrittenOrders(user.id).then(setOrders).catch(console.error);
+    getUnwrittenOrders(user.id).then(setOrders, setLoading(false)).catch(console.error);
   }, [user.id]);
 
   const handleSubmit = async () => {
@@ -82,6 +82,7 @@ const ReviewCreatePage = () => {
       ? orders.find((o) => o.orderId === Number(selectedOrderId))
       : null;
 
+  console.log(orders)
   return (
     <div className="container mt-5">
       <Card className="p-4 shadow-sm">
@@ -97,7 +98,7 @@ const ReviewCreatePage = () => {
             <option value="">주문 선택...</option>
             {orders.map((o) => (
               <option key={o.orderId} value={o.orderId}>
-                주문번호 #{o.orderId} | {new Date(o.orderDate).toLocaleString()} |{" "}
+                주문번호 #{o.orderId} |{" "}
                 {o.products.map((p) => p.productName).join(", ")}
               </option>
             ))}
