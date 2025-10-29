@@ -528,7 +528,7 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>TOP</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedTop?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({topValue})</span>
+                                            {selectedTop?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({topValue})</span>
                                         </p>
                                     </div>
 
@@ -536,7 +536,7 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>MIDDLE</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedMiddle?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({middleValue})</span>
+                                            {selectedMiddle?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({middleValue})</span>
                                         </p>
                                     </div>
 
@@ -544,7 +544,7 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>LAST</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedLast?.name || "없음"} <span style={{ fontWeight: "400", color: "#555" }}>({lastValue})</span>
+                                            {selectedLast?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({lastValue})</span>
                                         </p>
                                     </div>
                                 </div>
