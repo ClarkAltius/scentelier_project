@@ -186,3 +186,30 @@ input.custom-range::-ms-thumb {
   border: 2px solid #fff;
   cursor: pointer;
 }
+
+.ratio-message {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+
+  font-size: 1.1rem;
+  border-radius: 8px;
+  padding: 10px 15px;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.ratio-message.success {
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.08);
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.15);
+  font-weight: 600;
+}
+
+.ratio-message.warning {
+  color: #807062;
+  background-color: rgba(150, 60, 0, 0.08);
+  box-shadow: 0 0 6px rgba(138, 126, 126, 0.158);
+  font-weight: 500;
+}

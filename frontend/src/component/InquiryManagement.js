@@ -3,6 +3,7 @@ import styles from './InquiryManagement.module.css';
 import { Search, Filter, Eye, MessageSquare, CheckCircle, Archive } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import axios from 'axios';
+import { updateInquiryStatus } from '../api/InquiryApi';
 
 /**
  * InquiryManagement Component
@@ -88,26 +89,24 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
         setActiveView('inquiryDetail');
     };
 
-    /**
-     * handleMarkAsClosed: Placeholder for marking an inquiry as closed.
-     * @param {number} inquiryId - The ID of the inquiry to close.
-     *
-     * TODO: Implement API call (e.g., PUT /api/admin/inquiries/{inquiryId}/status)
-     * to update the status to 'CLOSED'. Update local state. Add confirmation.
-     */
+
     const handleMarkAsClosed = async (inquiryId) => {
         if (window.confirm(`정말로 문의 #${inquiryId}을(를) 종결 처리하시겠습니까?`)) {
-            const url = `${API_BASE_URL}/api/admin/inquiry/${inquiryId}`;
-            await axios.patch(url, { withCredentials: true });
+            try {
+                // 1. InquiryAPI 에서 기능 호출
+                const updatedInquiry = await updateInquiryStatus(inquiryId, "CLOSED");
 
-            console.log(`TODO: Mark inquiry ${inquiryId} as CLOSED`);
-            // Example state update:
-            // setInquiries(prevInquiries =>
-            //     prevInquiries.map(inq =>
-            //         inq.id === inquiryId ? { ...inq, status: 'CLOSED' } : inq
-            //     )
-            // );
-            alert(`[Placeholder] 문의 #${inquiryId}을(를) 종결 처리합니다.`);
+                // 2. inquries list 스테이트 수정
+                setInquiries(prevInquiries =>
+                    prevInquiries.map(inq =>
+                        inq.id === inquiryId ? updatedInquiry : inq
+                    )
+                );
+                alert(`문의 #${inquiryId}이(가) 종결 처리되었습니다.`);
+            } catch (err) {
+                console.error(`Failed to close inquiry ${inquiryId}:`, err);
+                alert(`문의 #${inquiryId} 종결 처리 중 오류가 발생했습니다: ${err.message}`);
+            }
         }
     };
 

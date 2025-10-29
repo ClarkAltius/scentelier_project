@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.security.Principal;
 
 
 import java.util.List;
@@ -67,7 +68,45 @@ public class AdminController {
         return ResponseEntity.ok(inquiryList);
     }
 
+    // 문의사항 상세내역 GET API 엔드포인트
+    @GetMapping("/inquiries/{inquiryId}")
+    public ResponseEntity<InquiryDto> getInquiryDetail(
+            @PathVariable Long inquiryId){
+        InquiryDto inquiryDto = inquiryService.getInquiryDetail(inquiryId);
+        return ResponseEntity.ok(inquiryDto);
+    }
 
+    // 문의사항 관리자 답변 POST API 엔드포인트
+    @PostMapping("/inquiries/{inquiryId}/answers")
+    public ResponseEntity<InquiryAnswerResponseDto> saveInquiryAnswer(
+            @PathVariable Long inquiryId,
+            @Valid @RequestBody InquiryAnswerRequestDto answerDto,
+            Principal principal){
+        
+        // 스프링 시큐리티에서 체크하게 되어있지만 2중 안전장치
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String adminEmail = principal.getName();
+
+        InquiryAnswerResponseDto inquiryAnswerResponseDto =
+                inquiryService.submitAnswer(inquiryId, answerDto, adminEmail);
+
+        return ResponseEntity.ok(inquiryAnswerResponseDto);
+    }
+
+    // 문의사항 완료처리 API 엔드포인트
+    @PatchMapping("/inquiries/{inquiryId}/status")
+    public ResponseEntity<InquiryDto> closeInquiry(
+            @PathVariable Long inquiryId,
+            @Valid @RequestBody InquiryStatusUpdateDto statusDto){
+
+                InquiryDto updatedInquiry = inquiryService.updateInquiryStatus(
+                    inquiryId,
+                    statusDto.getStatus()
+        );
+        return ResponseEntity.ok(updatedInquiry);
+    }
 
     // 주문 상세 조회 (관리자 페이지)
     @GetMapping("/orders/{id}")
