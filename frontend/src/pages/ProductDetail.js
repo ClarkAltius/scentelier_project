@@ -198,12 +198,17 @@ function ProductDetail() {
                 >
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`}
+                        style={{ margin: 100 }}
                     ></img>
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`}
+                        style={{ margin: 100 }}
+
                     ></img>
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/3.png`}
+                        style={{ margin: 100 }}
+
                     ></img>
                 </Tab>
                 <Tab
