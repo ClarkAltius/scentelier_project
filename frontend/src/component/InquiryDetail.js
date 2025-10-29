@@ -15,74 +15,42 @@ import { ArrowLeft, Send } from 'lucide-react';
  * @param {number} inquiryId - The ID of the inquiry to fetch.
  * @returns {Promise<object>} - Mock data representing the inquiry and its answers.
  */
+
 const fetchInquiryDetails = async (inquiryId) => {
-    console.log(`[Placeholder] Fetching details for inquiry ID: ${inquiryId}`);
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const url = `${API_BASE_URL}/api/admin/inquiries/${inquiryId}`;
+    try {
+        const res = await axios.get(url, { withCredentials: true });
+        return res.data;
+    } catch (err) {
+        console.error(err);
+        console.log("API Call threw an error.");
+        throw err;
+    }
 
-    // --- Mock Data Structure (Based on Inquiry and InquiryAnswers entities) ---
-    const mockInquiry = {
-        id: inquiryId,
-        username: "박고객",
-        userEmail: "customer@example.com",
-        title: `문의 #${inquiryId}: 상품 재입고 관련 질문`,
-        content: "안녕하세요, 'Midnight Blossom' 향수는 언제쯤 재입고될 예정인가요? 계속 품절 상태라 궁금합니다. 빠른 답변 부탁드립니다.",
-        type: "PRODUCT", // From Inquiry entity (Type enum)
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // Simulate 2 days ago
-        status: "PENDING", // From Inquiry entity (Status enum)
-        product: { id: 1, name: "Midnight Blossom" }, // Optional product info from Inquiry entity
-    };
-
-    const mockAnswers = [
-        // Example structure if answers already exist
-        // {
-        //     id: 101,
-        //     content: "고객님, 문의주신 'Midnight Blossom' 향수는 다음 주 중 입고될 예정입니다. 정확한 날짜는 확정되는 대로 다시 안내드리겠습니다.",
-        //     createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // Simulate 1 day ago
-        //     user: { username: "김관리자" } // Admin user info from InquiryAnswers entity
-        // },
-    ];
-    // --- End Mock Data ---
-
-    // Simulate potential error
-    // if (inquiryId === 999) throw new Error("Inquiry not found");
-
-    return { inquiry: mockInquiry, answers: mockAnswers };
 };
 
-/**
- * Placeholder to submit a new answer for an inquiry.
- * In reality, this would POST the answer content to the backend.
- * The backend should create an InquiryAnswers record and potentially update the Inquiry status.
- * @param {number} inquiryId - The ID of the inquiry being answered.
- * @param {string} answerContent - The content of the admin's reply.
- * @param {object} adminUser - Information about the admin submitting the answer.
- * @returns {Promise<object>} - Mock data representing the newly created answer.
- */
-const submitInquiryAnswer = async (inquiryId, answerContent, adminUser) => {
-    console.log(`[Placeholder] Submitting answer for inquiry ID: ${inquiryId}`);
-    console.log(`[Placeholder] Answer Content: ${answerContent}`);
-    console.log(`[Placeholder] Admin User:`, adminUser);
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+const submitInquiryAnswer = async (inquiryId, answerContent) => {
+    const url = `${API_BASE_URL}/api/admin/inquiries/${inquiryId}/answers`;
 
-    // --- Mock Response Structure (Based on InquiryAnswers entity) ---
-    const newAnswer = {
-        id: Math.floor(Math.random() * 1000) + 100, // Simulate new ID
-        content: answerContent,
-        createdAt: new Date().toISOString(),
-        user: { username: adminUser?.username || 'Admin' } // Use logged-in admin username
+    // content 만 들어있는 DTO.
+    const requestData = {
+        content: answerContent
     };
-    // --- End Mock Response ---
+    console.log(`Submitting answer to: ${url}`);
+    try {
+        const res = await axios.post(
+            url,
+            requestData, //DTO 여기에
+            { withCredentials: true }
+        );
 
-    // Simulate potential error
-    // if (answerContent.toLowerCase().includes('error')) throw new Error("Failed to submit answer");
+        return res.data;
 
-    // In a real scenario, the backend might also return the updated Inquiry status
-    return { newAnswer: newAnswer, updatedInquiryStatus: 'ANSWERED' };
+    } catch (err) {
+        console.error("Error submitting answer:", err);
+        throw err;
+    }
 };
-// --- End Placeholder API Functions ---
-
 
 /**
  * InquiryDetail Component
@@ -113,10 +81,18 @@ function InquiryDetail({ setActiveView, inquiryId }) {
             setIsLoading(true);
             setError(null);
             try {
-                // Replace with actual API call
                 const data = await fetchInquiryDetails(inquiryId);
-                setInquiryDetails(data.inquiry);
-                setAnswers(data.answers || []);
+                // 'data' IS the InquiryDto object itself
+                setInquiryDetails(data);
+
+                const formattedAnswers = data.answers.map(answer => ({
+                    id: answer.id,
+                    content: answer.content,
+                    createdAt: answer.createdAt,
+                    user: { username: answer.adminUsername }
+                }));
+
+                setAnswers(formattedAnswers || []);
             } catch (err) {
                 console.error("Failed to load inquiry details:", err);
                 setError("문의 내용을 불러오는 데 실패했습니다: " + err.message);
@@ -137,30 +113,34 @@ function InquiryDetail({ setActiveView, inquiryId }) {
             alert("답변 내용을 입력해주세요.");
             return;
         }
-        if (!inquiryId || !adminUser) {
-            alert("필수 정보(문의 ID 또는 관리자 정보)가 없습니다.");
+        if (!inquiryId) {
+            alert("문의 ID가 없습니다.");
             return;
         }
 
         setIsSubmitting(true);
         setError(null);
         try {
-            // Replace with actual API call
-            const result = await submitInquiryAnswer(inquiryId, newAnswer, adminUser);
+            const result = await submitInquiryAnswer(inquiryId, newAnswer);
 
             // Add the new answer to the list
-            setAnswers(prevAnswers => [...prevAnswers, result.newAnswer]);
+            const formattedAnswer = {
+                id: newAnswer.id,
+                content: newAnswer.content,
+                createdAt: newAnswer.createdAt,
+                user: { username: newAnswer.adminUsername } // 백엔드에서 돌아온 username 사용
+            };
 
-            // Update the inquiry status locally (backend should confirm this)
-            if (inquiryDetails && result.updatedInquiryStatus) {
-                setInquiryDetails(prev => ({ ...prev, status: result.updatedInquiryStatus }));
+            /// 3. 리스트에 답변 매핑
+            setAnswers(prevAnswers => [...prevAnswers, formattedAnswer]);
+
+            // 4. 로컬에서 문의사항 내역 업데이트 (PENDING->ANSWERED)
+            if (inquiryDetails) {
+                setInquiryDetails(prev => ({ ...prev, status: 'ANSWERED' }));
             }
 
-            setNewAnswer(''); // Clear the textarea
+            setNewAnswer(''); // 텍스트 인풋 영역 초기화
             alert("답변이 성공적으로 등록되었습니다.");
-
-            // Optionally navigate back to the list after submission
-            // setActiveView('inquiries');
 
         } catch (err) {
             console.error("Failed to submit answer:", err);
@@ -183,7 +163,13 @@ function InquiryDetail({ setActiveView, inquiryId }) {
 
     // Render inquiry not found (or initial state)
     if (!inquiryDetails) {
-        return <div className={styles.container}>문의 내용을 찾을 수 없습니다. 목록으로 돌아가세요.</div>;
+        return <div className={styles.container}>
+            문의 내용을 찾을 수 없습니다. 목록으로 돌아가세요.
+            <button className={styles.backButton} onClick={() => setActiveView('inquiries')}>
+                <ArrowLeft size={18} /> 목록으로 돌아가기
+            </button>
+        </div>;
+
     }
 
     // Main render
@@ -195,7 +181,7 @@ function InquiryDetail({ setActiveView, inquiryId }) {
 
             {/* Inquiry Details Section */}
             <div className={styles.inquirySection}>
-                <h2>문의 상세: {inquiryDetails.title}</h2>
+                <h2>문의 제목: {inquiryDetails.title}</h2>
                 <div className={styles.metaInfo}>
                     <span><strong>작성자:</strong> {inquiryDetails.username} ({inquiryDetails.userEmail})</span>
                     <span><strong>작성일:</strong> {new Date(inquiryDetails.createdAt).toLocaleString()}</span>
