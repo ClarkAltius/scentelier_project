@@ -13,6 +13,32 @@ const MyReviewPage = () => {
     getUserReviews(user.id).then((data) => setReviews(data.content)).catch(console.error);
   }, [user.id]);
 
+  const handleUpdate = (updated) => {
+    axios
+      .put(`/reviews/${updated.reviewId}`, updated)
+      .then(() => {
+        alert("리뷰가 수정되었습니다.");
+        setReviews((prev) =>
+          prev.map((r) =>
+            r.reviewId === updated.reviewId
+              ? { ...r, ...updated }
+              : r
+          )
+        );
+      })
+      .catch(() => alert("수정 중 오류가 발생했습니다."));
+  };
+
+  const handleDelete = (reviewId) => {
+    axios
+      .delete(`/reviews/${reviewId}`)
+      .then(() => {
+        alert("리뷰가 삭제되었습니다.");
+        setReviews((prev) => prev.filter((r) => r.reviewId !== reviewId));
+      })
+      .catch(() => alert("삭제 중 오류가 발생했습니다."));
+  };
+
   return (
     <div className="container mt-4">
       <h3 className="fw-bold mb-4">내가 작성한 리뷰</h3>
@@ -23,8 +49,8 @@ const MyReviewPage = () => {
             key={review.reviewId}
             review={review}
             type="mypage"
-            onEdit={() => alert("수정 기능")}
-            onDelete={() => alert("삭제 기능")}
+            onUpdate={() => handleUpdate}
+            onDelete={() => handleDelete}
             />
         </div>
       ))}
