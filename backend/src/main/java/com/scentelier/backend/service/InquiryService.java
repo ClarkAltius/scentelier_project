@@ -94,9 +94,16 @@ public class InquiryService {
 
         // 상태 변경
         inquiry.setStatus(InquiryStatus.ANSWERED);
-
         InquiryAnswers savedAnswer = inquiryAnswerRepository.save(newAnswer);
-
         return new InquiryAnswerResponseDto(savedAnswer);
+    }
+
+    @Transactional
+    public InquiryDto updateInquiryStatus(Long inquiryId, InquiryStatus newStatus) {
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new EntityNotFoundException("Inquiry not found with id: " + inquiryId));
+        inquiry.setStatus(newStatus);
+
+        return getInquiryDetail(inquiryId);
     }
 }

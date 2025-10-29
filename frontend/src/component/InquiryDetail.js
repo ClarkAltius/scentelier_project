@@ -3,65 +3,15 @@ import axios from 'axios';
 import styles from './InquiryDetail.module.css'; // We'll create this CSS module
 import { API_BASE_URL } from '../config/config';
 import { useAuth } from './AuthContext'; // To get the current admin user info
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Lock } from 'lucide-react';
+import {
+    fetchInquiryDetails,
+    submitInquiryAnswer,
+    updateInquiryStatus
+} from '../api/InquiryApi';
 
-// --- Placeholder API Functions ---
-// Replace these with actual API calls to AdminController later
-
-/**
- * Placeholder to fetch inquiry details and associated answers.
- * In reality, this would fetch data based on the inquiryId.
- * It should ideally return the Inquiry object along with a list of InquiryAnswers.
- * @param {number} inquiryId - The ID of the inquiry to fetch.
- * @returns {Promise<object>} - Mock data representing the inquiry and its answers.
- */
-
-const fetchInquiryDetails = async (inquiryId) => {
-    const url = `${API_BASE_URL}/api/admin/inquiries/${inquiryId}`;
-    try {
-        const res = await axios.get(url, { withCredentials: true });
-        return res.data;
-    } catch (err) {
-        console.error(err);
-        console.log("API Call threw an error.");
-        throw err;
-    }
-
-};
-
-const submitInquiryAnswer = async (inquiryId, answerContent) => {
-    const url = `${API_BASE_URL}/api/admin/inquiries/${inquiryId}/answers`;
-
-    // content 만 들어있는 DTO.
-    const requestData = {
-        content: answerContent
-    };
-    console.log(`Submitting answer to: ${url}`);
-    try {
-        const res = await axios.post(
-            url,
-            requestData, //DTO 여기에
-            { withCredentials: true }
-        );
-
-        return res.data;
-
-    } catch (err) {
-        console.error("Error submitting answer:", err);
-        throw err;
-    }
-};
-
-/**
- * InquiryDetail Component
- * Displays details of a single inquiry and allows admins to respond.
- *
- * Props:
- * - setActiveView: Function to change the view in the parent Admin component.
- * - inquiryId: The ID of the inquiry to display.
- */
 function InquiryDetail({ setActiveView, inquiryId }) {
-    const { user: adminUser } = useAuth(); // Get current admin user info
+    const { user: adminUser } = useAuth(); // 현 관리자 정보 호출
 
     const [inquiryDetails, setInquiryDetails] = useState(null);
     const [answers, setAnswers] = useState([]);
@@ -70,7 +20,7 @@ function InquiryDetail({ setActiveView, inquiryId }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch inquiry details and answers when the component mounts or inquiryId changes
+    // inquiryId 변경시 다시 훅 사용
     useEffect(() => {
         if (!inquiryId) {
             setError("문의 ID가 제공되지 않았습니다.");
@@ -82,7 +32,6 @@ function InquiryDetail({ setActiveView, inquiryId }) {
             setError(null);
             try {
                 const data = await fetchInquiryDetails(inquiryId);
-                // 'data' IS the InquiryDto object itself
                 setInquiryDetails(data);
 
                 const formattedAnswers = data.answers.map(answer => ({
@@ -106,7 +55,7 @@ function InquiryDetail({ setActiveView, inquiryId }) {
         loadData();
     }, [inquiryId]); // Re-fetch if the inquiryId prop changes
 
-    // Handle submission of the new answer
+    // 신규 답변 제출 핸들러
     const handleSubmitAnswer = async (e) => {
         e.preventDefault();
         if (!newAnswer.trim()) {
@@ -151,6 +100,31 @@ function InquiryDetail({ setActiveView, inquiryId }) {
         }
     };
 
+
+    // 문의사항 완료처리 핸들러
+    const handleCloseInquiry = async () => {
+        if (!inquiryId) return;
+
+        if (!window.confirm("이 문의를 'CLOSED' 상태로 변경하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+            const updatedInquiry = await updateInquiryStatus(inquiryId, "CLOSED");
+            setInquiryDetails(updatedInquiry);
+            alert("문의가 성공적으로 마감되었습니다.");
+
+        } catch (err) {
+            console.error("Failed to close inquiry:", err);
+            setError("문의 마감 중 오류가 발생했습니다: " + err.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     // Render loading state
     if (isLoading) {
         return <div className={styles.loading}>문의 내용을 불러오는 중...</div>;
@@ -178,6 +152,16 @@ function InquiryDetail({ setActiveView, inquiryId }) {
             <button className={styles.backButton} onClick={() => setActiveView('inquiries')}>
                 <ArrowLeft size={18} /> 목록으로 돌아가기
             </button>
+            {/* --- 문의 마감 --- */}
+            {inquiryDetails.status !== 'CLOSED' && (
+                <button
+                    className={`${styles.closeButton} ${styles.submitButton}`}
+                    onClick={handleCloseInquiry}
+                    disabled={isSubmitting}
+                >
+                    <Lock size={16} /> 문의 마감
+                </button>
+            )};
 
             {/* Inquiry Details Section */}
             <div className={styles.inquirySection}>

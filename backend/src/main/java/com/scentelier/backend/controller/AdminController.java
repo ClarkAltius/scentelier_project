@@ -95,6 +95,19 @@ public class AdminController {
         return ResponseEntity.ok(inquiryAnswerResponseDto);
     }
 
+    // 문의사항 완료처리 API 엔드포인트
+    @PatchMapping("/inquiries/{inquiryId}/status")
+    public ResponseEntity<InquiryDto> closeInquiry(
+            @PathVariable Long inquiryId,
+            @Valid @RequestBody InquiryStatusUpdateDto statusDto){
+
+                InquiryDto updatedInquiry = inquiryService.updateInquiryStatus(
+                    inquiryId,
+                    statusDto.getStatus()
+        );
+        return ResponseEntity.ok(updatedInquiry);
+    }
+
     // 주문 상세 조회 (관리자 페이지)
     @GetMapping("/orders/{id}")
     public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long id) {
