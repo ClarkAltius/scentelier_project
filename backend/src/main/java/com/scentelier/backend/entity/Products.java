@@ -58,9 +58,9 @@ public class Products {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deletedAt;
 
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ProductStatus status = ProductStatus.SELLING;
+//
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private ProductStatus status = ProductStatus.SELLING;
 }
 

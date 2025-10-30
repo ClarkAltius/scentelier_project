@@ -14,25 +14,25 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     @Query(value = """
-           SELECT o.*, p.*
-               FROM orders o
-               JOIN order_product op ON o.order_id = op.order_id
-               JOIN products p ON op.product_id = p.product_id
-               WHERE o.order_date >= CURDATE() - INTERVAL 30 DAY
-               ORDER BY o.order_date DESC
-                   LIMIT 3;
-        """, nativeQuery = true)
+    SELECT p.*
+    FROM orders o
+    JOIN order_product op ON o.order_id = op.order_id
+    JOIN products p ON op.product_id = p.product_id
+    WHERE o.order_date >= CURDATE() - INTERVAL 30 DAY
+    ORDER BY o.order_date DESC
+    LIMIT 3
+""", nativeQuery = true)
     List<Products> findBestList();
 
     @Query(value = """
-           SELECT o.*, p.*
-               FROM orders o
-               JOIN order_product op ON o.order_id = op.order_id
-               JOIN products p ON op.product_id = p.product_id
-               WHERE o.order_date >= CURDATE() - INTERVAL 30 DAY
-               ORDER BY o.order_date DESC
-                   LIMIT 5;
-        """, nativeQuery = true)
+    SELECT p.*
+    FROM orders o
+    JOIN order_product op ON o.order_id = op.order_id
+    JOIN products p ON op.product_id = p.product_id
+    WHERE o.order_date >= CURDATE() - INTERVAL 30 DAY
+    ORDER BY o.order_date DESC
+    LIMIT 5
+""", nativeQuery = true)
     List<Products> findBestList2();
 
     List<Orders> findByUsers_IdOrderByOrderDateDesc(Long userId);
@@ -43,14 +43,15 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     int updateOrderStatus(@Param("orderId") Long orderId, @Param("status") OrderStatus status);
 
     @Query("""
-    select count(op)
-    from OrderProduct op
-      join op.orders o
-    where op.products.id = :productId
-      and o.status in (:statuses)
-""")
+        select count(op)
+        from OrderProduct op
+          join op.orders o
+        where op.products.id = :productId
+          and o.status in (:statuses)
+    """)
     long countPendingOrdersByProductId(
-            @Param("productId") Long productId
+            @Param("productId") Long productId,
+            @Param("statuses") List<OrderStatus> statuses
     );
     //  총 주문량 반환 쿼리
     @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o")

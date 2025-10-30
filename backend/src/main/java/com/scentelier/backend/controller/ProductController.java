@@ -87,21 +87,32 @@ public class ProductController {
     }
 
 
-    @PostMapping("/status/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
-        try {
-            Products updated = productService.updateStatus(id, status);
-            return ResponseEntity.ok(updated.getStatus());
-        } catch (RuntimeException e) {
-            // 판매중지 차단 메시지가 여기로 옴
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-    }
+//    @PostMapping("/status/{id}")
+//    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+//        try {
+//            Products updated = productService.updateStatus(id, status);
+//            return ResponseEntity.ok(updated.getStatus());
+//        } catch (RuntimeException e) {
+//            // 판매중지 차단 메시지가 여기로 옴
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//        }
+//    }
 
-    @PatchMapping("/status/{id}")
-    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
-        return updateStatus(id, status);
-    }
+//    @PostMapping("/status/{id}")
+//    public ResponseEntity<?> toggleStatus(@PathVariable Long id) {
+//        try {
+//            productService.toggleStatus(id);
+//            return ResponseEntity.ok("상태가 변경되었습니다!");
+//        } catch (RuntimeException e) {
+//            // 판매중지 차단 상황 등
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409
+//        }
+//    }
+
+//    @PatchMapping("/status/{id}")
+//    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+//        return updateStatus(id, status);
+//    }
 //        @PostMapping("/status/{id}")
 //        public ResponseEntity<ProductStatus> updateStatus(
 //                @PathVariable Long id,

@@ -92,33 +92,34 @@ public class ProductService {
         return true;
     }
 
-    @Transactional
-    public boolean toggleStatus(Long id){
-        Products products = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("상품 없음"));
-
-        if (products.getStatus() == ProductStatus.SELLING) {
-            // STOPPED로 내리기 전에 검증
-            long inCarts = cartItemRepository.countActiveByProductId(id);     // 장바구니 수
-            long inPendingOrders = orderRepository.countPendingOrdersByProductId(id); // 진행중 주문 수
-
-            if (inCarts > 0 || inPendingOrders > 0) {
-                StringBuilder sb = new StringBuilder("판매중지 불가: ");
-                boolean first = true;
-                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
-                if (inPendingOrders > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPendingOrders).append("건"); }
-                sb.append("이 존재합니다.");
-                throw new RuntimeException(sb.toString()); // 새 예외 클래스 없이 처리
-            }
-
-            products.setStatus(ProductStatus.STOPPED);
-        } else {
-            products.setStatus(ProductStatus.SELLING);
-        }
-
-        productRepository.save(products);
-        return true;
-    }
+//    @Transactional
+//    public boolean toggleStatus(Long id) {
+//        Products p = productRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("상품 없음"));
+//
+//        if (p.getStatus() == ProductStatus.SELLING) {
+//            // STOPPED로 내리기 전 “장바구니/주문” 점검
+//            long inCarts = cartItemRepository.countActiveByProductId(id);
+//            long inPendingOrders = orderRepository.countPendingOrdersByProductId(id, PENDING_STATUSES);
+//
+//            if (inCarts > 0 || inPendingOrders > 0) {
+//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
+//                boolean first = true;
+//                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
+//                if (inPendingOrders > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPendingOrders).append("건"); }
+//                sb.append("이 존재합니다.");
+//                // 커스텀 예외 굳이 안 쓰고 RuntimeException으로 409 응답 유도
+//                throw new RuntimeException(sb.toString());
+//            }
+//            p.setStatus(ProductStatus.STOPPED);
+//        } else {
+//            // STOPPED → SELLING은 제한 없이 허용
+//            p.setStatus(ProductStatus.SELLING);
+//        }
+//
+//        productRepository.save(p);
+//        return true;
+//    }
 
     @EventListener
     @Transactional
@@ -144,18 +145,18 @@ public class ProductService {
             }
         }
     }
-    @Transactional
-    public Products updateStatus(Long id, ProductStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException("status 값이 비어 있습니다.");
-        }
-        Products p = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("상품 없음: " + id));
-
-        // 상태가 동일하면 아무 것도 안 함
-        if (p.getStatus() == status) {
-            return p;
-        }
+//    @Transactional
+//    public Products updateStatus(Long id, ProductStatus status) {
+//        if (status == null) {
+//            throw new IllegalArgumentException("status 값이 비어 있습니다.");
+//        }
+//        Products p = productRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("상품 없음: " + id));
+//
+//        // 상태가 동일하면 아무 것도 안 함
+//        if (p.getStatus() == status) {
+//            return p;
+//        }
 
         // SELLING → STOPPED 로 내릴 때만 차단 조건 검사
 //        if (status == ProductStatus.STOPPED && p.getStatus() == ProductStatus.SELLING) {
@@ -173,9 +174,9 @@ public class ProductService {
 //        }
 
         // 검사 통과했거나, STOPPED → SELLING/기타 변경은 바로 반영
-        p.setStatus(status);
-        return productRepository.save(p);
-    }
+//        p.setStatus(status);
+//        return productRepository.save(p);
+//    }
     
     @Transactional
     public ProductStockDto updateStock(Long itemId, @NotNull(message = "Stock value cannot be null.") Integer newStock) {
