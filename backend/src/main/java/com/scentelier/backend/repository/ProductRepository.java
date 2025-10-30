@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Products, Long> {
-    Page<Products> findAllByIsDeletedFalse(Pageable pageable);
+    List<Products> findAllByIsDeletedFalse(); // ✅ 페이징 없이 전체 반환
     Page<Products> findAllByIsDeleted(boolean isDeleted, Pageable pageable);
   //  Optional<Products> findByIdAndIsDeletedFalse(Long id);
 //    Page<Products> findAllByStatusAndIsDeletedFalse(ProductStatus status, Pageable pageable);

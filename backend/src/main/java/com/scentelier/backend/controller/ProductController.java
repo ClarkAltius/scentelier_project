@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -66,10 +67,10 @@ public class ProductController {
     //상품 목록 보기 API
 
     @GetMapping("/list")
-    public ResponseEntity<Page<Products>> getProductList(Pageable pageable) {
-        //pageable 객체는 Spring이 자동으로 생성!
-        Page<Products> productsPage = productService.findAll(pageable);
-        return ResponseEntity.ok(productsPage);
+    public ResponseEntity<List
+            <Products>> getProductList() {
+        List<Products> products = productService.findAll();
+        return ResponseEntity.ok(products);
     }
 
     //상품 상세
