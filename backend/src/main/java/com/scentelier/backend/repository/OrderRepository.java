@@ -61,8 +61,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             @Param("productId") Long productId,
             @Param("statuses") List<OrderStatus> statuses
     );
-    //  총 주문량 반환 쿼리
-    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o")
+    //  총 주문량 반환 쿼리, 취소 안된 주문만
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.status != 'CANCELLED'")
     long sumTotalRevenue();
 
     // 상태별 갯수 반환
@@ -71,6 +71,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     // 월별 판매 추이 반환
     @Query("SELECT FUNCTION('DATE_FORMAT', o.orderDate, '%Y-%m') AS month, SUM(o.totalPrice) AS monthlySales " +
             "FROM Orders o " +
+            "WHERE o.status != 'CANCELLED'" +
             "GROUP BY month " +
             "ORDER BY month DESC")
     List<Object[]> findMonthlySales();

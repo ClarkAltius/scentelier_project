@@ -8,7 +8,6 @@ import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import com.scentelier.backend.event.OrderCancelledEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +77,7 @@ public class OrderService {
         return orderRepository.findByUsers_IdOrderByOrderDateDesc(userId);
     }
 
+    @Transactional(readOnly = true)
     public OrderResponseDto getOrderDetail(Long orderId) {
         // 1. Find the order, or throw an error
         Orders order = orderRepository.findById(orderId)

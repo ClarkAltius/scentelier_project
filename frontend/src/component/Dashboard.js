@@ -24,6 +24,7 @@ import {
     getLowStockItems,
     getMonthlySales
 } from '../api/DashboardApi';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 function Dashboard() {
 
@@ -99,6 +100,15 @@ function Dashboard() {
         return <div className={`${styles.centeredMessage} ${styles.errorMessage}`}>Incomplete dashboard data.</div>;
     }
 
+    // Pie Chart 데이터
+    const pieData = [
+        { name: '완제품', value: salesBreakdown.finishedPerfumes },
+        { name: '커스텀', value: salesBreakdown.customPerfumes },
+    ];
+
+    // Pie Chart 색상 (CSS의 legend와 일치)
+    const PIE_COLORS = ['#4ade80', '#60a5fa'];
+
     return (
         <div className={styles.dashboard}>
             {/* Top Row: High-Level KPIs */}
@@ -135,18 +145,52 @@ function Dashboard() {
 
             {/* Second Row: Sales Charts */}
             <div className={styles.mainGrid}>
-                <div className={`${styles.card} ${styles.largeCard}`}>
+                <div className={`${styles.card}`}>
                     <h3>월별 매출 추이</h3>
-                    <div className={styles.chartPlaceholder}>
-                        {/* Placeholder for a real bar chart component */}
-                        <p>Bar chart showing monthly sales would be here.</p>
+                    <div style={{ width: '100%', height: 300 }}> {/* Set container dimensions */}
+                        <ResponsiveContainer>
+                            <BarChart
+                                data={monthlySales}
+                                margin={{
+                                    top: 5, right: 30, left: 20, bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="month" />
+                                {/* Format Y-axis ticks if needed */}
+                                <YAxis tickFormatter={(value) => `₩${value.toLocaleString()}`} />
+                                <Tooltip formatter={(value) => [`₩${value.toLocaleString()}`, "매출"]} />
+                                <Legend />
+                                <Bar dataKey="sales" fill="#8884d8" name="월 매출" />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
                 <div className={styles.card}>
                     <h3>매출 비중</h3>
                     <div className={styles.chartPlaceholder}>
-                        {/* Placeholder for a real pie/donut chart component */}
-                        <p>Pie chart for Finished vs. Custom Perfumes would be here.</p>
+                        {/* 파이차트, 매출 비중 비교 */}
+                        <div style={{ width: '100%', height: 300 }}> {/* Set container dimensions */}
+                            <ResponsiveContainer>
+                                <PieChart>
+                                    <Pie
+                                        data={pieData}
+                                        cx="50%" // Center X
+                                        cy="50%" // Center Y
+                                        innerRadius={60} // Donut chart hole
+                                        outerRadius={90} // Size of chart
+                                        fill="#8884d8"
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `₩${value.toLocaleString()}`} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                         <ul className={styles.chartLegend}>
                             <li><span className={styles.legendDot} style={{ backgroundColor: '#4ade80' }}></span>완제품: ₩{salesBreakdown.finishedPerfumes.toLocaleString()}</li>
                             <li><span className={styles.legendDot} style={{ backgroundColor: '#60a5fa' }}></span>커스텀: ₩{salesBreakdown.customPerfumes.toLocaleString()}</li>

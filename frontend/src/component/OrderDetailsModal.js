@@ -26,7 +26,9 @@ function OrderDetailsModal({ order, show, handleClose }) {
                         { withCredentials: true }
                     );
                     setOrderDetails(response.data);
-
+                    console.log("커스텀향수 디버깅 : " + response.data);
+                    console.log("커스텀 향수 오브젝트 반환값 뭐냐 : " + orderDetails);
+                    console.log("FETCHED ORDER DETAILS:", JSON.stringify(response.data, null, 2))
                 } catch (err) {
                     console.error("Failed to fetch order details:", err);
                     setError("주문 상세 정보를 불러오는 데 실패했습니다.");
@@ -59,11 +61,12 @@ function OrderDetailsModal({ order, show, handleClose }) {
             return null; // 표기 x
         }
 
+
         // 성공적으로 주문 정보를 불러오면 렌더링
         return (
             <>
                 <p><strong>고객명:</strong> {orderDetails.recipientName}</p>
-                <p><strong>주문 날짜:</strong> {orderDetails.orderDate}</p>
+                <p><strong>주문 날짜:</strong> {new Date(orderDetails.orderDate).toLocaleString()}</p>
                 <p><strong>총액:</strong> ₩{orderDetails.totalPrice?.toLocaleString()}</p>
                 <p>
                     <strong>상태: </strong>
@@ -76,13 +79,34 @@ function OrderDetailsModal({ order, show, handleClose }) {
                 <h4>주문 항목</h4>
                 <ul className="list-group">
                     {(orderDetails.orderItems || []).map((item) => (
-                        <li key={item.productId} className="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{item.productName}</strong>
-                                <br />
-                                <small>개당 ₩{item.price?.toLocaleString()}</small>
+                        // Fallback 안전망
+                        <li key={item.productId || Math.random()} className="list-group-item">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {/* 커스텀 향수 이름 */}
+                                    <strong>{item.productName}</strong>
+
+                                    {/* 커스텀 향수용 배지 */}
+                                    {item.type === 'CUSTOM' && <span className="badge bg-secondary ms-2">Custom</span>}
+                                    <br />
+                                    <small>개당 ₩{item.price?.toLocaleString()}</small>
+                                </div>
+                                <span className="badge bg-primary rounded-pill">{item.quantity}개</span>
                             </div>
-                            <span className="badge bg-primary rounded-pill">{item.quantity}개</span>
+
+                            {/* --- 원액 표기 --- */}
+                            {item.type === 'CUSTOM' && item.ingredients && item.ingredients.length > 0 && (
+                                <div className="mt-2 ms-3" style={{ borderLeft: '3px solid #eee', paddingLeft: '10px' }}>
+                                    <small><strong>Ingredients:</strong></small>
+                                    <ul style={{ fontSize: '0.9em', paddingLeft: '20px', marginBottom: '0' }}>
+                                        {item.ingredients.map((ing, index) => (
+                                            <li key={index}>
+                                                {ing.ingredientName}: {ing.amount}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </li>
                     ))}
                 </ul>

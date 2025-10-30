@@ -19,10 +19,11 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
             "ORDER BY SUM(op.quantity) DESC")
     List<BestSellerDto> findBestSellers(Pageable pageable);
 
-    // 매출 중 비중 조회
+    // 관리자 페이지 매출 중 비중 조회, 취소 안된 주문만
     @Query("SELECT CASE WHEN op.products IS NOT NULL THEN 'FINISHED' ELSE 'CUSTOM' END AS productType, " +
             "SUM(op.price * op.quantity) AS totalSales " +
             "FROM OrderProduct op " +
+            "WHERE op.orders.status != 'CANCELLED' " +
             "GROUP BY productType")
     List<Object[]> findSalesBreakdownByType();
 
