@@ -15,6 +15,7 @@ import java.util.List;
 public class ReviewDto {
     private Long reviewId;
     private Long orderId;
+    private String userName;
     private String content;
     private int rating;
     private LocalDateTime createdAt;

@@ -14,6 +14,7 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
 
   const {
     reviewId,
+    userName,
     content,
     rating,
     createdAt,
@@ -65,7 +66,7 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
         {/* 용도별 세부 렌더링 */}
         {type === "mypage" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
             <div className="text-muted small">총 금액: ₩{totalPrice}</div>
             <ul className="list-unstyled ms-3 mb-0">{renderProducts()}</ul>
             <div className="d-flex justify-content-end gap-2 mt-3">
@@ -81,14 +82,14 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
 
         {type === "all" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
            <ul className="list-unstyled ms-3 mb-0">{renderProducts()}</ul>
           </>
         )}
 
         {type === "product" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
           </>
         )}
       </Card.Body>
