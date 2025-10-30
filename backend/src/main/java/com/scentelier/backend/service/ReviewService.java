@@ -60,13 +60,13 @@ public class ReviewService {
     // 전체 리뷰 조회
     public Page<ReviewDto> getAllReviews(Pageable pageable) {
         Page<Reviews> reviews = reviewRepository.findAllByIsDeletedFalse(pageable);
-        return reviews.map(this::convertToDto);
+        return reviews.map(this::convertToBlockDto);
     }
 
     // 특정 상품 리뷰 조회
     public Page<ReviewDto> getReviewsByProduct(Long productId, Pageable pageable) {
         Page<Reviews> reviews = reviewRepository.findAllByProductId(productId, pageable);
-        return reviews.map(this::convertToDto);
+        return reviews.map(this::convertToBlockDto);
     }
 
     // 리뷰 수정
@@ -127,7 +127,7 @@ public class ReviewService {
         return new ReviewDto(
                 review.getId(),
                 order.getId(),
-                order.getUsers().getUsername(),
+                maskUsingRegex(order.getUsers().getUsername(), "*"),
                 review.getContent(),
                 review.getRating(),
                 review.getCreatedAt(),
@@ -138,5 +138,40 @@ public class ReviewService {
                 order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null,
                 items
         );
+    }
+
+    private ReviewDto convertToBlockDto(Reviews review) {
+        Orders order = review.getOrder();
+        List<ReviewOrderProductDto> items = order.getOrderProducts().stream()
+                .map(op -> new ReviewOrderProductDto(
+                        op.getProducts().getId(),
+                        op.getProducts().getName(),
+                        op.getQuantity(),
+                        op.getProducts().getPrice()
+                ))
+                .collect(Collectors.toList());
+
+        return new ReviewDto(
+                review.getId(),
+                order.getId(),
+                maskUsingRegex(order.getUsers().getUsername(), "*"),
+                review.getContent(),
+                review.getRating(),
+                review.getCreatedAt(),
+                null,
+                null,
+                order.getTotalPrice(),
+                null,
+                order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null,
+                items
+        );
+    }
+
+    // 첫 글자를 제외한 나머지 글자를 모두 마스킹 처리
+    public static String maskUsingRegex(String text, String maskChar) {
+        if (text == null || text.length() < 2) {
+            return text;
+        }
+        return text.replaceAll("(?<=.{1}).", maskChar);
     }
 }

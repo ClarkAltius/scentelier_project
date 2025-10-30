@@ -14,7 +14,7 @@ const MyReviewPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getUserReviews(user.id).then((data) => setReviews(data.content)).catch(console.error);
+    getUserReviews(user.id, 0, 12).then((data) => setReviews(data.content)).catch(console.error);
   }, [user.id]);
 
   const handleUpdate = (updated) => {

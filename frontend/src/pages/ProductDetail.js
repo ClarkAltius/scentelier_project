@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Container, Form, Row, Tab, Tabs } from "react-bootstrap";
+import { Card, Col, Container, Form, Pagination, Row, Tab, Tabs } from "react-bootstrap";
 import './../App.css'
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
 import axios from "axios";
 import { useAuth } from "../component/AuthContext";
+import { getProductReviews } from "../api/reviewApi";
+import ReviewCard from "../component/ReviewCard";
 
 function ProductDetail() {
     const { user } = useAuth();
@@ -13,8 +15,13 @@ function ProductDetail() {
     const [total, setTotal] = useState();
     // ------------------------------------------------------------------------------
     const { id } = useParams();
-    const [product, setProduct] = useState(null);
+    const [product, setProduct] = useState();
+    //------------------------------------------------------
+    const [reviews, setReviews] = useState([]);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
+    
 
     useEffect(() => {
         const url = `${API_BASE_URL}/product/detail/${id}`;
@@ -22,9 +29,7 @@ function ProductDetail() {
         //파라미터 id가 갱신이 되면 화면을 다시 rendering 시킵니다.
         axios.get(url)
             .then((response) => {
-                setProduct(response.data)
-                console.log(response.data)
-
+                setProduct(response.data);
             })
             .catch((error) => {
                 console.log("리액트 오류 내용" + error)
@@ -33,12 +38,20 @@ function ProductDetail() {
 
             })
 
-
         if (product) {
             setTotal(product.price * quantity);
         }
+    }, [id, page]);
 
-    }, [id])
+    const reviewLoding = () => {
+        console.log(product);
+        if(product) {
+            getProductReviews(product.id, page, 6).then((data) => {
+                setReviews(data.content);
+                setTotalPages(data.totalPages);
+            });
+        }
+    }
 
     const totalPrice = (product?.price ?? 0) * quantity;
 
@@ -188,7 +201,7 @@ function ProductDetail() {
         <div style={{ width: '100%', maxWidth: '100%', marginTop: "50px", padding: 0 }}>
             <Tabs
                 activeKey={key}
-                onSelect={(k) => setKey(k)}
+                onSelect={(k) => {setKey(k); reviewLoding()}}
                 className="full-width-tabs"
             >
                 <Tab
@@ -215,23 +228,34 @@ function ProductDetail() {
                     eventKey="review"
                     title="Review"
                 >
-                    <div style={{ display: 'flex', padding: '10px', gap: '20px', width: '100%', marginTop: "50px" }}>
-                        {/* 왼쪽 영역: 화면 1/4 너비 */}
-                        <div style={{ width: '25%' }}>
-                            <p>★★★★★ </p>
-                            <p>아이디</p>
-                            <p>작성일</p>
+                    <div className="container mt-4">
+                    {reviews.length === 0 ? (
+                        <div className="text-center py-5 border rounded bg-light">
+                        <p className="text-muted mb-3">아직 등록된 리뷰가 없습니다.</p>
+                        </div>
+                    ) : (
+                        <>
+                        <div className="row">
+                            {reviews.map((review) => (
+                            <div className="col-md-6 col-lg-4" key={review.reviewId}>
+                                <ReviewCard review={review} type="product" />
+                            </div>
+                            ))}
                         </div>
 
-                        {/* 오른쪽 영역: 나머지 3/4 차지 */}
-                        <div style={{ width: '75%', textAlign: "left" }}>
-                            <img
-                                src="/ddd.jpg"
-                                style={{ width: '30%', height: '300px', objectFit: 'cover' }}
-                                alt="review"
-                            />
-                            <p>아주조아요</p>
-                        </div>
+                        <Pagination className="justify-content-center mt-4">
+                            {[...Array(totalPages)].map((_, i) => (
+                            <Pagination.Item
+                                key={i}
+                                active={i === page}
+                                onClick={() => setPage(i)}
+                            >
+                                {i + 1}
+                            </Pagination.Item>
+                            ))}
+                        </Pagination>
+                        </>
+                    )}
                     </div>
                 </Tab>
             </Tabs>
