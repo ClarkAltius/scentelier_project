@@ -48,7 +48,6 @@ public class OrderController {
 
         List<OrderProduct> orderProductList = new ArrayList<>();
         for (OrderProductDto item : dto.getOrderProducts()) {
-
             OrderProduct orderProduct = new OrderProduct();
             if (item.getProductId() != null) {
                 Products products = productService.findProductsById(item.getProductId())
@@ -98,11 +97,7 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDto>> getOrderList(@RequestParam Long userId, @RequestParam Role role) {
         List<Orders> orders = null;
 
-        if(role == Role.ADMIN) {
-            // orders = orderService.findAllOrders(OrderStatus.PENDING);
-        } else {
-            orders = orderService.findByUserId(userId);
-        }
+        orders = orderService.findByUserId(userId);
 
         List<OrderResponseDto> responseDtos = new ArrayList<>();
 
@@ -119,9 +114,14 @@ public class OrderController {
 
             List<OrderResponseDto.OrderItem> orderItems = new ArrayList<>();
             for (OrderProduct op : bean.getOrderProducts()) {
-                OrderResponseDto.OrderItem oi
-                        = new OrderResponseDto.OrderItem(op.getProducts().getId(), op.getProducts().getName(), op.getQuantity(), op.getPrice());
-                orderItems.add(oi);
+                OrderResponseDto.OrderItem oi = null;
+                if (op.getProducts() != null) {
+                    oi = new OrderResponseDto.OrderItem(op.getProducts().getId(), null, op.getProducts().getName(), op.getQuantity(), op.getPrice());
+                    orderItems.add(oi);
+                } else if (op.getCustomPerfume() != null){
+                    oi = new OrderResponseDto.OrderItem(null, op.getCustomPerfume().getId(), op.getCustomPerfume().getName(), op.getQuantity(), op.getPrice());
+                    orderItems.add(oi);
+                }
             }
             dto.setOrderItems(orderItems);
 
@@ -139,9 +139,13 @@ public class OrderController {
             if (status == OrderStatus.CANCELLED) {
                 List<OrderProduct> orderProducts = OrderProductService.findByOrderId(orderId);
                 for (OrderProduct item : orderProducts) {
-                    Products products = productService.ProductById(item.getProducts().getId());
-                    products.setStock(products.getStock()+item.getQuantity());
-                    productService.save(products);
+                    if (item.getProducts() != null) {
+                        Products products = productService.ProductById(item.getProducts().getId());
+                        products.setStock(products.getStock()+item.getQuantity());
+                        productService.save(products);
+                    } else if (item.getCustomPerfume() != null) {
+                        customPerfumeIngredientService.increaseIngredientStock(item.getCustomPerfume(), item.getQuantity());
+                    }
                 }
             }
             String message = "주문 번호 " + orderId + "의 주문 상태가 변경 되었습니다.";

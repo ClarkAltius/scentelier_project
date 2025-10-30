@@ -11,7 +11,6 @@ function Payments(props) {
     const navigate = useNavigate();
 
     const products = location.state?.products || [];
-    console.log(products);
     const { user } = useAuth();
 
     const [method, setMethod] = useState("Card");
@@ -72,17 +71,19 @@ function Payments(props) {
             paymentMethod: method,
             orderProducts: [
                 ...products
-                    .filter((product) => !product.isCustom)
+                    .filter((product) => product.productId)
                     .map((p) => ({
                     cartItemId: p.cartItemId,
                     productId: p.productId,
+                    customId: null,
                     quantity: p.quantity,
                     price: p.price,
                 })),
                 ...products
-                    .filter((product) => product.isCustom)
+                    .filter((product) => product.customId)
                     .map((c) => ({
                     cartItemId: c.cartItemId,
+                    productId: null,
                     customId: c.customId,
                     quantity: c.quantity,
                     price: c.price,
@@ -246,7 +247,7 @@ function Payments(props) {
                 <Modal.Body>
                     <h5 className="fw-bold mb-3 text-center">결제가 성공적으로 완료되었습니다!</h5>
                     <div className="border rounded-3 p-3 bg-light">
-                        <p><strong>수취인:</strong> {delivery.receiver}</p>
+                        <p><strong>수취인:</strong> {delivery.recipientName}</p>
                         <p><strong>연락처:</strong> {delivery.phone}</p>
                         <p><strong>배송지:</strong> {delivery.address} {delivery.detail}</p>
                         <p><strong>결제 방식:</strong> {paymentMethods.find((m) => m.id === method)?.name}</p>

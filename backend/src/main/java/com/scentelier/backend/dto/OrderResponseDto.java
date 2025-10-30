@@ -2,7 +2,9 @@ package com.scentelier.backend.dto;
 
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.constant.Payment;
+import com.scentelier.backend.entity.CustomPerfume;
 import com.scentelier.backend.entity.Orders;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,11 +31,23 @@ public class OrderResponseDto {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class OrderItem {
         private Long productId;
+        private Long customId;
         private String productName;
         private int quantity;
         private BigDecimal price;
+        private String type; //PRODUCT or CUSTOM
+        private List<CustomPerfumeIngredientDto> ingredients; // 커스텀 향수 전용
+
+        public OrderItem(Long productId, Long customId, @NotBlank(message = "향수 이름을 정해주세요.") String name, int quantity, BigDecimal price) {
+            this.productId = productId;
+            this.customId = customId;
+            this.productName = name;
+            this.quantity = quantity;
+            this.price = price;
+        }
     }
 
     // 관리자 페이지 주문 상세보기
@@ -54,32 +68,52 @@ public class OrderResponseDto {
         }
 
         if (order.getOrderProducts() != null) {
+            // 완제품, 커스텀 향수 둘 다 반환하도록 변경
             this.orderItems = order.getOrderProducts().stream()
                     .map(orderProduct -> {
-
-                        Long id = null;
-                        String name = "Unknown Item"; // Default name
+                        // --- MERGED BLOCK START ---
+                        OrderItem item = new OrderItem();
+                        item.setQuantity(orderProduct.getQuantity());
+                        item.setPrice(orderProduct.getPrice());
 
                         if (orderProduct.getProducts() != null) {
-                            id = orderProduct.getProducts().getId();
-                            name = orderProduct.getProducts().getName();
-                        }
-                        else if (orderProduct.getCustomPerfume() != null) {
-                            id = orderProduct.getCustomPerfume().getId();
-                            name = orderProduct.getCustomPerfume().getName();
+                            // 완제품
+                            item.setProductId(orderProduct.getProducts().getId());
+                            item.setProductName(orderProduct.getProducts().getName());
+                            item.setType("PRODUCT");
+                            item.setIngredients(Collections.emptyList());
+
+                        } else if (orderProduct.getCustomPerfume() != null) {
+                            // 커스텀 향수
+                            CustomPerfume customPerfume = orderProduct.getCustomPerfume();
+                            item.setCustomId(customPerfume.getId()); // <-- This is the fix
+                            item.setProductName(customPerfume.getName()); // 커스텀 향수 이름
+                            item.setType("CUSTOM");
+
+                            // 원액 fetch / map
+                            if (customPerfume.getCustomPerfumeIngredients() != null) {
+                                item.setIngredients(
+                                        customPerfume.getCustomPerfumeIngredients().stream()
+                                                .map(CustomPerfumeIngredientDto::new) //DTO 에서 가져오기
+                                                .collect(Collectors.toList())
+                                );
+                            } else {
+                                item.setIngredients(Collections.emptyList());
+                            }
+                        } else {
+                            // 해당 제품, 원액명이 없을 경우
+                            item.setProductId(null);
+                            item.setProductName("Unknown Item");
+                            item.setType("UNKNOWN");
+                            item.setIngredients(Collections.emptyList());
                         }
 
-                        return new OrderItem(
-                                id,
-                                name,
-                                orderProduct.getQuantity(),
-                                orderProduct.getPrice()
-                        );
+                        return item;
+                        // --- MERGED BLOCK END ---
                     })
                     .collect(Collectors.toList());
         } else {
             this.orderItems = Collections.emptyList();
         }
-
     }
 }

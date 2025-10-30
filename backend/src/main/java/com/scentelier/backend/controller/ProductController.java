@@ -1,5 +1,6 @@
 package com.scentelier.backend.controller;
 
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -65,15 +67,15 @@ public class ProductController {
     //상품 목록 보기 API
 
     @GetMapping("/list")
-    public ResponseEntity<Page<Products>> getProductList(Pageable pageable) {
-        //pageable 객체는 Spring이 자동으로 생성!
-        Page<Products> productsPage = productService.findAll(pageable);
-        return ResponseEntity.ok(productsPage);
+    public ResponseEntity<List
+            <Products>> getProductList() {
+        List<Products> products = productService.findAll();
+        return ResponseEntity.ok(products);
     }
 
     //상품 상세
 
-    @GetMapping("detail/{id}")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<Products> detail(@PathVariable Long id) {
         Products product = this.productService.ProductById(id);
 
@@ -84,6 +86,42 @@ public class ProductController {
             return ResponseEntity.ok(product);
         }
     }
+
+
+//    @PostMapping("/status/{id}")
+//    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+//        try {
+//            Products updated = productService.updateStatus(id, status);
+//            return ResponseEntity.ok(updated.getStatus());
+//        } catch (RuntimeException e) {
+//            // 판매중지 차단 메시지가 여기로 옴
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+//        }
+//    }
+
+//    @PostMapping("/status/{id}")
+//    public ResponseEntity<?> toggleStatus(@PathVariable Long id) {
+//        try {
+//            productService.toggleStatus(id);
+//            return ResponseEntity.ok("상태가 변경되었습니다!");
+//        } catch (RuntimeException e) {
+//            // 판매중지 차단 상황 등
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409
+//        }
+//    }
+
+//    @PatchMapping("/status/{id}")
+//    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+//        return updateStatus(id, status);
+//    }
+//        @PostMapping("/status/{id}")
+//        public ResponseEntity<ProductStatus> updateStatus(
+//                @PathVariable Long id,
+//                @RequestParam ProductStatus status) {
+//            Products updated = productService.updateStatus(id, status);
+//            return ResponseEntity.ok(updated.getStatus());
+//            }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
@@ -104,4 +142,7 @@ public class ProductController {
         }
     }
 
-    }
+
+
+
+}

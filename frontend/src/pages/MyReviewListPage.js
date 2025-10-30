@@ -4,18 +4,22 @@ import axios from "axios";
 import ReviewCard from "../component/ReviewCard";
 import { getUserReviews } from "../api/reviewApi";
 import { useAuth } from "../component/AuthContext";
+import { API_BASE_URL } from "../config/config";
+import { useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
 
 const MyReviewPage = () => {
     const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    getUserReviews(user.id).then((data) => setReviews(data.content)).catch(console.error);
+    getUserReviews(user.id, 0, 12).then((data) => setReviews(data.content)).catch(console.error);
   }, [user.id]);
 
   const handleUpdate = (updated) => {
     axios
-      .put(`/reviews/${updated.reviewId}`, updated)
+      .put(`${API_BASE_URL}/reviews/update/${updated.reviewId}`, updated, { withCredentials: true })
       .then(() => {
         alert("리뷰가 수정되었습니다.");
         setReviews((prev) =>
@@ -31,7 +35,7 @@ const MyReviewPage = () => {
 
   const handleDelete = (reviewId) => {
     axios
-      .delete(`/reviews/${reviewId}`)
+      .put(`${API_BASE_URL}/reviews/delete/${reviewId}`, { withCredentials: true })
       .then(() => {
         alert("리뷰가 삭제되었습니다.");
         setReviews((prev) => prev.filter((r) => r.reviewId !== reviewId));
@@ -42,19 +46,31 @@ const MyReviewPage = () => {
   return (
     <div className="container mt-4">
       <h3 className="fw-bold mb-4">내가 작성한 리뷰</h3>
-      <div className="row">
-      {reviews.map((review) => (
-        <div className="col-md-6 col-lg-4" key={review.reviewId}>
-            <ReviewCard
-            key={review.reviewId}
-            review={review}
-            type="mypage"
-            onUpdate={() => handleUpdate}
-            onDelete={() => handleDelete}
-            />
+      {reviews.length === 0 ? (
+        <div className="text-center py-5 border rounded bg-light">
+            <p className="text-muted mb-3">아직 작성한 리뷰가 없습니다.</p>
+            <Button variant="primary" onClick={() => navigate("/reviews/write")}>
+                리뷰 작성하러 가기
+            </Button>
         </div>
-      ))}
-      </div>
+      ) : (
+        <div className="row">
+            {reviews.map((review) => (
+                <div className="col-md-6 col-lg-4" key={review.reviewId}>
+                <ReviewCard
+                    review={review}
+                    type="mypage"
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
+                />
+                </div>
+            ))}
+            <Button variant="primary" onClick={() => navigate("/reviews/write")}>
+                리뷰 작성하러 가기
+            </Button>
+        </div>
+      )}
+        
     </div>
   );
 };

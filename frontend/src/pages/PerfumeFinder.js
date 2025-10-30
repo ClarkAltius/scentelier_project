@@ -15,12 +15,12 @@ function PerfumeTest() {
 
 
     useEffect(() => {
-        const url2 = `${API_BASE_URL}/product/list?page=0&size=24`
+        const url2 = `${API_BASE_URL}/product/list`
         axios.get(url2)
             .then((response) => {
                 console.log("응답받은 데이터2 :");
-                console.log(response.data.content);
-                setProduct(response.data.content);
+                console.log(response.data);
+                setProduct(response.data);
             })
             .catch(error => {
                 console.error('데이터 가져오기 실패:', error);
@@ -33,7 +33,7 @@ function PerfumeTest() {
 
     const handleButtonClick = (type) => {
         setSelectedType(type);
-        const filtered = product.filter((item) =>
+        const filtered = product?.filter((item) =>
             item.category === type);
         setFilteredProducts(filtered);
     };

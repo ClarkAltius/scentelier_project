@@ -164,6 +164,9 @@ const OrderList = () => {
   };
 
   const gotoProduct = (productId) => {
+    if (productId === null) {
+      navigate(`/myperfume`);
+    }
     navigate(`/product/detail/${productId}`);
   };
 

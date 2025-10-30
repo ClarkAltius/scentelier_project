@@ -1,7 +1,5 @@
 package com.scentelier.backend.dto;
-
 import com.scentelier.backend.entity.Orders;
-
 import java.math.BigDecimal;
 
 public class OrderAdminDto {

@@ -54,5 +54,25 @@ public class ReviewController {
     ) {
         return ResponseEntity.ok(reviewService.getReviewsByProduct(productId, pageable));
     }
+
+    @PutMapping("/update/{reviewId}")
+    public ResponseEntity<?> updateReview(@PathVariable Long reviewId, @RequestBody ReviewCreateDto dto) {
+        try {
+            ReviewDto result = reviewService.updateReview(reviewId, dto);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/delete/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
+        try {
+            ReviewDto result = reviewService.deleteReview(reviewId);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
 

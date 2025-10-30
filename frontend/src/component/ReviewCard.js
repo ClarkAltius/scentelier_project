@@ -14,6 +14,7 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
 
   const {
     reviewId,
+    userName,
     content,
     rating,
     createdAt,
@@ -65,9 +66,9 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
         {/* 용도별 세부 렌더링 */}
         {type === "mypage" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
             <div className="text-muted small">총 금액: ₩{totalPrice}</div>
-            <ul className="mt-2">{renderProducts()}</ul>
+            <ul className="list-unstyled ms-3 mb-0">{renderProducts()}</ul>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="outline-primary" size="sm" onClick={() => setShowEdit(true)}>
                 수정
@@ -81,14 +82,14 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
 
         {type === "all" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
            <ul className="list-unstyled ms-3 mb-0">{renderProducts()}</ul>
           </>
         )}
 
         {type === "product" && (
           <>
-            <div className="text-muted small">수령인: {recipientName}</div>
+            <div className="text-muted small">이름: {userName}</div>
           </>
         )}
       </Card.Body>
@@ -102,15 +103,17 @@ const ReviewCard = ({ review, type = "default", onUpdate, onDelete, onClick }) =
           <Form>
             <Form.Group className="mb-3">
               <Form.Label>별점</Form.Label>
+                <div className="d-flex justify-content-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                         key={star}
                         size={22}
                         onClick={() => setEditRating(star)}
-                        className="cursor-pointer"
-                        color={rating >= star ? "#FBBF24" : "#9CA3AF"}
+                        style={{ cursor: "pointer" }}
+                        color={editRating >= star ? "#FBBF24" : "#9CA3AF"}
                     />
                 ))}
+                </div>
             </Form.Group>
             <Form.Group>
               <Form.Label>내용</Form.Label>

@@ -8,6 +8,7 @@ import java.util.List;
 
 
 import java.util.List;
+import com.scentelier.backend.constant.InquiryStatus;
 
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
@@ -16,4 +17,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     List<Inquiry> findAllWithUser();
 
     List<Inquiry> findByUserIdAndIsDeletedFalse(Long userId);
+
+    // 상태별 총 문의사항 반환
+    int countByStatus(InquiryStatus status);
 }
