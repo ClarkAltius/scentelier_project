@@ -31,10 +31,6 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderDto dto) {
-        dto.getOrderProducts().forEach(op ->
-                System.out.println("💡 전달받은 productId=" + op.getProductId() + ", customId=" + op.getCustomId())
-        );
-
         Optional<Users> optionalUsers = userService.findUserById(dto.getUserId());
         if (optionalUsers.isEmpty()) {
             throw new RuntimeException("회원이 존재하지 않습니다.");
