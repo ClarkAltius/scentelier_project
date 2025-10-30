@@ -41,7 +41,12 @@ public class OrderResponseDto {
         private String type; //PRODUCT or CUSTOM
         private List<CustomPerfumeIngredientDto> ingredients; // 커스텀 향수 전용
 
-        public OrderItem(Object o, Long id, @NotBlank(message = "향수 이름을 정해주세요.") String name, int quantity, BigDecimal price) {
+        public OrderItem(Long productId, Long customId, @NotBlank(message = "향수 이름을 정해주세요.") String name, int quantity, BigDecimal price) {
+            this.productId = productId;
+            this.customId = customId;
+            this.productName = name;
+            this.quantity = quantity;
+            this.price = price;
         }
     }
 

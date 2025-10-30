@@ -5,6 +5,7 @@ import com.scentelier.backend.entity.CustomPerfume;
 import com.scentelier.backend.entity.CustomPerfumeIngredient;
 import com.scentelier.backend.entity.Ingredient;
 import com.scentelier.backend.repository.CustomPerfumeIngredientRepository;
+import com.scentelier.backend.repository.IngredientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomPerfumeIngredientService {
     private final CustomPerfumeIngredientRepository customPerfumeIngredientRepository;
+    private final IngredientRepository ingredientRepository;
 
     public List<CustomPerfumeIngredient> findByCustomPerfume(CustomPerfume customPerfume) {
         return customPerfumeIngredientRepository.findByCustomPerfume(customPerfume);
@@ -37,7 +39,23 @@ public class CustomPerfumeIngredientService {
             }
 
             ingredient.setStock(ingredient.getStock()-usedAmount);
+            ingredientRepository.save(ingredient);
         }
     }
 
+    /**
+     * 주문 취소 시 Ingredient 재고를 (사용량 × 주문 수량) 만큼 증가
+     */
+    @Transactional
+    public void increaseIngredientStock(CustomPerfume customPerfume, int quantity) {
+        List<CustomPerfumeIngredient> ingredients = findByCustomPerfume(customPerfume);
+
+        for (CustomPerfumeIngredient cpi : ingredients) {
+            Ingredient ingredient = cpi.getIngredients();
+            int usedAmount = cpi.getAmount().intValue() * quantity; // 향수 하나에 들어가는 양 × 주문 수량
+
+            ingredient.setStock(ingredient.getStock()+usedAmount);
+            ingredientRepository.save(ingredient);
+        }
+    }
 }

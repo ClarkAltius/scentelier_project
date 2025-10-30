@@ -97,11 +97,7 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDto>> getOrderList(@RequestParam Long userId, @RequestParam Role role) {
         List<Orders> orders = null;
 
-        if(role == Role.ADMIN) {
-            // orders = orderService.findAllOrders(OrderStatus.PENDING);
-        } else {
-            orders = orderService.findByUserId(userId);
-        }
+        orders = orderService.findByUserId(userId);
 
         List<OrderResponseDto> responseDtos = new ArrayList<>();
 
@@ -147,6 +143,8 @@ public class OrderController {
                         Products products = productService.ProductById(item.getProducts().getId());
                         products.setStock(products.getStock()+item.getQuantity());
                         productService.save(products);
+                    } else if (item.getCustomPerfume() != null) {
+                        customPerfumeIngredientService.increaseIngredientStock(item.getCustomPerfume(), item.getQuantity());
                     }
                 }
             }
