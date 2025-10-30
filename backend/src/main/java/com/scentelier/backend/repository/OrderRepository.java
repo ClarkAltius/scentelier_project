@@ -1,5 +1,6 @@
 package com.scentelier.backend.repository;
 import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import jakarta.transaction.Transactional;
@@ -51,6 +52,18 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     long countPendingOrdersByProductId(
             @Param("productId") Long productId
     );
+    //  총 주문량 반환 쿼리
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o")
+    long sumTotalRevenue();
+
+    // 상태별 갯수 반환
+    int countByStatus(OrderStatus status);
+
+    // 월별 판매 추이 반환
+    @Query("SELECT FUNCTION('DATE_FORMAT', o.orderDate, '%Y-%m') AS month, SUM(o.totalPrice) AS monthlySales " +
+            "FROM Orders o " +
+            "GROUP BY month " +
+            "ORDER BY month DESC")
+    List<Object[]> findMonthlySales();
+
 }
-
-
