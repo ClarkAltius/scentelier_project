@@ -1,11 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../component/AuthContext";
+import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
-  const [userInfo, setUserInfo] = useState({
-    name: "홍길동",
-    email: "hong@example.com",
-    address: "서울특별시",
-  }); // 사용자 예시
+  const { user } = useAuth(); // 로그인한 사용자 정보
+  const [userInfo, setUserInfo] = useState(null); // 초기값을 null로
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    // 로그인된 사용자 정보로 상태 초기화
+    setUserInfo({
+      name: user.username || "",
+      email: user.email || "",
+      address: user.address || "",
+    });
+  }, [user, navigate]);
 
   const handleEdit = () => {
     const newName = prompt("이름을 입력하세요", userInfo.name);
@@ -19,13 +35,21 @@ const MyPage = () => {
     }));
   };
 
+  const handleMyInquiry = () => {
+    navigate("/myinquiry"); // 문의사항 페이지로 이동
+  };
+
   const handleDelete = () => {
     const confirmed = window.confirm("정말 탈퇴하시겠습니까?");
     if (confirmed) {
       alert("탈퇴 완료되었습니다.");
       setUserInfo({ name: "", email: "", address: "" });
+      // 실제 API 호출 후 로그아웃 처리 필요
     }
   };
+
+  // 아직 사용자 정보가 로드되지 않았다면 로딩 표시
+  if (!userInfo) return <div>로딩 중...</div>;
 
   return (
     <div style={styles.pageWrapper}>
@@ -39,6 +63,9 @@ const MyPage = () => {
         <div style={styles.buttonGroup}>
           <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleEdit}>
             수정
+          </button>
+          <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyInquiry}>
+            나의 문의사항
           </button>
           <button style={{ ...styles.button, backgroundColor: "#f44336" }} onClick={handleDelete}>
             탈퇴

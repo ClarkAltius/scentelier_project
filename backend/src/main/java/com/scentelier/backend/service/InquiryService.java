@@ -1,5 +1,6 @@
 package com.scentelier.backend.service;
 
+import com.scentelier.backend.constant.InquiryStatus;
 import com.scentelier.backend.dto.InquiryAnswerRequestDto;
 import com.scentelier.backend.dto.InquiryAnswerResponseDto;
 import com.scentelier.backend.dto.InquiryDto;
@@ -9,14 +10,13 @@ import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.InquiryAnswerRepository;
 import com.scentelier.backend.repository.InquiryRepository;
 import com.scentelier.backend.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.stream.Collectors;
-import jakarta.persistence.EntityNotFoundException;
-import com.scentelier.backend.constant.InquiryStatus;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -34,26 +34,30 @@ public class InquiryService {
         this.inquiryAnswerRepository = inquiryAnswerRepository;
         this.userRepository = userRepository;
     }
-//문의 저장
+
+////문의 저장(사용자용)
     public Inquiry saveInquiry(Inquiry inquiry) {
         return inquiryRepository.save(inquiry);
     }
+
     // 일반 유저: 삭제되지 않은 문의 조회
     public List<Inquiry> getMyInquiries(Long userId) {
         return inquiryRepository.findByUserIdAndIsDeletedFalse(userId);
     }
-// 모든 문의 조회
-//    public List<Inquiry> getAllInquiries() {
-//        return inquiryRepository.findAll();
-//    }
-    // 관리자용: 모든 문의 조회 + DTO 변환 (삭제 여부 포함)
-    public List<InquiryDto> findAllWithUserIncludingDeleted() {
-        List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
 
-        return inquiries.stream()
-                .map(InquiryDto::new)
-                .collect(Collectors.toList());
-    }
+//// 모든 문의 조회
+////    public List<Inquiry> getAllInquiries() {
+////        return inquiryRepository.findAll();
+////    }
+//    // 관리자용: 모든 문의 조회 + DTO 변환 (삭제 여부 포함)
+//    public List<InquiryDto> findAllWithUserIncludingDeleted() {
+//        List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
+//
+//        return inquiries.stream()
+//                .map(InquiryDto::new)
+//                .collect(Collectors.toList());
+//    }
+@Transactional(readOnly = true)
     public List<InquiryDto> findAllWithUser() {
         List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
 
@@ -105,6 +109,7 @@ public class InquiryService {
 
         // 상태 변경
         inquiry.setStatus(InquiryStatus.ANSWERED);
+        inquiryRepository.save(inquiry);
         InquiryAnswers savedAnswer = inquiryAnswerRepository.save(newAnswer);
         return new InquiryAnswerResponseDto(savedAnswer);
     }
@@ -114,16 +119,30 @@ public class InquiryService {
         Inquiry inquiry = inquiryRepository.findById(inquiryId)
                 .orElseThrow(() -> new EntityNotFoundException("Inquiry not found with id: " + inquiryId));
         inquiry.setStatus(newStatus);
-
+        inquiryRepository.save(inquiry);
         return getInquiryDetail(inquiryId);
     }
 
+//    //추가 수정
+//public List<InquiryDto> getAllInquiriesForAdmin() {
+//    List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
+//    return inquiries.stream()
+//            .map(InquiryDto::new)
+//            .collect(Collectors.toList());
+//}
+//}
+    /** 사용자: 문의 소프트 삭제 (isDeleted = true) */
+    @Transactional
+    public void softDeleteInquiry(Long inquiryId, Long userId) {
+        Inquiry inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 문의를 찾을 수 없습니다."));
 
-    //추가 수정
-public List<InquiryDto> getAllInquiriesForAdmin() {
-    List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
-    return inquiries.stream()
-            .map(InquiryDto::new)
-            .collect(Collectors.toList());
-}
+        if (!inquiry.getUser().getId().equals(userId)) {
+            throw new SecurityException("본인이 작성한 문의만 삭제할 수 있습니다.");
+        }
+
+        inquiry.setDeleted(true);
+        inquiry.setDeletedAt(LocalDateTime.now());
+        inquiryRepository.save(inquiry);
+    }
 }

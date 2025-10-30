@@ -31,14 +31,14 @@ function Login() {
             params.append('email', email);
             params.append('password', password);
 
-            // 스프링 부트가 넘겨 주는 정보는 Map<String, Object> 타입입니다.
+            // 스프링 부트가 넘겨 주는 정보는 Map<String, Object> 타입
             // 전일환 : withCredentials 추가
             const response = await axios.post(url, params, { withCredentials: true });
 
-            // message에는 '로그인 성공 여부'를 알리는 내용, member에는 로그인 한 사람의 객체 정보가 반환 됩니다.
+            // message에는 '로그인 성공 여부'를 알리는 내용, member에는 로그인 한 사람의 객체 정보가 반환
             const { message, member } = response.data;
 
-            if (message === 'success') { // 자바에서 맵.put("message", "success") 식으로 코딩을 했습니다.
+            if (message === 'success') {
                 console.log('로그인 한 사람의 정보');
                 console.log(member);
 

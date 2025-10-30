@@ -12,9 +12,7 @@ function InquiryDetail() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-
     const { user } = useAuth();
-    console.log(user);
 
     useEffect(() => {
         if (!user) {
@@ -37,6 +35,20 @@ function InquiryDetail() {
         })();
     }, [id, navigate, user]);
 
+    // 삭제 
+    const handleDelete = async () => {
+        if (!window.confirm("정말 이 문의를 삭제하시겠습니까?")) return;
+
+        try {
+            await axios.delete(`${API_BASE_URL}/api/inquiries/${id}`, { withCredentials: true });
+            alert("문의가 삭제되었습니다.");
+            navigate("/myinquiry");
+        } catch (err) {
+            console.error(err);
+            alert(err.response?.data?.error || "문의 삭제에 실패했습니다.");
+        }
+    }; //삭제 코드 끝
+
     if (loading) return <p style={{ padding: "20px" }}>로딩중...</p>;
     if (error) return <p style={{ color: "red", padding: "20px" }}>{error}</p>;
     if (!inquiry) return <p>문의사항이 존재하지 않습니다.</p>;
@@ -47,12 +59,16 @@ function InquiryDetail() {
             <p><strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}</p>
             <p><strong>내용:</strong></p>
             <p>{inquiry.content}</p>
-            <p><strong>답변 상태:</strong> {inquiry.status === "WAITING" ? "답변 대기 중" : "답변 완료"}</p>
+            <p><strong>상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}</p>
 
-
-            <Link to="/myinquiry" className="btn btn-outline-secondary mt-3">
-                목록으로
-            </Link>
+            <div style={{ marginTop: "20px" }}>
+                <Link to="/myinquiry" className="btn btn-outline-secondary me-2">
+                    목록으로
+                </Link>
+                <button onClick={handleDelete} className="btn btn-danger">
+                    삭제
+                </button>
+            </div>
         </div>
     );
 }
