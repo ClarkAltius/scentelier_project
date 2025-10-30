@@ -30,9 +30,9 @@ public class CustomPerfumeIngredientService {
 
         for (CustomPerfumeIngredient cpi : ingredients) {
             Ingredient ingredient = cpi.getIngredients();
-            int usedAmount = Integer.parseInt(String.valueOf(cpi.getAmount())) * quantity; // 향수 하나에 들어가는 양 × 주문 수량
+            int usedAmount = cpi.getAmount().intValue() * quantity; // 향수 하나에 들어가는 양 × 주문 수량
 
-            if (Integer.parseInt(String.valueOf(ingredient.getStock())) < usedAmount) {
+            if (ingredient.getStock() < usedAmount) {
                 throw new RuntimeException("재료 재고가 부족합니다: " + ingredient.getName());
             }
 

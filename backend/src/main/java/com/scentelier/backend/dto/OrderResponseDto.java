@@ -31,6 +31,7 @@ public class OrderResponseDto {
     @AllArgsConstructor
     public static class OrderItem {
         private Long productId;
+        private Long customId;
         private String productName;
         private int quantity;
         private BigDecimal price;
@@ -57,20 +58,22 @@ public class OrderResponseDto {
             this.orderItems = order.getOrderProducts().stream()
                     .map(orderProduct -> {
 
-                        Long id = null;
+                        Long productId = null;
+                        Long customId = null;
                         String name = "Unknown Item"; // Default name
 
                         if (orderProduct.getProducts() != null) {
-                            id = orderProduct.getProducts().getId();
+                            productId = orderProduct.getProducts().getId();
                             name = orderProduct.getProducts().getName();
                         }
                         else if (orderProduct.getCustomPerfume() != null) {
-                            id = orderProduct.getCustomPerfume().getId();
+                            customId = orderProduct.getCustomPerfume().getId();
                             name = orderProduct.getCustomPerfume().getName();
                         }
 
                         return new OrderItem(
-                                id,
+                                productId,
+                                customId,
                                 name,
                                 orderProduct.getQuantity(),
                                 orderProduct.getPrice()

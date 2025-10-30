@@ -11,7 +11,6 @@ function Payments(props) {
     const navigate = useNavigate();
 
     const products = location.state?.products || [];
-    console.log(products);
     const { user } = useAuth();
 
     const [method, setMethod] = useState("Card");
@@ -72,17 +71,19 @@ function Payments(props) {
             paymentMethod: method,
             orderProducts: [
                 ...products
-                    .filter((product) => !product.isCustom)
+                    .filter((product) => product.productId)
                     .map((p) => ({
                     cartItemId: p.cartItemId,
                     productId: p.productId,
+                    customId: null,
                     quantity: p.quantity,
                     price: p.price,
                 })),
                 ...products
-                    .filter((product) => product.isCustom)
+                    .filter((product) => product.customId)
                     .map((c) => ({
                     cartItemId: c.cartItemId,
+                    productId: null,
                     customId: c.customId,
                     quantity: c.quantity,
                     price: c.price,

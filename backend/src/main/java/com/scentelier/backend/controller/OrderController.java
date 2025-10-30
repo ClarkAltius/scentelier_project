@@ -31,6 +31,10 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderDto dto) {
+        dto.getOrderProducts().forEach(op ->
+                System.out.println("💡 전달받은 productId=" + op.getProductId() + ", customId=" + op.getCustomId())
+        );
+
         Optional<Users> optionalUsers = userService.findUserById(dto.getUserId());
         if (optionalUsers.isEmpty()) {
             throw new RuntimeException("회원이 존재하지 않습니다.");
@@ -48,7 +52,6 @@ public class OrderController {
 
         List<OrderProduct> orderProductList = new ArrayList<>();
         for (OrderProductDto item : dto.getOrderProducts()) {
-
             OrderProduct orderProduct = new OrderProduct();
             if (item.getProductId() != null) {
                 Products products = productService.findProductsById(item.getProductId())
@@ -119,8 +122,12 @@ public class OrderController {
 
             List<OrderResponseDto.OrderItem> orderItems = new ArrayList<>();
             for (OrderProduct op : bean.getOrderProducts()) {
-                OrderResponseDto.OrderItem oi
-                        = new OrderResponseDto.OrderItem(op.getProducts().getId(), op.getProducts().getName(), op.getQuantity(), op.getPrice());
+                OrderResponseDto.OrderItem oi = null;
+                if (op.getProducts() != null) {
+                    oi = new OrderResponseDto.OrderItem(op.getProducts().getId(), null, op.getProducts().getName(), op.getQuantity(), op.getPrice());
+                } else {
+                    oi = new OrderResponseDto.OrderItem(null, op.getCustomPerfume().getId(), op.getOrders().getRecipientName(), op.getQuantity(), op.getPrice());
+                }
                 orderItems.add(oi);
             }
             dto.setOrderItems(orderItems);
