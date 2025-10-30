@@ -5,48 +5,47 @@ import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
 
 function App() {
-    // 파라미터 관련 state 변수 선언
-    const [name, setName] = useState('');
+
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [address, setAddress] = useState('');
+    const [phone, setPhone] = useState('');
 
-    // 폼 유효성 검사(Form Validation Check) 관련 state 정의 : 입력 양식에 문제 발생시 값을 저장할 곳
+
     const [errors, setErrors] = useState({
         name: '', email: '', password: '', address: '', general: ''
     });
 
     const navigate = useNavigate();
 
-    /*
-        구분	     async/await 사용	        then/catch 사용
-        필수 여부	 없어도 됨	                  가능
-        가독성    더 깔끔	                     체인이 길어지면 복잡
-        에러 처리	 try...catch 한 번에 가능	  .catch() 따로 작성
-        추천 여부	 대부분의 비동기 코드에서 추천	 간단한 한 줄짜리 Promise라면 가능
-    */
+
     const SignupAction = async (event) => {
         event.preventDefault(); // 이벤트 전파 방지
 
         try {
             const url = `${API_BASE_URL}/signup`;
-            const parameters = { name, email, password, address };
+            const params = new URLSearchParams();
+            params.append('username', username);
+            params.append('email', email);
+            params.append('password', password);
+            params.append('address', address);
+            params.append('phone', phone);
 
-            // response는 응답 받은 객체입니다.
-            const response = await axios.post(url, parameters);
+            const response = await axios.post(url, params);
 
-            if (response.status === 200) { /* 스프링의 MemberController 파일 참조 */
+            if (response.status === 200) {
                 alert('회원 가입 성공');
                 navigate('/login');
             }
 
-        } catch (error) { // error : 예외 객체
+        } catch (error) {
             if (error.response && error.response.data) {
                 // 서버에서 받은 오류 정보를 객체로 저장합니다.
                 setErrors(error.response.data);
 
             } else { // 입력 값 이외에 발생하는 다른 오류과 관련됨
-                setErrors((previous) => ({ ...previous, general: '회원 가입 중에 오류가 발생하였습니다.' }));
+                setErrors((prev) => ({ ...prev, general: '회원 가입 중에 오류가 발생하였습니다.' }));
             }
         }
     };
@@ -59,16 +58,10 @@ function App() {
                         <Card.Body>
                             <h2 className="text-center mb-4">회원 가입</h2>
 
-                            {/* 일반 오류 발생시 사용자에게 alert 메시지를 보여 줍니다. */}
-                            {/* contextual : 상황에 맞는 적절한 스타일 색상을 지정하는 기법 */}
+
                             {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
-                            {/*
-                                !! 연산자는 어떠한 값을 강제로 boolean 형태로 변환해주는 자바스크립트 기법입니다.
 
-                                isInvalid 속성은 해당 control의 유효성을 검사하는 속성입니다.
-                                값이 true이면 Form.Control.Feedback에 빨간 색상으로 오류 메시지를 보여 줍니다.
-                            */}
 
                             <Form onSubmit={SignupAction}>
                                 <Form.Group className="mb-3">
@@ -76,15 +69,27 @@ function App() {
                                     <Form.Control
                                         type="text"
                                         placeholder="이름을 입력해 주세요."
-                                        value={name}
-                                        onChange={(event) => setName(event.target.value)}
-                                        isInvalid={!!errors.name}
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        isInvalid={!!errors.username}
                                     />
 
                                     <Form.Control.Feedback type="invalid">
-                                        {errors.name}
+                                        {errors.username}
                                     </Form.Control.Feedback>
 
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>전화번호</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="전화번호를 입력해 주세요."
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        isInvalid={!!errors.phone}
+                                    />
+                                    <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
                                 </Form.Group>
 
                                 <Form.Group className="mb-3">
