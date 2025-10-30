@@ -325,7 +325,7 @@ function Productlist() {
                                             textOverflow: 'ellipsis',  // 넘치는 텍스트에 "..." 표시
                                             maxHeight: '120px',
                                         }}
-                                    ><span style={{ fontSize: "18px" }}><strong>{item.price}원</strong></span>
+                                    ><span style={{ fontSize: "18px" }}><strong>{formatPrice(item.price)}원</strong></span>
 
                                         <Button
                                             onClick={(e) => {
