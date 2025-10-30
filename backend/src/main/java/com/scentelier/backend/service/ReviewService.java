@@ -101,6 +101,7 @@ public class ReviewService {
                 null,
                 order.getId(),
                 null,
+                null,
                 0,
                 null,
                 order.getRecipientName(),
@@ -126,6 +127,7 @@ public class ReviewService {
         return new ReviewDto(
                 review.getId(),
                 order.getId(),
+                order.getUsers().getUsername(),
                 review.getContent(),
                 review.getRating(),
                 review.getCreatedAt(),
