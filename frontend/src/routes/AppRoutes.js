@@ -21,6 +21,7 @@ import PrivateRoute from './PrivateRoute.js';
 import ReviewWriteForm from '../pages/ReviewWriteForm.js'
 import MyReviewListPage from '../pages/MyReviewListPage.js'
 import ReviewBoardPage from '../pages/ReviewBoardPage.js'
+import Signup from '../pages/Signup.js'
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -46,6 +47,7 @@ function AppRoutes() {
             <Route path='/myinquiry' element={<MyInquiry />} />
             <Route path='/inquirydetail' element={<InquiryDetail />} />
             <Route path='/reviews/list' element={<ReviewBoardPage />} />
+            <Route path='/signup' element={<Signup />} />
 
             {/**로그인 사용자 전용 */}
             <Route
