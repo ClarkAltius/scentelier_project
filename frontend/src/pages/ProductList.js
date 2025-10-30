@@ -17,22 +17,16 @@ function Productlist() {
     const { user } = useAuth();
 
     const formatPrice = (price) => {
-    const n = typeof price === 'number' ? price : Number(price);
-    if (Number.isFinite(n)) return n.toLocaleString();
-    return '0';
+        const n = typeof price === 'number' ? price : Number(price);
+        if (Number.isFinite(n)) return n.toLocaleString();
+        return '0';
     };
-
-
-
-
-    // 썸네일 목록 - 3번 반복해 무한 루프 효과
-
 
     useEffect(() => {// 베스트상품 스크롤 관련
         const container = containerRef.current;
 
         const url1 = `${API_BASE_URL}/order/list2`
-        const url2 = `${API_BASE_URL}/product/list?page=0&size=24`
+        const url2 = `${API_BASE_URL}/product/list`
         axios.get(url1)
             .then((response) => {
                 console.log("응답받은 데이터 :");
@@ -46,14 +40,8 @@ function Productlist() {
 
         axios.get(url2)
             .then((response) => {
-             const list = (response.data.content ?? []).map(p => {
-                // 안전 가드: status 미존재/null → SELLING으로 보정
-                const status = p?.status ?? (p?.selling === true ? 'SELLING' : (p?.selling === false ? 'STOPPED' : 'SELLING'));
-                return { ...p, status };
-            });
-            // 고객 노출용: 판매중만
-            const onlySelling = list.filter(p => p.status === 'SELLING');
-            setProduct(onlySelling);
+                console.log(response.data);
+                setProduct(response.data);
             })
             .catch(error => {
                 console.error('데이터 가져오기 실패:', error);
@@ -112,16 +100,14 @@ function Productlist() {
 
     }, []);
 
-    useEffect(() => { // 하단 상품  스크롤 관련
+    useEffect(() => {
         const handleScroll = () => {
-            // 현재 스크롤 위치 + 화면 높이 >= 문서 전체 높이 - 100 (임계점 설정)
             if (
                 window.innerHeight + window.scrollY >=
                 document.documentElement.scrollHeight - 100
             ) {
-                // 아직 상품이 더 남아있으면 6개씩 더 보여줌
                 setVisibleCount((prev) => {
-                    if (prev < product.length) {
+                    if (prev < (product?.length ?? 0)) {
                         return prev + 6;
                     }
                     return prev;
@@ -130,10 +116,8 @@ function Productlist() {
         };
 
         window.addEventListener("scroll", handleScroll);
-
-        // 클린업 함수: 컴포넌트 언마운트 시 이벤트 제거
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [product.length]);
+    }, [product?.length]);
 
     // ---------------------------카테고리---------------------------------
 
@@ -142,7 +126,7 @@ function Productlist() {
 
     const [activeCategory, setActiveCategory] = useState('all');
     const [selectedTag, setSelectedTag] = useState(null);
-    const [filteredProducts, setFilteredProducts] = useState(product);
+    const [filteredProducts, setFilteredProducts] = useState(product ?? []);
     const [searchTerm, setSearchTerm] = useState("");
 
     const [searchParams] = useSearchParams();
@@ -233,7 +217,7 @@ function Productlist() {
     }
 
     useEffect(() => {
-        let filtered = product;
+        let filtered = Array.isArray(product) ? product : [];
 
         // 1️⃣ 카테고리 + 태그 필터
         if (activeCategory === "type" && selectedTag) {
@@ -258,7 +242,10 @@ function Productlist() {
         setFilteredProducts(filtered);
     }, [product, activeCategory, selectedTag, searchTerm]);
 
-    const displayedProducts = filteredProducts.slice(0, visibleCount);
+
+    const displayedProducts = (filteredProducts ?? []).slice(0, visibleCount);
+
+
 
     const addToCart = async (e, product) => {
         e.stopPropagation();
@@ -338,8 +325,8 @@ function Productlist() {
                                             textOverflow: 'ellipsis',  // 넘치는 텍스트에 "..." 표시
                                             maxHeight: '120px',
                                         }}
-                                    >
-                                        
+                                    ><span style={{ fontSize: "18px" }}><strong>{item.price}원</strong></span>
+
                                         <Button
                                             onClick={(e) => {
                                                 if (!user) {
@@ -514,9 +501,9 @@ function Productlist() {
                             {item.name}
                         </Card.Title>
                         <Card.Text style={{ margin: "10px", textAlign: "center" }}>
-                            
-                                {formatPrice(item.price)}원
-                            
+
+                            <span style={{ fontSize: "20px" }}><strong>{formatPrice(item.price)}원</strong></span>
+
                             <br />
                             <div
                                 style={{

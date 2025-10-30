@@ -63,8 +63,8 @@ public class ProductService {
     }
 
     //상품 리스트 pageable로 전체 가져오기 서비스
-    public Page<Products> findAll(Pageable pageable) {
-        return productRepository.findAllByIsDeletedFalse(pageable); //삭제 x 인 상품만
+    public List<Products> findAll() {
+        return productRepository.findAllByIsDeletedFalse(); // 삭제되지 않은 상품 전체
     }
 
     public Products ProductById(Long id) {
