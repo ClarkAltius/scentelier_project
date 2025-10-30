@@ -1,5 +1,6 @@
 package com.scentelier.backend.repository;
 
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,8 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Products, Long> {
     Page<Products> findAllByIsDeletedFalse(Pageable pageable);
     Page<Products> findAllByIsDeleted(boolean isDeleted, Pageable pageable);
-    Optional<Products> findByIdAndIsDeletedFalse(Long id);
+  //  Optional<Products> findByIdAndIsDeletedFalse(Long id);
+    Page<Products> findAllByStatusAndIsDeletedFalse(ProductStatus status, Pageable pageable);
 
 }
 

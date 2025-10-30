@@ -1,6 +1,7 @@
 package com.scentelier.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.constant.Season;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -56,4 +57,10 @@ public class Products {
     @Column(name = "deleted_at", columnDefinition = "DATETIME DEFAULT NULL")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deletedAt;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status = ProductStatus.SELLING;
 }
+

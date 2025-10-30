@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import styles from './ProductManagement.module.css';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2} from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+axios.defaults.withCredentials = true;
 
 
 function ProductManagement({ setActiveView }) {
@@ -50,7 +51,19 @@ function ProductManagement({ setActiveView }) {
         };
 
         fetchProducts();
-    }, [page]); // '페이지' 스테이트 변경시마다 재실행
+            }, [page]); // '페이지' 스테이트 변경시마다 재실행
+
+        const renderStatusBadge = (status) => {
+        if (status === "SELLING")
+            return <span className={`${styles.badge} ${styles.badgeSelling}`}>판매중</span>;
+        if (status === "STOPPED")
+            return <span className={`${styles.badge} ${styles.badgeStopped}`}>판매중지</span>;
+        if (status === "PENDING")
+            return <span className={`${styles.badge} ${styles.badgePending}`}>주문중</span>;
+
+        return <span>알수없음</span>;
+        };
+
 
     //페이징 핸들러
     const handleNextPage = () => {
@@ -82,14 +95,12 @@ function ProductManagement({ setActiveView }) {
             setSelectedIds(products.map((p) => p.id));
         }
     };
-    
+
 
     // 페이지 바뀌면 선택초기화
     useEffect(()=>{
         setSelectedIds([]);
     }, [page]);
-
-
 
 
     // CRUD 기능 플레이스홀더
@@ -102,25 +113,26 @@ function ProductManagement({ setActiveView }) {
 
     };
 
-const handleDelete = async (productId) => {
+    const handleDelete = async (productId) => {
 
- if (!window.confirm('정말 삭제하시겠습니까?')) 
-    return;
+    if (!window.confirm('정말 삭제하시겠습니까?')) 
+        return;
 
-  const del = products;
-  setProducts((prev) => prev.filter((p) => !selectedIds.includes(p.id)));
+    const del = products;
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
 
-  try {
-    await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
-      withCredentials: true,
-    });
-    alert('상품이 삭제되었습니다.');    
-  } catch (error) {
-    console.error('삭제 중 오류:', error);
-    setProducts(del);
-    alert('상품 삭제 중 오류가 발생하였습니다.');
-  }
-};
+    try {
+        await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
+        withCredentials: true,
+        });
+        alert('상품이 삭제되었습니다.');   
+        setSelectedIds(prev => prev.filter(id => id !== productId)); 
+    } catch (error) {
+        console.error('삭제 중 오류:', error);
+        setProducts(del);
+        alert('상품 삭제 중 오류가 발생하였습니다.');
+    }
+    };
 
     const handleSelectDelete = async () => {
         if (selectedIds.length === 0 ) return ;
@@ -136,11 +148,10 @@ const handleDelete = async (productId) => {
         try{
             const result = await Promise.allSettled(
                 selectedIds.map((id)=>
-                axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`,{
-                    withCredentials:true
-                })
-            )
-            );
+                axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, null,
+                 { withCredentials: true })));
+                
+            
             const successCount = result.filter((result)=>result.status === 'fulfilled').length ;
             const failCount = result.length - successCount;
 
@@ -170,7 +181,38 @@ const handleDelete = async (productId) => {
             alert('선택 삭제 중 오류가 발생했습니다');
         }
     };
-    
+
+        const handleToggleStatus = async (id, currentStatus) => {
+        const nextStatus = currentStatus === "SELLING" ? "STOPPED" : "SELLING";
+
+        const snapshot = [...products];
+        setProducts(prev =>
+            prev.map(p =>
+            p.id === id ? { ...p, status: nextStatus } : p
+            )
+        );
+
+            try {
+                const { data } = await axios.post(
+                `${API_BASE_URL}/product/status/${id}`,
+                null,
+                {
+                    params: { status: nextStatus },   
+                    withCredentials: true
+                }
+                );
+
+                // 서버가 enum(문자열)로 돌려주니, 응답값으로 최종 동기화(선택)
+                setProducts(prev => prev.map(p => p.id === id ? { ...p, status: data } : p));
+            } catch (err) {
+                // 롤백 + 에러 안내
+                setProducts(snapshot);
+                const msg = err?.response?.data || '상태 변경 실패';
+                alert(typeof msg === 'string' ? msg : '상태 변경 실패');
+            }
+            };
+
+                
     //페이지 렌더링 용 함수
     const renderTable = () => {
         if (isLoading) {
@@ -201,69 +243,92 @@ const handleDelete = async (productId) => {
                             <th>카테고리</th>
                             <th>가격</th>
                             <th>재고</th>
+                            <th>상태</th>
                             <th>변경</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {products.length === 0 ? (
-                            <tr>
-                                <td colSpan="7" className={styles.emptyCell}>
-                                    상품이 없습니다. '신규 상품 추가' 버튼을 눌러 상품을 등록해주세요.
-                                </td>
-                            </tr>
-                        ) : (
-                            products.map((product) => (
-                                <tr key={product.id} onClick={(e)=>{
-                                    if(e.target.closest('button') || e.target.tagName === 'INPUT') return;
-                                    handleSelect(product.id);
-                                }} style={{ cursor:'pointer'}}>
-                                    <td>
-                                        <input 
-                                            type="checkbox"
-                                            checked={selectedIds.includes(product.id)}
-                                            onChange={()=> handleSelect(product.id)}
-                                            aria-label={`${product.name} 선택`}
-                                        />
-                                        </td>
+                                    <tbody>
+                    {products.length === 0 ? (
+                        <tr>
+                        <td colSpan="8" className={styles.emptyCell}>
+                            상품이 없습니다. '신규 상품 추가' 버튼을 눌러 상품을 등록해주세요.
+                        </td>
+                        </tr>
+                    ) : (
+                        products.map((product) => (
+                       
+                        <tr
+                        key={product.id}
+                        className={product.status === 'STOPPED' ? styles.rowStopped : undefined}
+                        onClick={(e) => {
+                            if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
+                            handleSelect(product.id);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                        >
+                        <td>
+                            <input
+                            type="checkbox"
+                            checked={selectedIds.includes(product.id)}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                handleSelect(product.id);
+                            }}
+                            aria-label={`${product.name} 선택`}
+                            />
+                        </td>
 
-                                        <td>
-                                        <img
-                                            // 백엔드 이미지 경로
-                                            src={`${API_BASE_URL}/uploads/products/${product.imageUrl}`}
-                                            alt={product.name}
-                                            className={styles.productThumbnail}
-                                        />
-                                        
-                                    </td>
-                                    <td>{product.name}</td>
-                                    <td>{product.category}</td>
-                                    <td>{product.price.toLocaleString('ko-KR')}원</td>
-                                    <td>{product.stock}</td>
-                                    <td>
-                                        <div className={styles.actionButtons}>
-                                            <button
-                                                className={`${styles.actionButton} ${styles.editButton}`}
-                                                onClick={() => handleEdit(product.id)}
-                                            >
-                                                <Edit size={16} />
-                                            </button>
-                                            <button
-                                                className={`${styles.actionButton} ${styles.deleteButton}`}
-                                                onClick={() => handleDelete(product.id)}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                        <td>
+                            <img
+                            src={`${API_BASE_URL}/uploads/products/${product.imageUrl}`}
+                            alt={product.name}
+                            className={styles.productThumbnail}
+                            />
+                        </td>
 
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
+                        <td>{product.name}</td>
+                        <td>{product.category}</td>
+                        <td>{typeof product.price === 'number' ? product.price.toLocaleString('ko-KR') : product.price}원</td>
+                        <td>{product.stock}</td>
+
+                         {/* 상태 표시 열 */}
+                        <td>{renderStatusBadge(product.status)}</td>
+
+                        <td>
+                        <div className={styles.actionButtons}>
+                            <button
+                            className={`${styles.actionButton} ${styles.editButton}`}
+                            onClick={(e) => { e.stopPropagation(); handleEdit(product.id); }}
+                            >
+                            <Edit size={16} />
+                            </button>
+
+                            <button
+                            className={styles.toggleStatusButton}
+                            disabled={product.status === 'PENDING'}
+                            onClick={(e) => { e.stopPropagation(); handleToggleStatus(product.id, product.status); }}
+                            >
+                            {product.status === 'SELLING' ? '판매중지' : '판매시작'}
+                            </button>
+
+                            <button
+                            className={`${styles.actionButton} ${styles.deleteButton}`}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
+                            >
+                            <Trash2 size={16} />
+                            </button>
+                        </div>
+                        </td>
+
+                        </tr>
+                                    ))
+                                )}
+                                </tbody>
+
+                            </table>
+                        </div>
+                    );
+                };
 
 
     return (

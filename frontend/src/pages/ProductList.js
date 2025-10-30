@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
 
 
+
 function Productlist() {
     const containerRef = useRef();
     const [extended, setExtended] = useState([]);
@@ -14,6 +15,13 @@ function Productlist() {
     const [visibleCount, setVisibleCount] = useState(6);
     const navigate = useNavigate();
     const { user } = useAuth();
+
+    const formatPrice = (price) => {
+    const n = typeof price === 'number' ? price : Number(price);
+    if (Number.isFinite(n)) return n.toLocaleString();
+    return '0';
+    };
+
 
 
 
@@ -36,12 +44,16 @@ function Productlist() {
                 console.error('데이터 가져오기 실패:', error);
             })
 
-
         axios.get(url2)
             .then((response) => {
-                console.log("응답받은 데이터2 :");
-                console.log(response.data.content);
-                setProduct(response.data.content);
+             const list = (response.data.content ?? []).map(p => {
+                // 안전 가드: status 미존재/null → SELLING으로 보정
+                const status = p?.status ?? (p?.selling === true ? 'SELLING' : (p?.selling === false ? 'STOPPED' : 'SELLING'));
+                return { ...p, status };
+            });
+            // 고객 노출용: 판매중만
+            const onlySelling = list.filter(p => p.status === 'SELLING');
+            setProduct(onlySelling);
             })
             .catch(error => {
                 console.error('데이터 가져오기 실패:', error);
@@ -294,9 +306,9 @@ function Productlist() {
                 }}
                 className="no-scrollbar"
             >
-                {extended.map((item) => (
+                {extended.map((item, idx) => (
                     <div
-                        key={item.id}
+                        key={`${item.id}-${idx}`}
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
@@ -327,7 +339,7 @@ function Productlist() {
                                             maxHeight: '120px',
                                         }}
                                     >
-                                        <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>{item.price.toLocaleString()}원</span><br />
+                                        
                                         <Button
                                             onClick={(e) => {
                                                 if (!user) {
@@ -502,9 +514,9 @@ function Productlist() {
                             {item.name}
                         </Card.Title>
                         <Card.Text style={{ margin: "10px", textAlign: "center" }}>
-                            <span style={{ fontSize: "1.3em", fontWeight: "bold" }}>
-                                {item.price?.toLocaleString() ?? "38,000"}원
-                            </span>
+                            
+                                {formatPrice(item.price)}원
+                            
                             <br />
                             <div
                                 style={{

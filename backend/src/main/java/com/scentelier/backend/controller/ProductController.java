@@ -1,5 +1,6 @@
 package com.scentelier.backend.controller;
 
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ public class ProductController {
 
     //상품 상세
 
-    @GetMapping("detail/{id}")
+    @GetMapping("/detail/{id}")
     public ResponseEntity<Products> detail(@PathVariable Long id) {
         Products product = this.productService.ProductById(id);
 
@@ -84,6 +85,31 @@ public class ProductController {
             return ResponseEntity.ok(product);
         }
     }
+
+
+    @PostMapping("/status/{id}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+        try {
+            Products updated = productService.updateStatus(id, status);
+            return ResponseEntity.ok(updated.getStatus());
+        } catch (RuntimeException e) {
+            // 판매중지 차단 메시지가 여기로 옴
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/status/{id}")
+    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+        return updateStatus(id, status);
+    }
+//        @PostMapping("/status/{id}")
+//        public ResponseEntity<ProductStatus> updateStatus(
+//                @PathVariable Long id,
+//                @RequestParam ProductStatus status) {
+//            Products updated = productService.updateStatus(id, status);
+//            return ResponseEntity.ok(updated.getStatus());
+//            }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
@@ -104,4 +130,7 @@ public class ProductController {
         }
     }
 
-    }
+
+
+
+}

@@ -2,8 +2,6 @@ USE scentelier;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
-USE scentelier;
-
 show tables;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -16,9 +14,6 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- DROP TABLE IF EXISTS cart;
 
 SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS cart_item;
-DROP TABLE IF EXISTS cart;
 
 -- users / products / custom_perfume 는 건들지 않음 (이미 있다고 가정)
 
@@ -56,6 +51,17 @@ CREATE TABLE cart_item (
     FOREIGN KEY (custom_id)  REFERENCES custom_perfume(custom_id)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE products
+  MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'SELLING';
+  
+  ALTER TABLE products
+ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'SELLING';
+
+-- 만약 기존 데이터에 null이 있으면:
+UPDATE products SET status = 'SELLING' WHERE status IS NULL;
+
+UPDATE products SET status = 'SELLING' WHERE status IS NULL;
 
 show tables;
 SELECT * from products;
