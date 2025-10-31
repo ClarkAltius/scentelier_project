@@ -61,12 +61,17 @@ const MyPage = () => {
         },
       });
 
-      const result = await response.text(); // 백엔드에서 받은 문자열
-
+      //const result = await response.text(); // 백엔드에서 받은 문자열
+      const result = await response.json();
       if (response.ok) {
-
-        setUserInfo({ ...updatedInfo });
-        alert(result) //"회원 정보가 성공적으로 업데이트되었습니다."
+        setUserInfo({
+          name: result.username,
+          email: result.email,
+          phone: result.phone,
+          address: result.address,
+        });
+        //  setUserInfo({ ...updatedInfo });
+        alert("회원 정보가 성공적으로 업데이트되었습니다.")
       } else {
         alert(`업데이트 실패: ${result}`);
       }

@@ -204,8 +204,8 @@ const Findpass = () => {
             <h2 style={styles.title}>비밀번호 찾기</h2>
             <InputField
               label="이름"
-              id="name"
-              value={inputs.name}
+              id="username"
+              value={inputs.username}
               onChange={handleChange}
             />
             <InputField
@@ -216,9 +216,9 @@ const Findpass = () => {
               onChange={handleChange}
             />
             <InputField
-              label="주소"
-              id="address"
-              value={inputs.address}
+              label="전화번호"
+              id="phone"
+              value={inputs.phone}
               onChange={handleChange}
             />
             <div style={styles.message}>{message}</div>
