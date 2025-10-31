@@ -8,9 +8,12 @@ import com.scentelier.backend.service.IngredientService;
 import com.scentelier.backend.service.InquiryService;
 import com.scentelier.backend.service.OrderService;
 import com.scentelier.backend.service.ProductService;
+import com.scentelier.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -28,13 +31,15 @@ public class AdminController {
     private final ProductService productService;
     private final OrderService orderService;
     private final InquiryService inquiryService;
+    private final PurchaseOrderService purchaseOrderService;
 
     @Autowired
-    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService) {
+    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService, PurchaseOrderService purchaseOrderService) {
         this.productService = productService;
         this.ingredientService = ingredientService;
         this.orderService = orderService;
         this.inquiryService = inquiryService;
+        this.purchaseOrderService = purchaseOrderService;
     }
 
 
@@ -139,6 +144,31 @@ public class AdminController {
             @Valid @RequestBody StockUpdateDto dto){
         IngredientStockDto updateIngredient = ingredientService.updateStock(itemId, dto.getAdjustment());
         return ResponseEntity.ok(updateIngredient);
+    }
+
+    @PostMapping("/generate-purchase-order")
+    public ResponseEntity<byte[]> generatePurchaseOrder(
+            @Valid @RequestBody PurchaseOrderRequestDto requestDto) {
+
+        try {
+            byte[] excelBytes = purchaseOrderService.generatePurchaseOrderExcel(requestDto);
+
+            // Set HTTP headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            // The filename for the download
+            headers.setContentDispositionFormData("attachment", requestDto.getPoNumber() + ".xlsx");
+            headers.setContentLength(excelBytes.length);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(excelBytes);
+
+        } catch (Exception e) {
+            // error log
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
 
