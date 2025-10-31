@@ -9,14 +9,12 @@ import { AuthProvider } from './component/AuthContext.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
     <BrowserRouter>
       {/**전체를 AuthProvider로 wrap 하면 모든 요소에 authentication 적용 */}
       <AuthProvider>
         <App />
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

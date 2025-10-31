@@ -89,12 +89,25 @@ public class ReviewService {
     // DTO 변환
     private ReviewDto convertToDto(Orders order) {
         List<ReviewOrderProductDto> items = order.getOrderProducts().stream()
-                .map(op -> new ReviewOrderProductDto(
-                        op.getProducts().getId(),
-                        op.getProducts().getName(),
-                        op.getQuantity(),
-                        op.getProducts().getPrice()
-                ))
+                .map(op -> {
+                    if (op.getProducts() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getProducts().getId(),
+                                op.getProducts().getName(),
+                                op.getQuantity(),
+                                op.getProducts().getPrice()
+                        );
+                    } else if (op.getCustomPerfume() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getCustomPerfume().getId(),
+                                op.getCustomPerfume().getName(),
+                                op.getQuantity(),
+                                op.getPrice()
+                        );
+                    } else {
+                        throw new IllegalStateException("OrderProduct에 상품 정보가 없습니다. (order_product_id: " + op.getId() + ")");
+                    }
+                })
                 .collect(Collectors.toList());
 
         return new ReviewDto(
@@ -116,12 +129,25 @@ public class ReviewService {
     private ReviewDto convertToDto(Reviews review) {
         Orders order = review.getOrder();
         List<ReviewOrderProductDto> items = order.getOrderProducts().stream()
-                .map(op -> new ReviewOrderProductDto(
-                        op.getProducts().getId(),
-                        op.getProducts().getName(),
-                        op.getQuantity(),
-                        op.getProducts().getPrice()
-                ))
+                .map(op -> {
+                    if (op.getProducts() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getProducts().getId(),
+                                op.getProducts().getName(),
+                                op.getQuantity(),
+                                op.getProducts().getPrice()
+                        );
+                    } else if (op.getCustomPerfume() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getCustomPerfume().getId(),
+                                op.getCustomPerfume().getName(),
+                                op.getQuantity(),
+                                op.getPrice()
+                        );
+                    } else {
+                        throw new IllegalStateException("OrderProduct에 상품 정보가 없습니다. (order_product_id: " + op.getId() + ")");
+                    }
+                })
                 .collect(Collectors.toList());
 
         return new ReviewDto(
@@ -143,12 +169,25 @@ public class ReviewService {
     private ReviewDto convertToBlockDto(Reviews review) {
         Orders order = review.getOrder();
         List<ReviewOrderProductDto> items = order.getOrderProducts().stream()
-                .map(op -> new ReviewOrderProductDto(
-                        op.getProducts().getId(),
-                        op.getProducts().getName(),
-                        op.getQuantity(),
-                        op.getProducts().getPrice()
-                ))
+                .map(op -> {
+                    if (op.getProducts() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getProducts().getId(),
+                                op.getProducts().getName(),
+                                op.getQuantity(),
+                                op.getProducts().getPrice()
+                        );
+                    } else if (op.getCustomPerfume() != null) {
+                        return new ReviewOrderProductDto(
+                                op.getCustomPerfume().getId(),
+                                op.getCustomPerfume().getName(),
+                                op.getQuantity(),
+                                op.getPrice()
+                        );
+                    } else {
+                        throw new IllegalStateException("OrderProduct에 상품 정보가 없습니다. (order_product_id: " + op.getId() + ")");
+                    }
+                })
                 .collect(Collectors.toList());
 
         return new ReviewDto(
