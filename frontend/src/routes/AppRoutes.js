@@ -46,6 +46,7 @@ function AppRoutes() {
             <Route path='/findpass' element={<Findpass />} />
             <Route path='/myinquiry' element={<MyInquiry />} />
             <Route path='/inquirydetail' element={<InquiryDetail />} />
+            <Route path='/inquiry/:id' element={<InquiryDetail />} />
             <Route path='/reviews/list' element={<ReviewBoardPage />} />
             <Route path='/signup' element={<SignUp />} />
 

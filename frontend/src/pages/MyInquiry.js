@@ -72,7 +72,7 @@ function MyInquiry() {
                             <strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}
                         </p>
                         <p>
-                            <strong>상태:</strong> {inquiry.status === "WAITING" ? "답변 대기 중" : "답변 완료"}
+                            <strong>상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
                         </p>
                     </div>
                 ))
