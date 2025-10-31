@@ -83,10 +83,10 @@ spring.datasource.password=your-mysql-password
 
 cmd 창을 열어 frontend 폴더로 찾아가주세요. 
 
-다음 커맨드를 실행해주세요
+필요한 패키지 설치를 위해 다음 커맨드를 실행해주세요. package-lock.json 파일에 있는 걸걸 모두 찾아서 clean install을 진행합니다.  
 
 ```
-npm install
+npm ci
 ```
 ```
 npm start
