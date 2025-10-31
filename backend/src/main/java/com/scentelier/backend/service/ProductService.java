@@ -30,6 +30,9 @@ import org.springframework.context.event.EventListener;
 @Service
 public class ProductService {
 
+    private static final List<OrderStatus> BLOCK_STATUSES = List.of(
+            OrderStatus.CREATED, OrderStatus.PENDING, OrderStatus.PROCESSING, OrderStatus.PAYMENT_PENDING
+    );
     private static final List<OrderStatus> PENDING_STATUSES = List.of(
             OrderStatus.CREATED,
             OrderStatus.PENDING,
@@ -37,7 +40,7 @@ public class ProductService {
             OrderStatus.PAYMENT_PENDING,
             OrderStatus.PAID,        // 결제 완료도 아직 배송 전이면 진행 중으로 볼 거면 유지
             OrderStatus.SHIPPED    // 배송 중도 진행 중으로 표시
-            );
+    );
 
     @Autowired
     private ProductRepository productRepository;
@@ -63,14 +66,18 @@ public class ProductService {
     }
 
     //상품 리스트 pageable로 전체 가져오기 서비스
+    public Page<Products> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable); //삭제 x 인 상품만
+    }
     public List<Products> findAll() {
-        return productRepository.findAllByIsDeletedFalse(); // 삭제되지 않은 상품 전체
+        return productRepository.findAllByIsDeletedFalse();
     }
 
     public Products ProductById(Long id) {
         Optional<Products> product = this.productRepository.findById(id);
         return product.orElse(null);
     }
+
 
     // 상품 재고 가져오기 서비스
     public List<ProductStockDto> getProductStock() {
@@ -145,39 +152,8 @@ public class ProductService {
             }
         }
     }
-//    @Transactional
-//    public Products updateStatus(Long id, ProductStatus status) {
-//        if (status == null) {
-//            throw new IllegalArgumentException("status 값이 비어 있습니다.");
-//        }
-//        Products p = productRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("상품 없음: " + id));
-//
-//        // 상태가 동일하면 아무 것도 안 함
-//        if (p.getStatus() == status) {
-//            return p;
-//        }
 
-        // SELLING → STOPPED 로 내릴 때만 차단 조건 검사
-//        if (status == ProductStatus.STOPPED && p.getStatus() == ProductStatus.SELLING) {
-//            long inCarts = cartItemRepository.countActiveByProductId(id);          // 장바구니 담긴 건수
-//            long inPending = orderRepository.countPendingOrdersByProductId(id);    // 진행 중 주문 건수
-//
-//            if (inCarts > 0 || inPending > 0) {
-//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
-//                boolean first = true;
-//                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
-//                if (inPending > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPending).append("건"); }
-//                sb.append("이 존재합니다.");
-//                throw new RuntimeException(sb.toString());   // 커스텀 예외 안 쓰는 최소 변경 버전
-//            }
-//        }
 
-        // 검사 통과했거나, STOPPED → SELLING/기타 변경은 바로 반영
-//        p.setStatus(status);
-//        return productRepository.save(p);
-//    }
-    
     @Transactional
     public ProductStockDto updateStock(Long itemId, @NotNull(message = "Stock value cannot be null.") Integer newStock) {
 
@@ -194,6 +170,61 @@ public class ProductService {
         // DTO 반환
         return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock());
     }
+
+    public Page<Products> findAllSelling(Pageable pageable) {
+        return productRepository.findAllByIsDeleted(false, pageable);
+    }
+    // 관리자 목록: 모두
+    public Page<Products> findAllAdmin(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
+
+    // --- 상태 계산 (노출용) ---
+    public String computeStatus(Products p) {
+        if (p.isDeleted()) return "STOPPED";
+        long inCarts  = cartItemRepository.countActiveByProductId(p.getId());
+        long inOrders = orderRepository.countPendingOrdersByProductId(p.getId(), BLOCK_STATUSES);
+        return (inCarts > 0 || inOrders > 0) ? "PENDING" : "SELLING";
+    }
+
+    // --- 판매재개(복구) ---
+    @Transactional
+    public Products restoreDeleted(Long id) {
+        Products p = productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("상품 없음: " + id));
+        p.setDeleted(false);
+        p.setDeletedAt(null);
+        return productRepository.save(p);
+    }
+
+    // --- 관리자 토글 (STOPPED<->SELLING) ---
+    @Transactional
+    public Products updateSellingFlag(Long id, boolean stop) {
+        Products p = productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("상품 없음: " + id));
+        if (stop) {
+            // SELLING -> STOPPED: 장바구니/진행주문 있으면 차단
+            long cartCnt  = cartItemRepository.countActiveByProductId(id);
+            long orderCnt = orderRepository.countPendingOrdersByProductId(id, BLOCK_STATUSES);
+            if (cartCnt > 0 || orderCnt > 0) {
+                StringBuilder sb = new StringBuilder("판매중지 불가: ");
+                boolean first = true;
+                if (cartCnt > 0)   { sb.append("장바구니 ").append(cartCnt).append("건"); first = false; }
+                if (orderCnt > 0)  { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(orderCnt).append("건"); }
+                sb.append("이 존재합니다.");
+                throw new IllegalStateException(sb.toString()); // 컨트롤러에서 409로 응답
+            }
+            p.setDeleted(true);
+            p.setDeletedAt(LocalDate.now());
+        } else {
+            // STOPPED -> SELLING
+            p.setDeleted(false);
+            p.setDeletedAt(null);
+        }
+        return productRepository.save(p);
+    }
+
 }
+
 
 

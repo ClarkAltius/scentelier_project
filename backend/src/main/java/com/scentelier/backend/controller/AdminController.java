@@ -1,5 +1,6 @@
 package com.scentelier.backend.controller;
 
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.dto.*;
 import com.scentelier.backend.entity.Inquiry;
 import com.scentelier.backend.entity.Orders;
@@ -11,6 +12,7 @@ import com.scentelier.backend.service.ProductService;
 import com.scentelier.backend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,7 +22,10 @@ import jakarta.validation.Valid;
 import java.security.Principal;
 
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -170,5 +175,88 @@ public class AdminController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/products")
+    public ResponseEntity<Page<Map<String, Object>>> getAdminProducts(Pageable pageable) {
+        Page<Products> page = productService.findAllAdmin(pageable);
+        List<Map<String, Object>> content = page.getContent().stream().map(p -> {
+            Map<String,Object> m = new LinkedHashMap<>();
+            m.put("id", p.getId());
+            m.put("name", p.getName());
+            m.put("description", p.getDescription());
+            m.put("price", p.getPrice());
+            m.put("stock", p.getStock());
+            m.put("category", p.getCategory());
+            m.put("imageUrl", p.getImageUrl());
+            m.put("season", p.getSeason());
+            m.put("keyword", p.getKeyword());
+            m.put("createdAt", p.getCreatedAt());
+            m.put("isDeleted", p.isDeleted());
+            m.put("deletedAt", p.getDeletedAt());
+            m.put("status", productService.computeStatus(p)); // SELLING/PENDING/STOPPED
+            return m;
+        }).toList();
+        return ResponseEntity.ok(new PageImpl<>(content, page.getPageable(), page.getTotalElements()));
+    }
+
+    // 관리자 상세
+    @GetMapping("/products/{id}")
+    public ResponseEntity<?> getAdminProductDetail(@PathVariable Long id) {
+        Products p = productService.ProductById(id);
+        if (p == null) return ResponseEntity.status(404).body("상품 없음: " + id);
+        Map<String,Object> m = new LinkedHashMap<>();
+        m.put("id", p.getId());
+        m.put("name", p.getName());
+        m.put("description", p.getDescription());
+        m.put("price", p.getPrice());
+        m.put("stock", p.getStock());
+        m.put("category", p.getCategory());
+        m.put("imageUrl", p.getImageUrl());
+        m.put("season", p.getSeason());
+        m.put("keyword", p.getKeyword());
+        m.put("createdAt", p.getCreatedAt());
+        m.put("isDeleted", p.isDeleted());
+        m.put("deletedAt", p.getDeletedAt());
+        m.put("status", productService.computeStatus(p));
+        return ResponseEntity.ok(m);
+    }
+
+    // 관리자: 판매중지/판매시작 토글 (status=STOPPED|SELLING)
+    @PatchMapping("/products/{id}/status")
+    public ResponseEntity<?> adminUpdateProductStatus(@PathVariable Long id,
+                                                      @RequestParam("status") String statusText) {
+        try {
+            boolean stop;
+            if ("STOPPED".equalsIgnoreCase(statusText)) stop = true;
+            else if ("SELLING".equalsIgnoreCase(statusText)) stop = false;
+            else return ResponseEntity.badRequest().body("허용되지 않는 status 값입니다.");
+
+            Products updated = productService.updateSellingFlag(id, stop);
+            String computed = productService.computeStatus(updated);
+            return ResponseEntity.ok(Map.of("status", computed));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(e.getMessage()); // 장바구니/진행주문 있을 때
+        }
+    }
+
+    // 관리자: 판매재개(복구) 별도 엔드포인트(선호 시)
+    @PatchMapping("/products/{id}/restore")
+    public ResponseEntity<?> adminRestoreProduct(@PathVariable Long id) {
+        try {
+            Products restored = productService.restoreDeleted(id);
+            return ResponseEntity.ok(Map.of(
+                    "id", restored.getId(),
+                    "isDeleted", restored.isDeleted(),
+                    "status", productService.computeStatus(restored)
+            ));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("복구 중 오류: " + e.getMessage());
+        }
+    }
 }
+
 

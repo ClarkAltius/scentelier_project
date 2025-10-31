@@ -51,16 +51,15 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     int updateOrderStatus(@Param("orderId") Long orderId, @Param("status") OrderStatus status);
 
     @Query("""
-        select count(op)
-        from OrderProduct op
-          join op.orders o
-        where op.products.id = :productId
-          and o.status in (:statuses)
-    """)
-    long countPendingOrdersByProductId(
-            @Param("productId") Long productId,
-            @Param("statuses") List<OrderStatus> statuses
-    );
+           select count(op)
+           from OrderProduct op
+           join op.orders o
+           where op.products.id = :productId
+             and o.status in :statuses
+           """)
+    long countPendingOrdersByProductId(@Param("productId") Long productId,
+                                       @Param("statuses") List<OrderStatus> statuses);
+
     //  총 주문량 반환 쿼리, 취소 안된 주문만
     @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.status != 'CANCELLED'")
     long sumTotalRevenue();

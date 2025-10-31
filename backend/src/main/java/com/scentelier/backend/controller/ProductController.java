@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -65,7 +67,6 @@ public class ProductController {
     }
 
     //상품 목록 보기 API
-
     @GetMapping("/list")
     public ResponseEntity<List
             <Products>> getProductList() {
@@ -73,8 +74,8 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    //상품 상세
 
+    //상품 상세
     @GetMapping("/detail/{id}")
     public ResponseEntity<Products> detail(@PathVariable Long id) {
         Products product = this.productService.ProductById(id);
@@ -87,62 +88,47 @@ public class ProductController {
         }
     }
 
-
-//    @PostMapping("/status/{id}")
-//    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<String> delete(@PathVariable Long id) {
+//        log.info("[SOFTDELETE] /product/{} reached", id);
 //        try {
-//            Products updated = productService.updateStatus(id, status);
-//            return ResponseEntity.ok(updated.getStatus());
-//        } catch (RuntimeException e) {
-//            // 판매중지 차단 메시지가 여기로 옴
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-//        }
-//    }
-
-//    @PostMapping("/status/{id}")
-//    public ResponseEntity<?> toggleStatus(@PathVariable Long id) {
-//        try {
-//            productService.toggleStatus(id);
-//            return ResponseEntity.ok("상태가 변경되었습니다!");
-//        } catch (RuntimeException e) {
-//            // 판매중지 차단 상황 등
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409
-//        }
-//    }
-
-//    @PatchMapping("/status/{id}")
-//    public ResponseEntity<?> patchStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
-//        return updateStatus(id, status);
-//    }
-//        @PostMapping("/status/{id}")
-//        public ResponseEntity<ProductStatus> updateStatus(
-//                @PathVariable Long id,
-//                @RequestParam ProductStatus status) {
-//            Products updated = productService.updateStatus(id, status);
-//            return ResponseEntity.ok(updated.getStatus());
+//            boolean isDeleted = this.productService.softDelete(id);
+//
+//            if (isDeleted) {
+//                return ResponseEntity.ok(id + "상품이 삭제 되었습니다.");
+//            } else {
+//                return ResponseEntity.badRequest().body(id + "상품이 존재하지 않습니다.");
 //            }
-
+//        } catch (org.springframework.dao.DataIntegrityViolationException err) {
+//            String message = "해당 상품은 장바구니에 포함되어 있거나, \n 이미 매출이 발생한 상품입니다.";
+//            return ResponseEntity.badRequest().body(message);
+//        } catch (Exception err) {
+//            return ResponseEntity.internalServerError().body("오류 발생: " + err.getMessage());
+//        }
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         log.info("[SOFTDELETE] /product/{} reached", id);
         try {
-            boolean isDeleted = this.productService.softDelete(id);
-
-            if (isDeleted) {
-                return ResponseEntity.ok(id + "상품이 삭제 되었습니다.");
-            } else {
-                return ResponseEntity.badRequest().body(id + "상품이 존재하지 않습니다.");
-            }
-        } catch (org.springframework.dao.DataIntegrityViolationException err) {
-            String message = "해당 상품은 장바구니에 포함되어 있거나, \n 이미 매출이 발생한 상품입니다.";
-            return ResponseEntity.badRequest().body(message);
-        } catch (Exception err) {
-            return ResponseEntity.internalServerError().body("오류 발생: " + err.getMessage());
+            boolean ok = productService.softDelete(id);
+            return ok ? ResponseEntity.ok(id + "상품이 삭제(판매중지) 되었습니다.")
+                    : ResponseEntity.badRequest().body(id + "상품이 존재하지 않습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("오류 발생: " + e.getMessage());
         }
     }
 
-
-
-
+    // 판매재개(복구)
+    @PatchMapping("/restore/{id}")
+    public ResponseEntity<?> restore(@PathVariable Long id) {
+        try {
+            Products restored = productService.restoreDeleted(id);
+            return ResponseEntity.ok(restored);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("복구 중 오류: " + e.getMessage());
+        }
+    }
 }

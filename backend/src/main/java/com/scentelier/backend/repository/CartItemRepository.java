@@ -7,13 +7,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface CartItemRepository extends JpaRepository<CartItems, Long> {
 
-    @Query(value = """
-        SELECT COUNT(*)
-        FROM cart_item ci
-        WHERE ci.product_id = :productId
-          AND ci.quantity > 0
-          AND ci.is_deleted = 0
-    """, nativeQuery = true)
+    @Query("""
+           select count(ci)
+           from CartItems ci
+           where ci.product.id = :productId
+           """)
     long countActiveByProductId(@Param("productId") Long productId);
 }
 
