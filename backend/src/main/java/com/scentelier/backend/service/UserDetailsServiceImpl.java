@@ -32,6 +32,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Users user = usersOptional.get();
 
+        // 탈퇴한 사용자면 로그인 불가
+        if (user.isDeleted()) {
+            throw new UsernameNotFoundException("탈퇴된 사용자입니다.");
+        }
+
         //역할군 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));

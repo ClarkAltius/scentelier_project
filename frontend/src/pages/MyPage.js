@@ -19,34 +19,101 @@ const MyPage = () => {
     setUserInfo({
       name: user.username || "",
       email: user.email || "",
+      phone: user.phone || "",
       address: user.address || "",
     });
   }, [user, navigate]);
 
-  const handleEdit = () => {
+
+  //수정코드 시작
+  const handleEdit = async () => {
     const newName = prompt("이름을 입력하세요", userInfo.name);
-    const newEmail = prompt("이메일을 입력하세요", userInfo.email);
+    //const newEmail = prompt("이메일을 입력하세요", userInfo.email);
+    const newPhone = prompt("전화번호를 입력하세요", userInfo.phone);
     const newAddress = prompt("주소를 입력하세요", userInfo.address);
 
-    setUserInfo((prev) => ({
-      name: newName !== null ? newName : prev.name,
-      email: newEmail !== null ? newEmail : prev.email,
-      address: newAddress !== null ? newAddress : prev.address,
-    }));
+    // 사용자가 취소하면 아무 것도 안 함
+    if (
+      newName === null &&
+      //newEmail === null &&
+      newPhone === null &&
+      newAddress === null
+    ) return;
+
+
+    // 업데이트할 정보 준비
+    const updatedInfo = {
+      name: newName !== null ? newName : userInfo.name,
+      email: userInfo.email, //이메일 변경불가 
+      //newEmail !== null ? newEmail : userInfo.email,
+      phone: newPhone !== null ? newPhone : userInfo.phone,
+      address: newAddress !== null ? newAddress : userInfo.address,
+    };
+
+    try {
+      // URLSearchParams를 사용해 쿼리스트링으로 변환
+      const params = new URLSearchParams(updatedInfo).toString();
+      const response = await fetch(`http://localhost:9000/user/update?${params}`, {
+        method: "PUT",
+        credentials: "include", // 쿠키 전송
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      const result = await response.text(); // 백엔드에서 받은 문자열
+
+      if (response.ok) {
+
+        setUserInfo({ ...updatedInfo });
+        alert(result) //"회원 정보가 성공적으로 업데이트되었습니다."
+      } else {
+        alert(`업데이트 실패: ${result}`);
+      }
+    } catch (error) {
+      console.error("업데이트 요청 실패:", error);
+      alert("서버 오류가 발생했습니다.");
+    }
   };
+
+  //수정 코드 끝
+
+
 
   const handleMyInquiry = () => {
     navigate("/myinquiry"); // 문의사항 페이지로 이동
   };
 
-  const handleDelete = () => {
+  //탈퇴코드 시작
+  const handleDelete = async () => {
     const confirmed = window.confirm("정말 탈퇴하시겠습니까?");
-    if (confirmed) {
-      alert("탈퇴 완료되었습니다.");
-      setUserInfo({ name: "", email: "", address: "" });
-      // 실제 API 호출 후 로그아웃 처리 필요
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:9000/user/delete?email=${encodeURIComponent(userInfo.email)}`,
+        {
+          method: "DELETE",
+          credentials: "include", // 쿠키 전송
+        }
+      );
+
+      const text = await response.text();
+      if (response.ok) {
+        alert(text);
+        setUserInfo({ name: "", email: "", address: "", phone: "" });
+        localStorage.removeItem("user"); // 혹시 로컬 스토리지에 user가 저장되어 있다면 삭제
+        sessionStorage.clear();
+        navigate("/login");
+      } else {
+        alert(`오류: ${text}`);
+      }
+    } catch (error) {
+      console.error("탈퇴 요청 실패:", error);
+      alert("서버 오류가 발생했습니다.");
     }
   };
+  //탈퇴 코드 끝
 
   // 아직 사용자 정보가 로드되지 않았다면 로딩 표시
   if (!userInfo) return <div>로딩 중...</div>;
@@ -58,6 +125,7 @@ const MyPage = () => {
 
         <InfoItem label="이름" value={userInfo.name} />
         <InfoItem label="이메일" value={userInfo.email} />
+        <InfoItem label="전화번호" value={userInfo.phone} />
         <InfoItem label="주소" value={userInfo.address} />
 
         <div style={styles.buttonGroup}>
