@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './InquiryDetail.module.css'; // We'll create this CSS module
+import styles from './InquiryDetail.module.css'; // The new CSS module
 import { API_BASE_URL } from '../config/config';
 import { useAuth } from './AuthContext'; // To get the current admin user info
 import { ArrowLeft, Send, Lock } from 'lucide-react';
@@ -70,14 +70,18 @@ function InquiryDetail({ setActiveView, inquiryId }) {
         setIsSubmitting(true);
         setError(null);
         try {
+            // 'newAnswer' is just the string, 'result' is the new answer object from the API
             const result = await submitInquiryAnswer(inquiryId, newAnswer);
 
-            // Add the new answer to the list
+            // --- ✅ BUG FIX APPLIED ---
+            // We must use the 'result' object returned from the API,
+            // not the 'newAnswer' string.
             const formattedAnswer = {
-                id: newAnswer.id,
-                content: newAnswer.content,
-                createdAt: newAnswer.createdAt,
-                user: { username: newAnswer.adminUsername } // 백엔드에서 돌아온 username 사용
+                id: result.id,
+                content: result.content,
+                createdAt: result.createdAt,
+                // Adjust 'result.adminUsername' to match your API response
+                user: { username: result.adminUsername || adminUser.username }
             };
 
             /// 3. 리스트에 답변 매핑
@@ -105,6 +109,8 @@ function InquiryDetail({ setActiveView, inquiryId }) {
     const handleCloseInquiry = async () => {
         if (!inquiryId) return;
 
+        // Note: window.confirm is used here as per original code.
+        // Consider replacing with a custom modal for better UX later.
         if (!window.confirm("이 문의를 'CLOSED' 상태로 변경하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
             return;
         }
@@ -143,94 +149,122 @@ function InquiryDetail({ setActiveView, inquiryId }) {
                 <ArrowLeft size={18} /> 목록으로 돌아가기
             </button>
         </div>;
-
     }
 
-    // Main render
+    // --- 🎨 NEW INTUITIVE JSX LAYOUT ---
     return (
         <div className={styles.container}>
-            <button className={styles.backButton} onClick={() => setActiveView('inquiries')}>
-                <ArrowLeft size={18} /> 목록으로 돌아가기
-            </button>
-            {/* --- 문의 마감 --- */}
-            {inquiryDetails.status !== 'CLOSED' && (
-                <button
-                    className={`${styles.closeButton} ${styles.submitButton}`}
-                    onClick={handleCloseInquiry}
-                    disabled={isSubmitting}
-                >
-                    <Lock size={16} /> 문의 마감
-                </button>
-            )};
 
-            {/* Inquiry Details Section */}
-            <div className={styles.inquirySection}>
-                <h2>문의 제목: {inquiryDetails.title}</h2>
-                <div className={styles.metaInfo}>
-                    <span><strong>작성자:</strong> {inquiryDetails.username} ({inquiryDetails.userEmail})</span>
-                    <span><strong>작성일:</strong> {new Date(inquiryDetails.createdAt).toLocaleString()}</span>
-                    <span><strong>유형:</strong> {inquiryDetails.type}</span>
-                    <span>
+            {/* --- 1. THE HEADER --- */}
+            <div className={styles.header}>
+                <button className={styles.backButton} onClick={() => setActiveView('inquiries')}>
+                    <ArrowLeft size={18} /> 목록으로 돌아가기
+                </button>
+
+                <h2 className={styles.headerTitle}>
+                    {inquiryDetails.title}
+                </h2>
+
+                {inquiryDetails.status !== 'CLOSED' && (
+                    <button
+                        className={styles.closeButton}
+                        onClick={handleCloseInquiry}
+                        disabled={isSubmitting}
+                    >
+                        <Lock size={16} /> 문의 마감
+                    </button>
+                )}
+            </div>
+
+            {/* --- MAIN CONTENT (Grid Layout) --- */}
+            <div className={styles.mainContent}>
+
+                {/* --- 2. THE INFO BOX --- */}
+                <div className={styles.infoBox}>
+                    <h3>문의 정보</h3>
+                    <div className={styles.metaInfo}>
                         <strong>상태:</strong>
                         <span className={`${styles.statusBadge} ${styles[`status${inquiryDetails.status}`]}`}>
                             {inquiryDetails.status}
                         </span>
-                    </span>
-                    {inquiryDetails.product && (
-                        <span><strong>관련 상품:</strong> {inquiryDetails.product.name} (ID: {inquiryDetails.product.id})</span>
+
+                        <strong>작성자:</strong>
+                        <span>{inquiryDetails.username} ({inquiryDetails.userEmail})</span>
+
+                        <strong>작성일:</strong>
+                        <span>{new Date(inquiryDetails.createdAt).toLocaleString()}</span>
+
+                        <strong>유형:</strong>
+                        <span>{inquiryDetails.type}</span>
+
+                        {inquiryDetails.product && (
+                            <>
+                                <strong>관련 상품:</strong>
+                                <span>{inquiryDetails.product.name} (ID: {inquiryDetails.product.id})</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* --- 3. THE CHAT THREAD --- */}
+                <div className={styles.thread}>
+
+                    {/* The Original Inquiry (styled as the first message) */}
+                    <div className={`${styles.message} ${styles.customerMessage}`}>
+                        <div className={styles.messageHeader}>
+                            <strong>{inquiryDetails.username}</strong>
+                            <span className={styles.messageDate}>{new Date(inquiryDetails.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p>{inquiryDetails.content}</p>
+                    </div>
+
+                    {/* The Answers List */}
+                    {answers.map((answer) => (
+                        <div key={answer.id} className={`${styles.message} ${styles.adminMessage}`}>
+                            <div className={styles.messageHeader}>
+                                <strong>{answer.user?.username || '관리자'} (Admin)</strong>
+                                <span className={styles.messageDate}>{new Date(answer.createdAt).toLocaleString()}</span>
+                            </div>
+                            <p>{answer.content}</p>
+                        </div>
+                    ))}
+
+                    {/* Show "No answers" only if there are none */}
+                    {answers.length === 0 && (
+                        <p className={styles.noAnswer}>아직 등록된 답변이 없습니다.</p>
+                    )}
+
+                    {/* The Answer Form (at the end of the thread) */}
+                    {inquiryDetails.status !== 'CLOSED' && (
+                        <form onSubmit={handleSubmitAnswer} className={styles.newAnswerForm}>
+                            {error && <div className={styles.errorBanner}>오류: {error}</div>}
+                            <textarea
+                                className={styles.answerTextarea}
+                                rows="6"
+                                placeholder="답변 내용을 입력하세요..."
+                                value={newAnswer}
+                                onChange={(e) => setNewAnswer(e.target.value)}
+                                disabled={isSubmitting}
+                                required
+                            />
+                            <button
+                                type="submit"
+                                className={styles.submitButton}
+                                disabled={isSubmitting || !newAnswer.trim()}
+                            >
+                                <Send size={16} /> {isSubmitting ? '등록 중...' : '답변 등록'}
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Show a message if the inquiry is closed */}
+                    {inquiryDetails.status === 'CLOSED' && (
+                        <div className={styles.closedMessage}>
+                            <Lock size={16} /> 이 문의는 마감되었습니다.
+                        </div>
                     )}
                 </div>
-                <div className={styles.contentBox}>
-                    <p>{inquiryDetails.content}</p>
-                </div>
             </div>
-
-            {/* Answers Section */}
-            <div className={styles.answersSection}>
-                <h3>답변 내역</h3>
-                {answers.length === 0 ? (
-                    <p>아직 등록된 답변이 없습니다.</p>
-                ) : (
-                    <ul className={styles.answerList}>
-                        {answers.map((answer) => (
-                            <li key={answer.id} className={styles.answerItem}>
-                                <div className={styles.answerHeader}>
-                                    <strong>{answer.user?.username || '관리자'}</strong>
-                                    <span className={styles.answerDate}>{new Date(answer.createdAt).toLocaleString()}</span>
-                                </div>
-                                <p>{answer.content}</p>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-
-            {/* New Answer Form Section */}
-            {inquiryDetails.status !== 'CLOSED' && ( // Only show form if not closed
-                <div className={styles.newAnswerSection}>
-                    <h3>답변 작성</h3>
-                    {/* Display submission errors here */}
-                    {error && <div className={styles.errorBanner}>오류: {error}</div>}
-                    <form onSubmit={handleSubmitAnswer}>
-                        <textarea
-                            className={styles.answerTextarea}
-                            rows="6"
-                            placeholder="답변 내용을 입력하세요..."
-                            value={newAnswer}
-                            onChange={(e) => setNewAnswer(e.target.value)}
-                            disabled={isSubmitting}
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className={styles.submitButton}
-                            disabled={isSubmitting || !newAnswer.trim()}
-                        >
-                            <Send size={16} /> {isSubmitting ? '등록 중...' : '답변 등록'}
-                        </button>
-                    </form>
-                </div>
-            )}
         </div>
     );
 }

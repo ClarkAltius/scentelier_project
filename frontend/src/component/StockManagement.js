@@ -73,7 +73,7 @@ function StockManagement() {
 
         const newStock = adjustmentValues[item.id];
 
-        if (newStock === undefined || newStock === '' || newStock < 0) {
+        if (newStock === undefined || newStock === '' || newStock == 0) {
             alert("발주 수량을 입력해주세요");
             return;
         }
@@ -124,7 +124,7 @@ function StockManagement() {
         // 데이터 수집 + Validation
         for (const itemId of selection) {
             const newStock = adjustmentValues[itemId];
-            if (newStock === undefined || newStock === '' || newStock < 0) {
+            if (newStock === undefined || newStock === '' || newStock == 0) {
                 alert(`ID #${itemId}에 유효한 재고 수량을 입력해주세요`);
                 return; // validation 실패시 정지
             }
@@ -219,33 +219,32 @@ function StockManagement() {
             return;
         }
 
-        // --- 1. Build the Request DTO ---
+        // --- 1. Request DTO 빌드 ---
         const today = new Date();
         const poNumber = `PO-${today.toISOString().split('T')[0]}`;
         const orderDate = today.toLocaleDateString('ko-KR');
-        // Example: 3 days from now
+        // 임시. 입고일은 주문 3일 후
         const dueDate = new Date(today.setDate(today.getDate() + 3)).toLocaleDateString('ko-KR');
-        // Example: 30 days from now
+        // 임시. 지급일은 주문 30일 후
         const payDate = new Date(today.setDate(today.getDate() + 27)).toLocaleDateString('ko-KR'); // (3 + 27 = 30)
 
         const poRequestData = {
             poNumber: poNumber,
-            supplierName: "Pefumare Co.", // TODO: Make this dynamic if needed
+            supplierName: "Pefumare Co.",
             orderDate: orderDate,
             dueDate: dueDate,
             payDate: payDate,
-            remarks: "비고란 코멘트", // TODO: Get this from a textarea
+            remarks: "비고란 코멘트", // 텍스트 입력창 도입 필요 (TODO)
             items: itemsToOrder
         };
 
-        // --- 2. Call the new backend endpoint ---
         try {
             const response = await axios.post(
                 `${API_BASE_URL}/api/admin/generate-purchase-order`,
                 poRequestData,
                 {
                     withCredentials: true,
-                    responseType: 'blob' // !! This is ESSENTIAL !!
+                    responseType: 'blob'
                 }
             );
 

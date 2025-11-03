@@ -40,7 +40,7 @@ function OrderManagement() {
             setError(null);
             try {
                 const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, { withCredentials: true });
-                console.log(response.data);
+                // console.log(response.data);
                 setOrders(response.data.content || []);
             } catch (err) {
                 console.error("Failed to fetch orders:", err);
@@ -56,41 +56,25 @@ function OrderManagement() {
 
     // === EVENT HANDLERS ===
 
-    /**
-     * handleSearchChange: Updates the search term state as the admin types.
-     * @param {React.ChangeEvent<HTMLInputElement>} event - The input change event.
-     */
+
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
-        // In a real application, you might want to debounce this input
-        // or trigger search/filter logic here or in a separate function.
     };
 
-    /**
-     * handleFilterChange: Updates the filter status state when the admin selects a filter option.
-     * @param {React.ChangeEvent<HTMLSelectElement>} event - The select change event.
-     */
+
     const handleFilterChange = (event) => {
         setFilterStatus(event.target.value);
-        // Trigger filtering logic based on the new status.
     };
 
-    /**
-     * handleViewDetails: Sets the selected order to display its details (e.g., in a modal).
-     * @param {object} order - The order object to view.
-     *
-     * TODO: Implement a modal or dedicated view to show comprehensive order details,
-     * including items, customer info, shipping address, payment details, etc.
-     */
+
     const handleViewDetails = (order) => {
-        setSelectedOrder(order);    // 1. Set the data for the order we clicked on.
-        setShowDetailsModal(true);  // 2. Set the modal visibility to 'true' (open it).
-        console.log("Viewing details for order:", order.id);
+        setSelectedOrder(order);
+        setShowDetailsModal(true);
     };
 
     const handleCloseModal = () => {
         setShowDetailsModal(false);
-        setSelectedOrder(null); // It's good practice to clear the selected order when closing.
+        setSelectedOrder(null);
     };
 
 
@@ -106,7 +90,6 @@ function OrderManagement() {
                 payload,
                 { withCredentials: true }
             );
-            // Upon response update local state
             setOrders(prevOrders =>
                 prevOrders.map(order =>
                     order.id === orderId ? { ...order, status: newStatus } : order
@@ -147,14 +130,6 @@ function OrderManagement() {
 
 
     // === DERIVED STATE & FILTERING/SEARCHING LOGIC ===
-
-    /**
-     * Filtered and Searched Orders: Computes the list of orders to display
-     * based on the current filter status and search term.
-     *
-     * TODO: Enhance filtering logic (e.g., filter by date range, customer).
-     * Improve search logic (e.g., search across multiple fields like name, email, product).
-     */
     const filteredOrders = orders.filter(order => {
         const matchesStatus = filterStatus === 'All' || order.status === filterStatus;
         const matchesSearch = searchTerm === '' ||
@@ -178,7 +153,6 @@ function OrderManagement() {
     return (
         <div className={styles.orderManagementPage}>
             {/* Header in TopBar.js */}
-            {/* Filter and Search Controls */}
             <div className={styles.controls}>
                 <div className={styles.searchBar}>
                     <Search size={18} className={styles.searchIcon} />
@@ -243,7 +217,6 @@ function OrderManagement() {
                                                 <Eye size={16} />
                                             </button>
 
-                                            {/* Example: Button to mark as 'Shipped' if 'Pending' or 'Paid' */}
                                             {(order.status === 'PENDING' || order.status === 'PAID') && (
                                                 <button
                                                     className={`${styles.actionButton} ${styles.updateButton}`}
@@ -253,7 +226,6 @@ function OrderManagement() {
                                                     <Edit size={16} /> Mark Shipped
                                                 </button>
                                             )}
-                                            {/* Example: Button to mark as 'Delivered' if 'Shipped' */}
                                             {order.status === 'SHIPPED' && (
                                                 <button
                                                     className={`${styles.actionButton} ${styles.updateButton}`}
@@ -287,20 +259,15 @@ function OrderManagement() {
                 </table>
             </div>
 
-            {/* TODO: Add Pagination controls here if the order list can be long */}
+            {/* TODO: 페이징 처리 여기에 추가 */}
 
-            {/* We render our new component here.
-                - order={selectedOrder}: Passes the currently selected order data.
-                - show={showDetailsModal}: Passes the boolean telling it to be open or closed.
-                - handleClose={handleCloseModal}: Passes the function it should call to close itself.
-            */}
             <OrderDetailsModal
                 order={selectedOrder}
                 show={showDetailsModal}
                 handleClose={handleCloseModal}
+                onCancelOrder={handleCancelOrder}
             />
-
-        </div> // This is the closing tag for <div className={styles.orderManagementPage}>
+        </div>
     );
 }
 

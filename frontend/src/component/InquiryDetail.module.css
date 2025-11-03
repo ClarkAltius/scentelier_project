@@ -1,245 +1,308 @@
-/* General container */
+/* --- Base Layout --- */
 .container {
     padding: 24px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    animation: fadeIn 0.3s ease-in-out;
+    background: #f9f9f9;
+    min-height: 100vh;
+    color: #333;
+    /* Ensure it fills the view */
 }
 
-/* Back button */
-.backButton {
-    display: inline-flex;
+/* --- 1. Header --- */
+.header {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 16px;
     margin-bottom: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #4b5563;
-    /* Medium gray text */
-    background-color: #f3f4f6;
-    /* Light gray background */
-    border: 1px solid #e5e7eb;
+    gap: 16px;
+    /* Adds space between header items */
+}
+
+.headerTitle {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+    flex-grow: 1;
+    /* Pushes other items to the right */
+}
+
+.backButton {
+    background: #eee;
+    border: none;
+    padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: #555;
+    transition: background-color 0.2s;
 }
 
 .backButton:hover {
-    background-color: #e5e7eb;
+    background: #ddd;
 }
 
-/* Sections */
-.inquirySection,
-.answersSection,
-.newAnswerSection {
-    margin-bottom: 32px;
-}
-
-.inquirySection h2,
-.answersSection h3,
-.newAnswerSection h3 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #111827;
-    /* Dark gray */
-    margin-bottom: 16px;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 8px;
-}
-
-/* Meta info for inquiry details */
-.metaInfo {
+.closeButton {
+    background: #d9534f;
+    /* Red for 'danger' action */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    font-size: 14px;
-    color: #6b7280;
-    /* Lighter gray */
-    margin-bottom: 16px;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+    background: #c9302c;
+}
+
+.closeButton:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* --- Main Content (Grid) --- */
+.mainContent {
+    display: grid;
+    /* 70% / 30% split, with min-width for the info box */
+    grid-template-columns: minmax(0, 2.3fr) minmax(280px, 1fr);
+    gap: 24px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 900px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+        /* Stack on top of each other */
+    }
+
+    .infoBox {
+        order: -1;
+        /* Move info box to the top */
+        position: static;
+        /* Remove sticky positioning */
+    }
+}
+
+
+/* --- 2. Info Box --- */
+.infoBox {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    align-self: start;
+    /* Sticks to the top of its grid area */
+    position: sticky;
+    top: 20px;
+}
+
+.infoBox h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.metaInfo {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    /* Label + Value */
+    gap: 12px;
+}
+
+.metaInfo strong {
+    color: #555;
+    font-weight: 600;
 }
 
 .metaInfo span {
-    display: inline-flex;
-    align-items: center;
+    word-break: break-word;
+    /* For long emails */
 }
 
-/* Content box for inquiry/answers */
-.contentBox {
-    background-color: #f9fafb;
-    /* Very light gray */
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+/* --- 3. Chat Thread --- */
+.thread {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     padding: 16px;
-    line-height: 1.6;
-    color: #374151;
 }
 
-.contentBox p {
-    margin: 0;
-    white-space: pre-wrap;
-    /* Preserve whitespace and line breaks */
-}
-
-/* Status Badge (reusing from InquiryManagement) */
-.statusBadge {
-    display: inline-block;
-    padding: 3px 10px;
-    margin-left: 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #fff;
-    background-color: #999;
-    /* Default */
-    vertical-align: middle;
-}
-
-.statusPENDING {
-    background-color: #ffc107;
-    color: #333;
-    /* Yellow */
-}
-
-.statusANSWERED {
-    background-color: #17a2b8;
-    /* Blue/Teal */
-}
-
-.statusCLOSED {
-    background-color: #6c757d;
-    /* Grey */
-}
-
-/* Answer list styling */
-.answerList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.answerItem {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+.message {
     padding: 16px;
-    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
-.answerHeader {
+.messageHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #eee;
 }
 
-.answerHeader strong {
-    font-weight: 600;
-    color: #1f2937;
-    /* Darker gray */
+.messageHeader strong {
+    font-size: 1rem;
+    color: #333;
 }
 
-.answerDate {
-    font-size: 12px;
-    color: #6b7280;
-    /* Lighter gray */
+.messageDate {
+    font-size: 0.85rem;
+    color: #777;
 }
 
-.answerItem p {
+.message p {
     margin: 0;
-    font-size: 14px;
-    color: #374151;
+    /* Remove default <p> margins */
     line-height: 1.6;
     white-space: pre-wrap;
-    /* Preserve whitespace and line breaks */
+    /* Preserve line breaks */
+    word-break: break-word;
 }
 
-/* New Answer Form */
+.customerMessage {
+    background: #ffffff;
+    /* Customer is plain white */
+}
+
+.adminMessage {
+    background: #f0f8ff;
+    /* Admin is light blue */
+    border-color: #d6eaff;
+}
+
+.adminMessage .messageHeader strong {
+    color: #0056b3;
+    /* Darker blue for admin name */
+}
+
+.noAnswer {
+    color: #777;
+    text-align: center;
+    padding: 20px;
+}
+
+/* --- Answer Form --- */
+.newAnswerForm {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
 .answerTextarea {
     width: 100%;
     padding: 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
-    /* Slightly darker border */
     border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
     margin-bottom: 12px;
-    resize: vertical;
-    /* Allow vertical resizing only */
-    min-height: 120px;
-    box-sizing: border-box;
-    /* Include padding and border in width */
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .answerTextarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
     outline: none;
-    border-color: #3b82f6;
-    /* Blue border on focus */
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .submitButton {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    background-color: #2563eb;
-    /* Blue */
-    border: none;
+    background: #007bff;
+    color: white;
+    padding: 12px;
     border-radius: 6px;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    align-self: flex-end;
+    /* Button to the right */
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
-.submitButton:hover:not(:disabled) {
-    background-color: #1d4ed8;
-    /* Darker blue on hover */
+.submitButton:hover {
+    background: #0056b3;
 }
 
 .submitButton:disabled {
-    background-color: #9ca3af;
-    /* Gray when disabled */
+    background: #ccc;
     cursor: not-allowed;
 }
 
-/* Loading and Error states */
+.closedMessage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    color: #555;
+    font-weight: 500;
+    margin-top: 16px;
+}
+
+/* --- Status Badges (Copied from previous CSS) --- */
+.statusBadge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    text-align: center;
+    justify-self: start;
+}
+
+.statusPENDING {
+    background: #f0ad4e;
+    /* Orange */
+}
+
+.statusANSWERED {
+    background: #007bff;
+    /* Blue */
+}
+
+.statusCLOSED {
+    background: #555;
+    /* Gray */
+}
+
+/* --- Utility / Loading / Error --- */
 .loading,
 .error {
     text-align: center;
     padding: 40px;
-    font-size: 16px;
-    color: #6b7280;
+    font-size: 1.2rem;
 }
 
-.error,
-.errorBanner {
-    color: #dc3545;
-    /* Red for errors */
+.error {
+    color: #d9534f;
 }
 
 .errorBanner {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 10px 15px;
+    color: #d9534f;
+    background: #fdd;
+    border: 1px solid #d9534f;
+    padding: 10px;
     border-radius: 6px;
-    margin-bottom: 16px;
-    font-size: 14px;
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    margin-bottom: 12px;
 }

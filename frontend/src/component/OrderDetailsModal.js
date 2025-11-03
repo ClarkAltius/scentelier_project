@@ -1,16 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Container, Row, Col, Table, Badge, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/config';
-// css 스타일 재활용
-import styles from './OrderManagement.module.css';
+import { User, Truck, Info, Calendar, DollarSign, Mail, Phone, MapPin } from 'lucide-react';
+// We no longer need to import the parent's CSS for status badges
+// import styles from './OrderManagement.module.css'; 
 
-function OrderDetailsModal({ order, show, handleClose }) {
+/**
+ * A helper function to render a Bootstrap Badge based on order status.
+ */
+const getStatusBadge = (status) => {
+    let variant;
+    switch (status) {
+        case 'PENDING':
+            variant = 'warning';
+            break;
+        case 'PAID':
+            variant = 'info';
+            break;
+        case 'SHIPPED':
+            variant = 'primary';
+            break;
+        case 'DELIVERED':
+            variant = 'success';
+            break;
+        case 'CANCELLED':
+            variant = 'danger';
+            break;
+        default:
+            variant = 'secondary';
+    }
+    return <Badge bg={variant}>{status}</Badge>;
+};
+
+/**
+ * A helper component to render the custom ingredients list.
+ */
+const CustomIngredients = ({ ingredients }) => {
+    if (!ingredients || ingredients.length === 0) {
+        return <small className="text-muted">No custom ingredients.</small>;
+    }
+
+    return (
+        <div style={{ fontSize: '0.85em', paddingLeft: '10px' }}>
+            <strong className="text-muted">Ingredients:</strong>
+            <ul style={{ paddingLeft: '20px', marginBottom: '0' }}>
+                {ingredients.map((ing, index) => (
+                    <li key={index}>
+                        {ing.ingredientName}: {ing.amount}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+
+function OrderDetailsModal({ order, show, handleClose, onCancelOrder }) {
 
     // 스테이트 정의
-    // 주문 전체 정보 담을 스테이트
     const [orderDetails, setOrderDetails] = useState(null);
-    // 로딩 & 에러
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -26,9 +75,6 @@ function OrderDetailsModal({ order, show, handleClose }) {
                         { withCredentials: true }
                     );
                     setOrderDetails(response.data);
-                    console.log("커스텀향수 디버깅 : " + response.data);
-                    console.log("커스텀 향수 오브젝트 반환값 뭐냐 : " + orderDetails);
-                    console.log("FETCHED ORDER DETAILS:", JSON.stringify(response.data, null, 2))
                 } catch (err) {
                     console.error("Failed to fetch order details:", err);
                     setError("주문 상세 정보를 불러오는 데 실패했습니다.");
@@ -46,14 +92,23 @@ function OrderDetailsModal({ order, show, handleClose }) {
         }
     }, [order, show]);
 
-    // 모달 바디 렌더링
+    // === Event Handlers ===
+    const handleCancelClick = async () => {
+        if (order && onCancelOrder) {
+            await onCancelOrder(order.id);
+            handleClose();
+        }
+    };
+
+
+    // === Render Logic ===
     const renderModalContent = () => {
         if (isLoading) {
-            return <p>상세 정보를 불러오는 중...</p>;
+            return <div className="text-center p-5"><Spinner animation="border" /> <p>상세 정보를 불러오는 중...</p></div>;
         }
 
         if (error) {
-            return <p className="text-danger">{error}</p>;
+            return <Alert variant="danger">{error}</Alert>;
         }
 
         // 로딩이 다 되었는데 정보가 없으면
@@ -61,56 +116,83 @@ function OrderDetailsModal({ order, show, handleClose }) {
             return null; // 표기 x
         }
 
+        // Helper function for optional fields
+        const InfoRow = ({ icon, label, value }) => (
+            value ? <p className="mb-1"><strong className="d-inline-flex align-items-center">{icon} {label}:</strong> {value}</p> : null
+        );
 
         // 성공적으로 주문 정보를 불러오면 렌더링
         return (
-            <>
-                <p><strong>고객명:</strong> {orderDetails.recipientName}</p>
-                <p><strong>주문 날짜:</strong> {new Date(orderDetails.orderDate).toLocaleString()}</p>
-                <p><strong>총액:</strong> ₩{orderDetails.totalPrice?.toLocaleString()}</p>
-                <p>
-                    <strong>상태: </strong>
-                    <span className={`${styles.statusBadge} ${styles[`status${orderDetails.status}`]}`}>
-                        {orderDetails.status}
-                    </span>
-                </p>
+            <Container fluid>
+                <Row className="mb-3 g-3">
+                    {/* Box 1: Customer Info */}
+                    <Col md={4}>
+                        <div className="p-3 border rounded h-100">
+                            <h5 className="d-flex align-items-center"><User size={20} className="me-2" />고객 정보</h5>
+                            <hr className="mt-1" />
+                            {InfoRow({ icon: <User size={16} className="me-1" />, label: "수령인", value: orderDetails.recipientName })}
+                            {InfoRow({ icon: <Mail size={16} className="me-1" />, label: "이메일", value: orderDetails.customerEmail })}
+                            {InfoRow({ icon: <Phone size={16} className="me-1" />, label: "연락처", value: orderDetails.recipientPhone })}
+                        </div>
+                    </Col>
 
-                <hr />
-                <h4>주문 항목</h4>
-                <ul className="list-group">
-                    {(orderDetails.orderItems || []).map((item) => (
-                        // Fallback 안전망
-                        <li key={item.productId || Math.random()} className="list-group-item">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {/* 커스텀 향수 이름 */}
-                                    <strong>{item.productName}</strong>
+                    {/* Box 2: Shipping Info */}
+                    <Col md={4}>
+                        <div className="p-3 border rounded h-100">
+                            <h5 className="d-flex align-items-center"><Truck size={20} className="me-2" />배송 정보</h5>
+                            <hr className="mt-1" />
+                            {InfoRow({ icon: <MapPin size={16} className="me-1" />, label: "주소", value: orderDetails.shippingAddress })}
+                            {InfoRow({ icon: <Mail size={16} className="me-1" />, label: "우편번호", value: orderDetails.shippingPostalCode })}
+                        </div>
+                    </Col>
 
-                                    {/* 커스텀 향수용 배지 */}
-                                    {item.type === 'CUSTOM' && <span className="badge bg-secondary ms-2">Custom</span>}
-                                    <br />
-                                    <small>개당 ₩{item.price?.toLocaleString()}</small>
-                                </div>
-                                <span className="badge bg-primary rounded-pill">{item.quantity}개</span>
+                    {/* Box 3: Order Summary */}
+                    <Col md={4}>
+                        <div className="p-3 border rounded h-100" style={{ backgroundColor: '#f8f9fa' }}>
+                            <h5 className="d-flex align-items-center"><Info size={20} className="me-2" />주문 요약</h5>
+                            <hr className="mt-1" />
+                            {InfoRow({ icon: <Calendar size={16} className="me-1" />, label: "주문 날짜", value: new Date(orderDetails.orderDate).toLocaleString() })}
+                            {InfoRow({ icon: <DollarSign size={16} className="me-1" />, label: "총액", value: `₩${orderDetails.totalPrice?.toLocaleString()}` })}
+                            <div className="d-flex align-items-center">
+                                <strong className="me-2">상태:</strong> {getStatusBadge(orderDetails.status)}
                             </div>
-
-                            {/* --- 원액 표기 --- */}
-                            {item.type === 'CUSTOM' && item.ingredients && item.ingredients.length > 0 && (
-                                <div className="mt-2 ms-3" style={{ borderLeft: '3px solid #eee', paddingLeft: '10px' }}>
-                                    <small><strong>Ingredients:</strong></small>
-                                    <ul style={{ fontSize: '0.9em', paddingLeft: '20px', marginBottom: '0' }}>
-                                        {item.ingredients.map((ing, index) => (
-                                            <li key={index}>
-                                                {ing.ingredientName}: {ing.amount}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </>
+                        </div>
+                    </Col>
+                </Row>
+                <div className="p-3 border rounded mt-3">
+                    <h4>주문 항목</h4>
+                    <Table striped="true" bordered hover responsive="sm" size="sm" className="mt-3">
+                        <thead>
+                            <tr>
+                                <th>상품명</th>
+                                <th>상세</th>
+                                <th>개당 가격</th>
+                                <th>수량</th>
+                                <th>합계</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {(orderDetails.orderItems || []).map((item) => (
+                                <tr key={item.productId || Math.random()}>
+                                    <td>
+                                        {item.productName}
+                                        {item.type === 'CUSTOM' && <Badge bg="secondary" className="ms-2">Custom</Badge>}
+                                    </td>
+                                    <td>
+                                        {item.type === 'CUSTOM' ?
+                                            <CustomIngredients ingredients={item.ingredients} /> :
+                                            <small className="text-muted">완제품</small>
+                                        }
+                                    </td>
+                                    <td>₩{item.price?.toLocaleString()}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>₩{(item.price * item.quantity).toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </div>
+            </Container>
         );
     };
 
@@ -128,6 +210,11 @@ function OrderDetailsModal({ order, show, handleClose }) {
                 <Button variant="secondary" onClick={handleClose}>
                     닫기
                 </Button>
+                {orderDetails && orderDetails.status !== 'CANCELLED' && orderDetails.status !== 'DELIVERED' && (
+                    <Button variant="danger" onClick={handleCancelClick}>
+                        주문 취소
+                    </Button>
+                )}
             </Modal.Footer>
         </Modal>
     );

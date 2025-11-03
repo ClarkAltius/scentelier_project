@@ -41,7 +41,7 @@ function Payments(props) {
     }, [user, location.state]);
 
 
-    const totalPrice = products.reduce((sum, item) => 
+    const totalPrice = products.reduce((sum, item) =>
         sum + item.price * (item.quantity || 1), 0);
 
     const paymentMethods = [
@@ -68,7 +68,7 @@ function Payments(props) {
             userId: user.id,
             recipientName: delivery.recipientName,
             phone: delivery.phone,
-            address: delivery.address+'/'+delivery.detail,
+            address: delivery.address + '/' + delivery.detail,
             totalPrice: totalPrice,
             status: 'PAID',
             paymentMethod: method,
@@ -76,21 +76,21 @@ function Payments(props) {
                 ...products
                     .filter((product) => product.productId)
                     .map((p) => ({
-                    cartItemId: p.cartItemId,
-                    productId: p.productId,
-                    customId: null,
-                    quantity: p.quantity,
-                    price: p.price,
-                })),
+                        cartItemId: p.cartItemId,
+                        productId: p.productId,
+                        customId: null,
+                        quantity: p.quantity,
+                        price: p.price,
+                    })),
                 ...products
                     .filter((product) => product.customId)
                     .map((c) => ({
-                    cartItemId: c.cartItemId,
-                    productId: null,
-                    customId: c.customId,
-                    quantity: c.quantity,
-                    price: c.price,
-                })),
+                        cartItemId: c.cartItemId,
+                        productId: null,
+                        customId: c.customId,
+                        quantity: c.quantity,
+                        price: c.price,
+                    })),
             ],
         };
         try {
@@ -103,7 +103,7 @@ function Payments(props) {
     };
 
     return (
-        <Container className="py-5 p-4" style={{ backgroundColor: "#f1f3f6", height:"93vh" }}>
+        <Container className="py-5 p-4" style={{ backgroundColor: "#f1f3f6", height: "93vh" }}>
             <Row className="g-4">
                 {/* 배송 정보 */}
                 <Col md={12}>
@@ -173,10 +173,10 @@ function Payments(props) {
                             {products.filter((product) => !!product.productId).map((p, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`p-${p.cartItemId}`}>
-                                    {p.name} — {p.quantity}개
+                                        {p.name} — {p.quantity}개
                                     </span>
                                     <span>
-                                        ₩{(p.price*p.quantity).toLocaleString()}
+                                        ₩{(p.price * p.quantity).toLocaleString()}
                                     </span>
                                 </div>
                             ))}
@@ -184,10 +184,10 @@ function Payments(props) {
                             {products.filter((product) => !!product.customId).map((c, idx) => (
                                 <div key={idx} className="d-flex justify-content-between mb-2">
                                     <span key={`c-${c.cartItemId}`}>
-                                    {c.name} — {c.quantity}개
+                                        {c.name} — {c.quantity}개
                                     </span>
                                     <span>
-                                        ₩{(c.price*c.quantity).toLocaleString()}
+                                        ₩{(c.price * c.quantity).toLocaleString()}
                                     </span>
                                 </div>
                             ))}
@@ -208,20 +208,19 @@ function Payments(props) {
                         <Card.Body>
                             <div className="d-flex flex-wrap justify-content-between">
                                 {paymentMethods.map((m) => (
-                                <div
-                                    key={m.id}
-                                    className={`text-center border rounded-3 p-3 mb-2 flex-grow-1 mx-1 payment-card ${
-                                    method === m.id ? "bg-success text-white border-success" : ""
-                                    }`}
-                                    style={{
-                                    cursor: "pointer",
-                                    transition: "transform 0.2s",
-                                    }}
-                                    onClick={() => setMethod(m.id)}
-                                >
-                                    <div>{m.icon}</div>
-                                    <div className="mt-2 fw-semibold">{m.name}</div>
-                                </div>
+                                    <div
+                                        key={m.id}
+                                        className={`text-center border rounded-3 p-3 mb-2 flex-grow-1 mx-1 payment-card ${method === m.id ? "bg-success text-white border-success" : ""
+                                            }`}
+                                        style={{
+                                            cursor: "pointer",
+                                            transition: "transform 0.2s",
+                                        }}
+                                        onClick={() => setMethod(m.id)}
+                                    >
+                                        <div>{m.icon}</div>
+                                        <div className="mt-2 fw-semibold">{m.name}</div>
+                                    </div>
                                 ))}
                             </div>
 
@@ -238,8 +237,8 @@ function Payments(props) {
             </Row>
 
             {/* 결제 완료 모달 */}
-            <Modal 
-                show={showModal} 
+            <Modal
+                show={showModal}
                 centered
                 backdrop="static"     // 바깥 클릭 막기
                 keyboard={false}      // ESC 키 막기
@@ -259,7 +258,7 @@ function Payments(props) {
                     <p className="fw-bold fs-5 text-center mb-0">
                         총 결제 금액:{" "}
                         <span className="text-success">
-                        ₩{totalPrice.toLocaleString()}
+                            ₩{totalPrice.toLocaleString()}
                         </span>
                     </p>
                 </Modal.Body>

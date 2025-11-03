@@ -67,12 +67,6 @@ function Sidebar({ activeView, setActiveView }) {
                     </a>
                 </li>
             </ul>
-            <div className={styles.navItem}>
-                <a href="#" className={styles.navLink}>
-                    <LogOut className={styles.icon} />
-                    <span className={styles.navText}>로그아웃</span>
-                </a>
-            </div>
         </div >
     );
 }

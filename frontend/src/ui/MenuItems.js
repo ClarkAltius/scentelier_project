@@ -1,7 +1,7 @@
 import { Nav, Navbar, Container, NavDropdown, NavItem } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart, User, Shield } from "lucide-react";
 
 function MenuItems() {
 
@@ -14,6 +14,9 @@ function MenuItems() {
         navigate('/');
     };
 
+    const isAdmin = user?.role === 'ADMIN';
+    // console.log("isAdmin 체크" + isAdmin + "user.role은 : " + user?.role)
+
     const handleDesignClick = () => {
         if (user) {
             navigate("/perfume/blending"); // 로그인된 경우
@@ -22,6 +25,8 @@ function MenuItems() {
             navigate("/login"); // 로그인 안 되어 있으면 로그인 페이지로
         }
     };
+
+
 
     return (
         <Navbar bg="light" variant="light" expand="lg" fixed="top" className="shadow-sm mb-3">
@@ -48,11 +53,17 @@ function MenuItems() {
                     {user ? (
                         // 로그인한 유저에겐 유저명 표기
                         <>
+                            {isAdmin && (
+                                <Nav.Link onClick={() => navigate('/admin')} title="Admin">
+                                    <Shield size={20} style={{ color: '#808080ff' }} />
+                                </Nav.Link>
+                            )}
                             <Nav.Link onClick={() => navigate('/cart/list')} title="Cart">
                                 <ShoppingCart size={20} style={{ color: '#808080ff' }} />
                             </Nav.Link>
                             <NavDropdown title={<User size={20} style={{ color: '#808080ff' }} />} id="user-nav-dropdown" align="end">
                                 <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => navigate('/mypage')}>마이 페이지</NavDropdown.Item>
                                 {/* 회원정보 링크 추가 예정 */}
                                 {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
                                 <NavDropdown.Divider />
@@ -63,7 +74,7 @@ function MenuItems() {
                                 {`어서오세요, ${user.username} 님` || 'User'}
                             </Navbar.Text>                        </>
                     ) : (
-                        // 기본적으로 로그인 버튼
+                        // 기본적인 로그인 버튼
                         <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>
                     )}
                 </Nav>

@@ -40,6 +40,8 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+
+
     // === DATA FETCHING ===
     useEffect(() => {
         const fetchAllData = async () => {
@@ -146,9 +148,9 @@ function Dashboard() {
             {/* Second Row: Sales Charts */}
             <div className={styles.mainGrid}>
                 <div className={`${styles.card}`}>
-                    <h3>월별 매출 추이</h3>
-                    <div style={{ width: '100%', height: 300 }}> {/* Set container dimensions */}
-                        <ResponsiveContainer>
+                    <h3 style={{ marginBottom: '1rem' }}>월별 매출 추이</h3>
+                    <div className={styles.chartWrapper}>
+                        <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={monthlySales}
                                 margin={{
@@ -167,35 +169,33 @@ function Dashboard() {
                     </div>
                 </div>
                 <div className={styles.card}>
-                    <h3>매출 비중</h3>
-                    <div className={styles.chartPlaceholder}>
-                        {/* 파이차트, 매출 비중 비교 */}
-                        <div style={{ width: '100%', height: 300 }}> {/* Set container dimensions */}
-                            <ResponsiveContainer>
-                                <PieChart>
-                                    <Pie
-                                        data={pieData}
-                                        cx="50%" // Center X
-                                        cy="50%" // Center Y
-                                        innerRadius={60} // Donut chart hole
-                                        outerRadius={90} // Size of chart
-                                        fill="#8884d8"
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {pieData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip formatter={(value) => `₩${value.toLocaleString()}`} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                        <ul className={styles.chartLegend}>
-                            <li><span className={styles.legendDot} style={{ backgroundColor: '#4ade80' }}></span>완제품: ₩{salesBreakdown.finishedPerfumes.toLocaleString()}</li>
-                            <li><span className={styles.legendDot} style={{ backgroundColor: '#60a5fa' }}></span>커스텀: ₩{salesBreakdown.customPerfumes.toLocaleString()}</li>
-                        </ul>
+                    <h3 style={{ marginBottom: '1rem' }}>매출 비중</h3>
+                    {/* 파이차트, 매출 비중 비교 */}
+                    <div className={styles.chartWrapper} style={{ flex: 1, minWidth: 0 }}>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={pieData}
+                                    cx="50%" // Center X
+                                    cy="50%" // Center Y
+                                    innerRadius={60} // Donut chart hole
+                                    outerRadius={90} // Size of chart
+                                    fill="#8884d8"
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {pieData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip formatter={(value) => `₩${value.toLocaleString()}`} />
+                            </PieChart>
+                        </ResponsiveContainer>
                     </div>
+                    <ul className={styles.chartLegend}>
+                        <li><span className={styles.legendDot} style={{ backgroundColor: '#4ade80' }}></span>완제품: ₩{salesBreakdown.finishedPerfumes.toLocaleString()}</li>
+                        <li><span className={styles.legendDot} style={{ backgroundColor: '#60a5fa' }}></span>커스텀: ₩{salesBreakdown.customPerfumes.toLocaleString()}</li>
+                    </ul>
                 </div>
             </div>
 

@@ -39,8 +39,8 @@ function Login() {
             const { message, member } = response.data;
 
             if (message === 'success') {
-                console.log('로그인 한 사람의 정보');
-                console.log(member);
+                // console.log('로그인 한 사람의 정보');
+                // console.log(member);
 
 
                 login(member);

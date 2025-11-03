@@ -9,7 +9,7 @@ const AdminRoute = ({ children }) => {
 
     // alert 반복으로 뜨던 현상 수정
     useEffect(() => {
-        if (!user || user.role !== 'ADMIN') {
+        if (user && user.role !== 'ADMIN') {
             alert('관리자 권한이 필요합니다.');
         }
     }, [user]);

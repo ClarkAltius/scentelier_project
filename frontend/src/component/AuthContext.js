@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, Children } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -21,19 +22,22 @@ export const AuthProvider = ({ children }) => {
         }
     });
 
+    const navigate = useNavigate();
+
 
     //로그인 기능
 
     const login = (userData) => {
         sessionStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
-        console.log("사용자 정보 스트링으로 변경 후 저장: ", userData);
+        // console.log("사용자 정보 스트링으로 변경 후 저장: ", userData);
 
     };
 
     //로그아웃 기능
     const logout = () => {
         sessionStorage.removeItem('user');
+        navigate(`/`);
         setUser(null);
     };
 
