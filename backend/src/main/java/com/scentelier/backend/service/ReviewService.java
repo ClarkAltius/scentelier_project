@@ -1,9 +1,6 @@
 package com.scentelier.backend.service;
 
-import com.scentelier.backend.dto.OrderResponseDto;
-import com.scentelier.backend.dto.ReviewCreateDto;
-import com.scentelier.backend.dto.ReviewDto;
-import com.scentelier.backend.dto.ReviewOrderProductDto;
+import com.scentelier.backend.dto.*;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Reviews;
 import com.scentelier.backend.repository.OrderRepository;
@@ -63,10 +60,16 @@ public class ReviewService {
         return reviews.map(this::convertToBlockDto);
     }
 
-    // 특정 상품 리뷰 조회
-    public Page<ReviewDto> getReviewsByProduct(Long productId, Pageable pageable) {
+    // 특정 상품 리뷰 조회 + 평균/개수 통합
+    public ReviewSummaryDto getReviewsByProduct(Long productId, Pageable pageable) {
         Page<Reviews> reviews = reviewRepository.findAllByProductId(productId, pageable);
-        return reviews.map(this::convertToBlockDto);
+
+        Double averageRating = reviewRepository.findAverageRatingByProductId(productId);
+        Long reviewCount = reviewRepository.countReviewsByProductId(productId);
+
+        Page<ReviewDto> reviewDtos = reviews.map(this::convertToBlockDto);
+
+        return new ReviewSummaryDto(averageRating, reviewCount, reviewDtos);
     }
 
     // 리뷰 수정

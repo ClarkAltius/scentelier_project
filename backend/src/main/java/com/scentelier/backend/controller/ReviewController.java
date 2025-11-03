@@ -2,6 +2,7 @@ package com.scentelier.backend.controller;
 
 import com.scentelier.backend.dto.ReviewCreateDto;
 import com.scentelier.backend.dto.ReviewDto;
+import com.scentelier.backend.dto.ReviewSummaryDto;
 import com.scentelier.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,9 +47,9 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getAllReviews(pageable));
     }
 
-    // 특정 상품 리뷰 조회
+    // 특정 상품 리뷰 조회 (요청 시 평균 별점, 리뷰 개수 포함)
     @GetMapping("/product/{productId}")
-    public ResponseEntity<Page<ReviewDto>> getReviewsByProduct(
+    public ResponseEntity<ReviewSummaryDto> getReviewsByProduct(
             @PathVariable Long productId,
             Pageable pageable
     ) {

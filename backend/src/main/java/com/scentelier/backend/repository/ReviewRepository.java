@@ -34,4 +34,16 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
     @Query("SELECT r FROM Reviews r WHERE r.order.id IN (SELECT o.id FROM Orders o JOIN o.orderProducts op WHERE op.products.id = :productId) " +
             "AND r.isDeleted = false ORDER BY r.createdAt DESC")
     Page<Reviews> findAllByProductId(@Param("productId") Long productId, Pageable pageable);
+
+    // 평균 별점
+    @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Reviews r " +
+            "WHERE r.order.id IN (SELECT o.id FROM Orders o JOIN o.orderProducts op WHERE op.products.id = :productId) " +
+            "AND r.isDeleted = false")
+    Double findAverageRatingByProductId(@Param("productId") Long productId);
+
+    // 리뷰 개수
+    @Query("SELECT COUNT(r) FROM Reviews r " +
+            "WHERE r.order.id IN (SELECT o.id FROM Orders o JOIN o.orderProducts op WHERE op.products.id = :productId) " +
+            "AND r.isDeleted = false")
+    Long countReviewsByProductId(@Param("productId") Long productId);
 }
