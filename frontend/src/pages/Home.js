@@ -236,63 +236,92 @@ function Home() {
             {/* 스크롤 끝------------------------------------------ */}
 
             <div className="d-flex justify-content-center" style={{ marginTop: '30px' }}>
-                <Card style={{ width: '80rem', height: '24rem', margin: '55px', borderColor: '#dbdbdbff' }}>
-                    <Card.Body style={{
-                        display: 'flex'
-                    }}>
-                        < img
+                <Card
+                    style={{
+                        width: '90%',
+                        maxWidth: '80rem',
+                        minHeight: '18rem',
+                        margin: '50px auto',
+                        borderColor: '#dbdbdbff',
+                    }}
+                >
+                    <Card.Body
+                        style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',      // 화면이 좁으면 아래로 내려가게
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '20px',           // 요소 사이 간격
+                        }}
+                    >
+                        <img
                             src={`${API_BASE_URL}/uploads/bigs/4.jpg`}
                             alt="..."
                             style={{
-                                width: '310px',
-                                height: '310px',
+                                width: '100%',
+                                maxWidth: '280px',   // 이미지 최대 크기
+                                height: 'auto',
                                 objectFit: 'cover',
                                 borderRadius: '8px',
-                                margin: '10px 0px 0px 50px',
-                                marginLeft: '50px'
+                                flexShrink: 0,       // 줄어들지 않게
                             }}
-
                         />
-                        <div style={{ margin: '10px 0px 0px 22px' }}>
-                            <h5 style={{ marginLeft: '40px', marginTop: '40px', fontSize: '40px', fontWeight: 'bold', color: '#67AB9F', fontFamily: "'Gowun Batang',serif" }}>
+
+                        <div
+                            style={{
+                                flex: '1 1 300px',  // 최소 300px, 여유 있으면 늘어남
+                                minWidth: '200px',  // 너무 작아지지 않도록
+                            }}
+                        >
+                            <h5
+                                style={{
+                                    fontSize: '2.5rem',
+                                    fontWeight: 'bold',
+                                    color: '#67AB9F',
+                                    fontFamily: "'Gowun Batang', serif",
+                                    marginBottom: '2rem',
+                                }}
+                            >
                                 “What scent is the perfect fit for me?”
                             </h5>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <p
-                                    style={{
-                                        paddingLeft: '80px',
-                                        paddingTop: '23px',
-                                        fontSize: '22px',
-                                        color: '#808080ff',
-                                        textAlign: 'left',
-                                        lineHeight: 1.4,
-                                        flex: 1
-                                    }}>
-                                    <strong>몇 가지 질문만으로,<br />
-                                        Scentelier가 당신의 성향과 감정에<br />
-                                        어울리는 향기를 제안합니다.</strong><br /><br />
-                                    <span style={{ fontSize: '19px', }}>나를 표현하는 단 하나의 향, 지금 바로 발견해보세요.</span>
-                                </p>
-                                <button
-                                    style={{
-                                        marginRight: '50px',
-                                        padding: '10px 20px',
-                                        fontSize: '16px',
-                                        cursor: 'pointer',
-                                        height: 'fit-content',
-                                        backgroundColor: 'transparent',   // 배경 투명
-                                        color: '#67AB9F',                  // 텍스트 노란색
-                                        border: '2px solid #67AB9F',       // 테두리 노란색
-                                        borderRadius: '5px',
-                                    }}
-                                    onClick={() => navigate(`/perfume/finder`)}>
-                                    TEST NOW
-                                </button>
-                            </div>
+
+                            <p
+                                style={{
+                                    fontSize: '1.2rem',
+                                    color: '#808080',
+                                    lineHeight: 1.5,
+                                }}
+                            >
+                                <strong>
+                                    몇 가지 질문만으로,<br />
+                                    Scentelier가 당신의 성향과 감정에<br />
+                                    어울리는 향기를 제안합니다.
+                                </strong>
+                                <br />
+                                <span style={{ fontSize: '1rem' }}>
+                                    나를 표현하는 단 하나의 향, 지금 바로 발견해보세요.
+                                </span>
+                            </p>
+
+                            <button
+                                style={{
+                                    padding: '10px 20px',
+                                    fontSize: '1rem',
+                                    cursor: 'pointer',
+                                    backgroundColor: 'transparent',
+                                    color: '#67AB9F',
+                                    border: '2px solid #67AB9F',
+                                    borderRadius: '5px',
+                                    marginTop: '30px',
+                                }}
+                                onClick={() => navigate(`/perfume/finder`)}
+                            >
+                                TEST NOW
+                            </button>
                         </div>
                     </Card.Body>
                 </Card>
-            </div >
+            </div>
 
             {/* 테스트카드 끝------------------------------------------ */}
 

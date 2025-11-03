@@ -565,64 +565,76 @@ function Productlist() {
 
         {/* 향수찾기 */}
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-            <Card style={{ width: '80rem', height: '24rem', margin: '55px', borderColor: '#dbdbdbff' }}>
-                <Card.Body style={{
-                    display: 'flex'
-                }}>
-                    < img
-                        src="/qqq.jpg"
-                        alt="..."
-                        style={{
-                            width: '310px',
-                            height: '310px',
-                            objectFit: 'cover',
-                            borderRadius: '8px',
-                            margin: '10px 0px 0px 50px',
-                            marginLeft: '50px'
-                        }}
+            <Card
+                style={{
+                    width: '90%',
+                    maxWidth: '80rem',
+                    height: '18rem',            // 카드 높이 줄임
+                    margin: '40px auto',
+                    borderColor: '#dbdbdbff',
+                    overflow: 'hidden',         // 카드 영역 넘어가는 이미지 자르기
+                }}
+            >
+                <Card.Body
+                    style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: '20px',
+                        height: '100%',
+                    }}
+                >
+                    {/* 이미지 영역 */}
+                    <div style={{
+                        width: '280px',
+                        height: '100%',            // 카드 높이에 맞춤
+                        overflow: 'hidden',
+                        borderRadius: '8px',
+                        flexShrink: 0
+                    }}>
+                        <img
+                            src="/qqq.jpg"
+                            alt="..."
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',     // 카드 높이에 맞춰 이미지 잘림
+                            }}
+                        />
+                    </div>
 
-                    />
-                    {/* 오른쪽 텍스트 영역 */}
-                    <div style={{ flex: 1, paddingLeft: '40px', paddingRight: '50px', marginTop: '18px' }}>
-
-                        {/* 타이틀 부분 */}
+                    {/* 텍스트 영역 */}
+                    <div style={{ flex: '1 1 280px', padding: '10px 20px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        {/* 타이틀 */}
                         <div>
                             <h5 style={{
-                                fontSize: '40px',
+                                fontSize: '2rem',
                                 fontWeight: 'bold',
                                 color: '#67AB9F',
                                 fontFamily: "'Gowun Batang', serif",
                                 textAlign: 'left',
-                                marginLeft: '50px' // 왼쪽으로 조금 들여쓰기
+                                marginBottom: '3rem'
                             }}>
-                                " Still searching for
-                            </h5>
-
-                            <h5 style={{
-                                fontSize: '40px',
-                                fontWeight: 'bold',
-                                color: '#67AB9F',
-                                fontFamily: "'Gowun Batang', serif",
-                                textAlign: 'right',           // 오른쪽 정렬
-                                marginRight: '80px',          // 오른쪽 여백
-                            }}>
-                                your perfect fragrance? "
+                                " Still searching for your perfect fragrance? "
                             </h5>
                         </div>
 
                         {/* 설명 + 버튼 */}
-                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px', backgroundColor: "#f5f5f5ff", borderRadius: '5px', padding: '10px' }}>
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: '15px'
+                        }}>
                             <p style={{
-                                paddingLeft: '30px',
-                                fontSize: '22px',
-                                color: '#808080ff',
-                                textAlign: 'left',
+                                fontSize: '1.1rem',
+                                color: '#808080',
                                 lineHeight: 1.4,
                                 flex: 1,
-                                marginTop: '12px'
+                                minWidth: '200px'
                             }}>
                                 <strong>센텔리아와 함께 나만의 향을 찾아보세요.</strong><br /><br />
-                                <span style={{ fontSize: '19px' }}>
+                                <span style={{ fontSize: '0.95rem' }}>
                                     세상에 하나뿐인 나만의 맞춤 향수를 만들어,<br />
                                     특별한 나만의 이야기를 시작하세요 →
                                 </span>
@@ -631,22 +643,23 @@ function Productlist() {
                             <button
                                 onClick={() => navigate(`/perfume/finder`)}
                                 style={{
-                                    marginRight: '49px',
-                                    padding: '10px 20px',
-                                    fontSize: '16px',
+                                    padding: '8px 16px',
+                                    fontSize: '0.95rem',
                                     cursor: 'pointer',
-                                    height: 'fit-content',
                                     backgroundColor: '#67AB9F',
-                                    color: '#ffff',
+                                    color: '#fff',
                                     border: '2px solid #67AB9F',
                                     borderRadius: '5px',
-                                    width: '150px'
-                                }}>
+                                    width: '130px',
+                                    flexShrink: 0,
+                                    marginRight: "30px"
+                                }}
+                            >
                                 NOW
                             </button>
                         </div>
-
                     </div>
+
                 </Card.Body>
             </Card>
         </div>

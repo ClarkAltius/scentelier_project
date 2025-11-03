@@ -267,7 +267,7 @@ function PerfumeBlending() {
                                     value={perfumeName}
                                     onChange={handleNameChange} />
 
-                                <Form.Label style={{ marginTop: "40px" }}>💗 당신이 끌리는 무드는 어떤건가요?</Form.Label>
+                                <Form.Label style={{ marginTop: "50px" }}>💗 당신이 끌리는 무드는 어떤건가요?</Form.Label>
                                 <div style={{ maxWidth: "400px", margin: "0 auto" }}>
                                     <Form.Select value={selectedType} onChange={handleSelect}>
 
@@ -284,16 +284,17 @@ function PerfumeBlending() {
 
                                     {selectedType && (
                                         <Card className="mt-3 shadow-sm" style={{
-                                            width: "700px",     // 카드 폭 고정
-                                            minWidth: "700px",  // 최소 폭도 700px로 고정
-                                            maxWidth: "700px",  // 최대 폭도 700px로 고정
+                                            width: "90%",
+                                            maxWidth: "700px",
+                                            padding: "20px",
+                                            boxSizing: "border-box"
                                         }}>
                                             <Card.Body
                                                 style={{
-                                                    display: "flex",          // 수평 정렬
-                                                    gap: "30px",              // 이미지와 텍스트 간격
-                                                    alignItems: "center",
-                                                    marginLeft: "40px"
+                                                    display: "flex",
+                                                    flexWrap: "wrap",      // 작은 화면에서 줄 바꿈
+                                                    gap: "20px",
+                                                    alignItems: "center"
                                                 }}
                                             >
                                                 {/* 이미지 영역 */}
@@ -323,7 +324,12 @@ function PerfumeBlending() {
 
                                                 {/* 텍스트 영역 */}
                                                 <div style={{
-                                                    display: "flex", flexDirection: "column", width: "100%", margin: "10px 0px 0px 10px"
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    flex: "1 1 0",            // 남은 공간만큼 늘어나고 줄어듦
+                                                    minWidth: "0",             // 필수! flexbox에서 줄어들 수 있게
+                                                    overflowWrap: "break-word",
+                                                    wordBreak: "break-word"
                                                 }}>
                                                     <div
                                                         style={{
@@ -336,7 +342,7 @@ function PerfumeBlending() {
                                                         ✨ 추천 조합
                                                     </div>
 
-                                                    <div style={{ fontSize: "1rem", color: "#6B4C3B", textAlign: "left", width: "100%" }}>
+                                                    <div style={{ fontSize: "1rem", color: "#6B4C3B", textAlign: "left", width: "100%", marginLeft: 30 }}>
 
                                                         <div>
                                                             <p>
@@ -370,24 +376,25 @@ function PerfumeBlending() {
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
-                                        width: "600px",     // 카드 폭 고정
-                                        minWidth: "600px",  // 최소 폭도 700px로 고정
-                                        maxWidth: "600px",
-                                        paddingRight: "30px"
+                                        width: "90%",        // 화면 폭에 맞춰 조정
+                                        maxWidth: "600px",   // 최대 폭만 600px
+                                        paddingRight: "30px",
+                                        boxSizing: 'border-box'
                                     }}>
                                         <Card.Body style={{
                                             display: "flex",
-                                            justifyContent: "flex-start", // 왼쪽 정렬
-                                            alignItems: "flex-start", // 위쪽 기준 정렬
-                                            gap: "10px", // 이미지와 설명 간격 줄이기
-                                            padding: "20px"
+                                            justifyContent: "flex-start",
+                                            alignItems: "flex-start",
+                                            gap: "10px",
+                                            padding: "20px",
+                                            flexWrap: "wrap"   // 작은 화면에서 이미지와 설명이 아래로 내려가도록
                                         }}>
                                             <div style={{ width: "150px", height: "150px", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}>
                                                 <img
                                                     src={
                                                         selectedTop
                                                             ? `${API_BASE_URL}/uploads/ingredient/${selectedTop?.name}.jpg`
-                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
+                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg`
                                                     }
                                                     style={{
                                                         width: "100%",
@@ -397,27 +404,25 @@ function PerfumeBlending() {
                                                     }}
                                                 />
                                             </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
-
+                                            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                                                 <div style={{
                                                     fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px"
                                                 }}>
                                                     {ingredients.find(i => i.name === (selectedTop?.name))?.description || "선택된 향료가 없습니다."}
                                                 </div>
-
                                             </div>
                                         </Card.Body>
-                                        <div style={{ width: "300px", margin: "30px auto" }}>
+                                        <div style={{ width: "90%", maxWidth: "300px", margin: "30px auto" }}>
                                             <Form.Label>Intensity: {topValue}</Form.Label>
-                                            <Form.Range className='custom-range'
-                                                value={topValue} onChange={handleChange("top")} max={MAX_TOTAL}
-
+                                            <Form.Range
+                                                className='custom-range'
+                                                value={topValue}
+                                                onChange={handleChange("top")}
+                                                max={MAX_TOTAL}
                                             />
                                         </div>
                                     </Card>
                                 </div>
-
-
 
                                 <Form.Label style={{ marginTop: "100px", fontSize: "15px" }}>
                                     <span style={{ fontSize: "20px" }}><strong>MIDDLE</strong></span>
@@ -427,24 +432,25 @@ function PerfumeBlending() {
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
-                                        width: "600px",     // 카드 폭 고정
-                                        minWidth: "600px",  // 최소 폭도 700px로 고정
-                                        maxWidth: "600px",
-                                        paddingRight: "30px"
+                                        width: "90%",        // 화면 폭에 맞춰 줄어듦
+                                        maxWidth: "600px",   // 최대 폭 제한
+                                        paddingRight: "30px",
+                                        boxSizing: "border-box"
                                     }}>
                                         <Card.Body style={{
                                             display: "flex",
-                                            justifyContent: "flex-start", // 왼쪽 정렬
-                                            alignItems: "flex-start", // 위쪽 기준 정렬
-                                            gap: "10px", // 이미지와 설명 간격 줄이기
-                                            padding: "20px"
+                                            justifyContent: "flex-start",
+                                            alignItems: "flex-start",
+                                            gap: "10px",
+                                            padding: "20px",
+                                            flexWrap: "wrap" // 작은 화면에서 이미지와 텍스트가 아래로 내려가도록
                                         }}>
                                             <div style={{ width: "150px", height: "150px", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}>
                                                 <img
                                                     src={
                                                         selectedMiddle
                                                             ? `${API_BASE_URL}/uploads/ingredient/${selectedMiddle?.name}.jpg`
-                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
+                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg`
                                                     }
                                                     style={{
                                                         width: "100%",
@@ -454,18 +460,19 @@ function PerfumeBlending() {
                                                     }}
                                                 />
                                             </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
-
+                                            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                                                 <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
                                                     {ingredients.find(i => i.name === selectedMiddle?.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
-
                                             </div>
                                         </Card.Body>
-                                        <div style={{ width: "300px", margin: "30px auto" }}>
+                                        <div style={{ width: "90%", maxWidth: "300px", margin: "30px auto" }}>
                                             <Form.Label>Intensity: {middleValue}</Form.Label>
-                                            <Form.Range className='custom-range'
-                                                value={middleValue} onChange={handleChange("middle")} max={MAX_TOTAL}
+                                            <Form.Range
+                                                className='custom-range'
+                                                value={middleValue}
+                                                onChange={handleChange("middle")}
+                                                max={MAX_TOTAL}
                                             />
                                         </div>
                                     </Card>
@@ -479,17 +486,26 @@ function PerfumeBlending() {
 
                                 <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
                                     <Card className='mt-3' style={{
-                                        width: "600px",     // 카드 폭 고정
-                                        minWidth: "600px",  // 최소 폭도 700px로 고정
-                                        maxWidth: "600px"
+                                        width: "90%",        // 화면 폭에 맞춰 줄어듦
+                                        maxWidth: "600px",   // 최대 폭 제한
+                                        paddingRight: "30px",
+                                        boxSizing: "border-box"
                                     }}>
-                                        <Card.Body style={{ display: "flex", justifyContent: "left", gap: '20px' }}>
+                                        <Card.Body style={{
+                                            display: "flex",
+                                            justifyContent: "flex-start",
+                                            alignItems: "flex-start",
+                                            gap: "10px",
+                                            padding: "20px",
+                                            flexWrap: "wrap" // 작은 화면에서 이미지와 텍스트가 아래로 내려가도록
+                                        }}>
+                                            {/* 이미지 영역 */}
                                             <div style={{ width: "150px", height: "150px", overflow: "hidden", borderRadius: "8px", flexShrink: 0 }}>
                                                 <img
                                                     src={
                                                         selectedLast
                                                             ? `${API_BASE_URL}/uploads/ingredient/${selectedLast?.name}.jpg`
-                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg` // 기본 이미지 경로
+                                                            : `${API_BASE_URL}/uploads/ingredient/default.jpg`
                                                     }
                                                     style={{
                                                         width: "100%",
@@ -499,28 +515,43 @@ function PerfumeBlending() {
                                                     }}
                                                 />
                                             </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', width: "100%" }}>
 
-                                                <div style={{ fontSize: '1rem', color: '#6B4C3B', textAlign: "left", margin: "30px 10px 0px 10px" }}>
+                                            {/* 텍스트 영역 */}
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                flex: 1,
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '1rem',
+                                                    color: '#6B4C3B',
+                                                    textAlign: "left",
+                                                    margin: "30px 10px 0px 10px"
+                                                }}>
                                                     {ingredients.find(i => i.name === selectedLast?.name)?.description || "선택된 향료가 없습니다."}
                                                 </div>
-
                                             </div>
                                         </Card.Body>
-                                        <div style={{ width: "300px", margin: "30px auto" }}>
+
+                                        {/* 강도 슬라이더 */}
+                                        <div style={{ width: "90%", maxWidth: "300px", margin: "30px auto" }}>
                                             <Form.Label>Intensity: {lastValue}</Form.Label>
-                                            <Form.Range className='custom-range'
-                                                value={lastValue} onChange={handleChange("last")} max={MAX_TOTAL}
+                                            <Form.Range
+                                                className='custom-range'
+                                                value={lastValue}
+                                                onChange={handleChange("last")}
+                                                max={MAX_TOTAL}
                                             />
                                         </div>
                                     </Card>
                                 </div>
 
+
                                 <div style={{
                                     display: "flex",
-                                    justifyContent: "space-between",
+                                    justifyContent: "center",  // 전체 중앙 정렬
                                     maxWidth: "600px",
-                                    marginTop: "70px",
+                                    margin: "70px auto 0 auto", // 상단 70px, 좌우 자동 중앙
                                     fontFamily: "'Noto Sans KR', sans-serif",
                                     gap: "20px"
                                 }}>
@@ -528,7 +559,8 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>TOP</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedTop?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({topValue})</span>
+                                            {selectedTop?.name || "없음"}<br />
+                                            <span style={{ fontWeight: "400", color: "#555" }}>({topValue})</span>
                                         </p>
                                     </div>
 
@@ -536,7 +568,8 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>MIDDLE</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedMiddle?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({middleValue})</span>
+                                            {selectedMiddle?.name || "없음"}<br />
+                                            <span style={{ fontWeight: "400", color: "#555" }}>({middleValue})</span>
                                         </p>
                                     </div>
 
@@ -544,7 +577,8 @@ function PerfumeBlending() {
                                     <div style={{ textAlign: "center", flex: 1 }}>
                                         <p style={{ fontSize: "12px", color: "#888", margin: "0 0 5px 0" }}>LAST</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-                                            {selectedLast?.name || "없음"}<br /><span style={{ fontWeight: "400", color: "#555" }}>({lastValue})</span>
+                                            {selectedLast?.name || "없음"}<br />
+                                            <span style={{ fontWeight: "400", color: "#555" }}>({lastValue})</span>
                                         </p>
                                     </div>
                                 </div>

@@ -21,7 +21,7 @@ function ProductDetail() {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
-    
+
 
     useEffect(() => {
         const url = `${API_BASE_URL}/product/detail/${id}`;
@@ -45,7 +45,7 @@ function ProductDetail() {
 
     const reviewLoding = () => {
         console.log(product);
-        if(product) {
+        if (product) {
             getProductReviews(product.id, page, 6).then((data) => {
                 setReviews(data.content);
                 setTotalPages(data.totalPages);
@@ -201,7 +201,7 @@ function ProductDetail() {
         <div style={{ width: '100%', maxWidth: '100%', marginTop: "50px", padding: 0 }}>
             <Tabs
                 activeKey={key}
-                onSelect={(k) => {setKey(k); reviewLoding()}}
+                onSelect={(k) => { setKey(k); reviewLoding() }}
                 className="full-width-tabs"
             >
                 <Tab
@@ -212,12 +212,12 @@ function ProductDetail() {
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`}
                         style={{ margin: 100 }}
-                    ></img>
+                    ></img><br />
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`}
                         style={{ margin: 100 }}
 
-                    ></img>
+                    ></img><br />
                     <img
                         src={`${API_BASE_URL}/uploads/Detail/${product.name}/3.png`}
                         style={{ margin: 100 }}
@@ -229,33 +229,33 @@ function ProductDetail() {
                     title="Review"
                 >
                     <div className="container mt-4">
-                    {reviews.length === 0 ? (
-                        <div className="text-center py-5 border rounded bg-light">
-                        <p className="text-muted mb-3">아직 등록된 리뷰가 없습니다.</p>
-                        </div>
-                    ) : (
-                        <>
-                        <div className="row">
-                            {reviews.map((review) => (
-                            <div className="col-md-6 col-lg-4" key={review.reviewId}>
-                                <ReviewCard review={review} type="product" />
+                        {reviews.length === 0 ? (
+                            <div className="text-center py-5 border rounded bg-light">
+                                <p className="text-muted mb-3">아직 등록된 리뷰가 없습니다.</p>
                             </div>
-                            ))}
-                        </div>
+                        ) : (
+                            <>
+                                <div className="row">
+                                    {reviews.map((review) => (
+                                        <div className="col-md-6 col-lg-4" key={review.reviewId}>
+                                            <ReviewCard review={review} type="product" />
+                                        </div>
+                                    ))}
+                                </div>
 
-                        <Pagination className="justify-content-center mt-4">
-                            {[...Array(totalPages)].map((_, i) => (
-                            <Pagination.Item
-                                key={i}
-                                active={i === page}
-                                onClick={() => setPage(i)}
-                            >
-                                {i + 1}
-                            </Pagination.Item>
-                            ))}
-                        </Pagination>
-                        </>
-                    )}
+                                <Pagination className="justify-content-center mt-4">
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <Pagination.Item
+                                            key={i}
+                                            active={i === page}
+                                            onClick={() => setPage(i)}
+                                        >
+                                            {i + 1}
+                                        </Pagination.Item>
+                                    ))}
+                                </Pagination>
+                            </>
+                        )}
                     </div>
                 </Tab>
             </Tabs>
