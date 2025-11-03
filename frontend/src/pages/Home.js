@@ -97,11 +97,7 @@ function Home() {
 
     }, []);
 
-    const formatPrice = (price) => {
-        const n = typeof price === 'number' ? price : Number(price);
-        if (Number.isFinite(n)) return n.toLocaleString();
-        return '0';
-    };
+    const formatPrice = (price) => price.toLocaleString("ko-KR");
 
     // ------------------------ 장바구니 ------------------------------------
 

@@ -5,8 +5,6 @@ import { API_BASE_URL } from "../config/config";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
 
-
-
 function Productlist() {
     const containerRef = useRef();
     const [extended, setExtended] = useState([]);
@@ -16,11 +14,8 @@ function Productlist() {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const formatPrice = (price) => {
-        const n = typeof price === 'number' ? price : Number(price);
-        if (Number.isFinite(n)) return n.toLocaleString();
-        return '0';
-    };
+
+    const formatPrice = (price) => price.toLocaleString("ko-KR");
 
     useEffect(() => {// 베스트상품 스크롤 관련
         const container = containerRef.current;
@@ -248,7 +243,6 @@ function Productlist() {
 
 
     const addToCart = async (e, product) => {
-        e.stopPropagation();
         try {
             const url = `${API_BASE_URL}/cart/insert`;
             const parameters = {
@@ -256,13 +250,10 @@ function Productlist() {
                 productId: product,
                 quantity: 1
             };
-
             const response = await axios.post(url, parameters, { withCredentials: true });
-
             alert(response.data);
         } catch (error) {
             console.log('오류 발생 : ' + error);
-
             if (error.response) {
                 alert('장바구니 추가 실패');
                 console.log(error.response.data);

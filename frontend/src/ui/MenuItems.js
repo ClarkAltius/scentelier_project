@@ -48,6 +48,7 @@ function MenuItems() {
                     <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Product</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
                     <Nav.Link onClick={handleDesignClick} style={{ color: '#808080ff' }}>Design</Nav.Link>
+                    <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link>
                 </Nav>
                 <Nav>
                     {user ? (
@@ -64,9 +65,7 @@ function MenuItems() {
                             <NavDropdown title={<User size={20} style={{ color: '#808080ff' }} />} id="user-nav-dropdown" align="end">
                                 <NavDropdown.Item onClick={() => navigate('/mypage')}>마이 페이지</NavDropdown.Item>
                                 <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>내 커스터 향수</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/inquiry`)}>문의 페이지</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>내 커스텀 향수</NavDropdown.Item>
                                 <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>나의 문의 사항 페이지</NavDropdown.Item>
                                 {/* 회원정보 링크 추가 예정 */}
                                 {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
