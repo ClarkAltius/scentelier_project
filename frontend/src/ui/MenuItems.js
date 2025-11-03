@@ -66,7 +66,9 @@ function MenuItems() {
                                 <NavDropdown.Item onClick={() => navigate('/mypage')}>마이 페이지</NavDropdown.Item>
                                 <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
                                 <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>내 커스텀 향수</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>나의 문의 사항 페이지</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => navigate(`/mypage/review`)}>내 리뷰</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => navigate(`/reviews/write`)}>리뷰 작성</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>내 문의사항</NavDropdown.Item>
                                 {/* 회원정보 링크 추가 예정 */}
                                 {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
                                 <NavDropdown.Divider />
