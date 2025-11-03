@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -56,4 +57,24 @@ public class UserService {
         }
         return false; // 이미 삭제되었거나 존재하지 않는 사용자
     }
+
+    //비밀번호 찾기
+    public Users resetPassword(String name, String email, String phone, String newPassword) {
+        Optional<Users> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new NoSuchElementException("해당 이메일의 사용자가 존재하지 않습니다.");
+        }
+
+        Users user = optionalUser.get();
+
+        // 이름 + 전화번호 일치 여부 검증
+        if (!user.getUsername().equals(name) || !user.getPhone().equals(phone)) {
+            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호 인코딩 후 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }// 비밀번호 찾기 끝
 }

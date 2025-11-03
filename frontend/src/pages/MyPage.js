@@ -3,26 +3,28 @@ import { useAuth } from "../component/AuthContext";
 import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
-  const { user } = useAuth(); // 로그인한 사용자 정보
+  const { user, login, logout } = useAuth(); // 로그인한 사용자 정보, useAuth에서 logout 가져오기
   const [userInfo, setUserInfo] = useState(null); // 초기값을 null로
-
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
-      alert("로그인이 필요합니다.");
-      navigate("/login");
+      if (!isDeleting) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+      }
       return;
     }
 
     // 로그인된 사용자 정보로 상태 초기화
     setUserInfo({
-      name: user.username || "",
+      username: user.username || "",
       email: user.email || "",
       phone: user.phone || "",
       address: user.address || "",
     });
-  }, [user, navigate]);
+  }, [user, navigate, isDeleting]);
 
 
   //수정코드 시작
@@ -43,7 +45,7 @@ const MyPage = () => {
 
     // 업데이트할 정보 준비
     const updatedInfo = {
-      name: newName !== null ? newName : userInfo.name,
+      name: newName !== null ? newName : userInfo.username,
       email: userInfo.email, //이메일 변경불가 
       //newEmail !== null ? newEmail : userInfo.email,
       phone: newPhone !== null ? newPhone : userInfo.phone,
@@ -64,13 +66,16 @@ const MyPage = () => {
       //const result = await response.text(); // 백엔드에서 받은 문자열
       const result = await response.json();
       if (response.ok) {
-        setUserInfo({
-          name: result.username,
+        const newUserData = {
+          //setUserInfo({
+          username: result.username,
           email: result.email,
           phone: result.phone,
           address: result.address,
-        });
-        //  setUserInfo({ ...updatedInfo });
+        };
+
+        setUserInfo(newUserData);
+        login(newUserData); // AuthContext도 갱신
         alert("회원 정보가 성공적으로 업데이트되었습니다.")
       } else {
         alert(`업데이트 실패: ${result}`);
@@ -93,7 +98,7 @@ const MyPage = () => {
   const handleDelete = async () => {
     const confirmed = window.confirm("정말 탈퇴하시겠습니까?");
     if (!confirmed) return;
-
+    setIsDeleting(true); // 탈퇴 중임을 표시
     try {
       const response = await fetch(
         `http://localhost:9000/user/delete?email=${encodeURIComponent(userInfo.email)}`,
@@ -109,7 +114,8 @@ const MyPage = () => {
         setUserInfo({ name: "", email: "", address: "", phone: "" });
         localStorage.removeItem("user"); // 혹시 로컬 스토리지에 user가 저장되어 있다면 삭제
         sessionStorage.clear();
-        navigate("/login");
+        await logout(); // user context 상태 초기화 + sessionStorage 제거 + 고르아웃이 완료된 후 이동
+        navigate("/");
       } else {
         alert(`오류: ${text}`);
       }
@@ -128,7 +134,7 @@ const MyPage = () => {
       <div style={styles.container}>
         <h2 style={styles.title}>마이페이지</h2>
 
-        <InfoItem label="이름" value={userInfo.name} />
+        <InfoItem label="이름" value={userInfo.username || ""} />
         <InfoItem label="이메일" value={userInfo.email} />
         <InfoItem label="전화번호" value={userInfo.phone} />
         <InfoItem label="주소" value={userInfo.address} />
