@@ -68,6 +68,29 @@ function PerfumeTest() {
         setFilteredProducts(filtered);
     };
 
+
+    const addToCart = async (e, product) => {
+        try {
+            const url = `${API_BASE_URL}/cart/insert`;
+            const parameters = {
+                userId: user.id,
+                productId: product,
+                quantity: 1
+            };
+            const response = await axios.post(url, parameters, { withCredentials: true });
+
+            const goToCart = window.confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?");
+            if (goToCart) {
+                navigate("/cart/list");
+            }
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+            if (error.response) {
+                alert('장바구니 추가 실패');
+                console.log(error.response.data);
+            }
+        }
+    }
     return (
         <>
             <div style={{ margin: 30, textAlign: 'center', color: '#6B4C3B' }}>
@@ -139,6 +162,19 @@ function PerfumeTest() {
                                         >
                                             <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>{item.price.toLocaleString()}원</span><br />
                                             <Button
+                                                onClick={(e) => {
+                                                    if (!user) {
+                                                        e.stopPropagation();
+
+                                                        alert('로그인이 필요한 서비스입니다.');
+                                                        navigate('/login');
+                                                        return; // 로그인 페이지로 이동 후 종료
+                                                    }
+
+                                                    // 로그인된 경우에만 장바구니 추가 실행
+                                                    e.stopPropagation();
+                                                    addToCart(e, item.id);
+                                                }}
                                                 style={{
                                                     backgroundColor: "transparent",
                                                     color: "#808080ff",
