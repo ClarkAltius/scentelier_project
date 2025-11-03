@@ -5,6 +5,7 @@ import { API_BASE_URL } from "../config/config";
 import { useAuth } from "../component/AuthContext";
 import axios from "axios";
 import { X } from "lucide-react";
+import "./CartList.css";
 
 // 배송 정책
 const SHIPPING_FEE = 0;
@@ -25,7 +26,7 @@ const normalizeCartItem = (raw) => {
     customId: custom_id,
     name: product.name ?? raw.name ?? "상품명",
     price: Number(product.price ?? raw.price ?? 0),
-    originalPrice: Number(product.original_price ?? raw.originalPrice ?? product.price ?? 0),
+    originalPrice: Number(product.original_price ?? raw.originalPrice ?? product.price ?? raw.price ?? 0),
     image: product.image_url ?? product.imageUrl ?? raw.image_url ?? raw.imageUrl ?? raw.image ?? null,
     quantity,
     checked,
@@ -219,14 +220,6 @@ function CartList() {
         {/* 상단  */}
         <div className="d-flex gap-2 justify-content-center mt-3">
           <Button
-            variant="outline-success"
-            size="sm"
-            style={{ borderRadius: 0, minWidth: 140, fontWeight: 600 }}
-            onClick={() => goToPayment(items.filter((p) => p.checked))}
-          >
-            선택상품주문
-          </Button>
-          <Button
             variant="outline-dark"
             size="sm"
             style={{ borderRadius: 0, minWidth: 140, fontWeight: 600 }}
@@ -265,15 +258,14 @@ function CartList() {
                   style={{ borderBottom: "1px solid #e9e9e9" }}
                 >
                   <Row className="g-3">
-                    <Col xs="auto" className="d-flex align-items-start">
+                    <Col xs="auto" className="d-flex align-items-center">
                       <Form.Check
                         type="checkbox"
                         checked={p.checked}
                         onChange={() => toggleOne(p.cartItemId)}
-                        className="mt-2"
+                        className="custom-checkbox"
                       />
                     </Col>
-
                     <Col xs={3} md={2}>
                       <Image src={imgSrc} alt={p.name} thumbnail />
                     </Col>
@@ -282,15 +274,27 @@ function CartList() {
                       <div className="d-flex justify-content-between">
                         <div>
                           <div style={{ fontWeight: 600 }}>{p.name}</div>
-                          <div className="mt-2 small">
-                            정상가 : {p.price.toLocaleString()}원
-                            <br />
-                            할인가 : {discount > 0 ? `- ${discount.toLocaleString()}원` : "없음"}
-                            <br />
-                            상품구매금액 : <strong>{lineTotal.toLocaleString()}원</strong>
+                          <div className="mt-2" style={{ fontSize: "0.9rem", lineHeight: "1.5" }}>
+                            <div className="text-muted">
+                              정상가 <span className="ms-2">{p.originalPrice.toLocaleString()}원</span>
+                            </div>
+
+                            {discount > 0 && (
+                              <div className="text-danger fw-semibold">
+                                할인가 <span className="ms-2">-{discount.toLocaleString()}원</span>
+                              </div>
+                            )}
+
+                            <hr className="my-2" style={{ opacity: 0.3 }} />
+
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span className="fw-semibold">상품금액</span>&nbsp;
+                              <span className="fw-bold fs-6 text-success">
+                                {lineTotal.toLocaleString()}원
+                              </span>
+                            </div>
                           </div>
                         </div>
-
                         <Button
                           variant="link"
                           className="text-muted"
