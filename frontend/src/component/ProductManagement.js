@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './ProductManagement.module.css';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
