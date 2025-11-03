@@ -1,7 +1,13 @@
 package com.scentelier.backend.dto;
 import com.scentelier.backend.entity.Orders;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
+@Data
+@AllArgsConstructor
 public class OrderAdminDto {
 
     private Long id;
@@ -10,6 +16,7 @@ public class OrderAdminDto {
     private String orderDate;
     private java.math.BigDecimal totalAmount;
     private String status;
+    private String address;
 
     public OrderAdminDto() {}
 
@@ -19,34 +26,12 @@ public class OrderAdminDto {
         this.orderDate = order.getOrderDate().toString();
         this.totalAmount = order.getTotalPrice();
         this.status = order.getStatus().toString();
+        this.address = order.getAddress();
 
         // 사용자 정보
         if (order.getUsers() != null) {
             this.customerName = order.getUsers().getUsername();
             this.customerEmail = order.getUsers().getEmail();
         }
-    }
-    public Long getId() {
-        return id;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public String getOrderDate() {
-        return orderDate;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public String getStatus() {
-        return status;
     }
 }

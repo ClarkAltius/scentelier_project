@@ -43,7 +43,7 @@ const CustomIngredients = ({ ingredients }) => {
 
     return (
         <div style={{ fontSize: '0.85em', paddingLeft: '10px' }}>
-            <strong className="text-muted">Ingredients:</strong>
+            <strong className="text-muted">원액 구성:</strong>
             <ul style={{ paddingLeft: '20px', marginBottom: '0' }}>
                 {ingredients.map((ing, index) => (
                     <li key={index}>

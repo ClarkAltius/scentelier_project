@@ -76,7 +76,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "FROM Orders o " +
             "WHERE o.status != 'CANCELLED'" +
             "GROUP BY month " +
-            "ORDER BY month DESC")
+            "ORDER BY month ASC")
     List<Object[]> findMonthlySales();
 
 }

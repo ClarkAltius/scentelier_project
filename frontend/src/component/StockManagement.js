@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './StockManagement.module.css';
-import { Package, Beaker, Edit, Save, X, PlusCircle, FileText } from 'lucide-react';
+import { Package, Beaker, Edit, Save, X, PlusCircle, FileText, ArrowUp, ArrowDown, Search, Filter } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
+import { Pagination } from 'react-bootstrap';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -33,30 +34,58 @@ function StockManagement() {
     // 재고 변동 저장할 스테이트
     const [adjustmentValues, setAdjustmentValues] = useState({});
 
+    // 검색, 필터링 창 용 스테이트
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // === 훅 ===
+    // 페이징 용 스테이트
+    const [pageSize, setPageSize] = useState(20);
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+    // 완제품 정렬, 페이징 용 테이블 스테이트
+    const [productSortConfig, setProductSortConfig] = useState({ key: 'stock', direction: 'asc' });
+    const [productTotalPages, setProductTotalPages] = useState(0);
+    const [productCurrentPage, setProductCurrentPage] = useState(0);
+
+    // 원액 정렬, 페이징 용 테이블 스테이트
+    const [ingredientSortConfig, setIngredientSortConfig] = useState({ key: 'stock', direction: 'asc' });
+    const [ingredientCurrentPage, setIngredientCurrentPage] = useState(0);
+    const [ingredientTotalPages, setIngredientTotalPages] = useState(0);
+
+    // === 훅, 페이징 정렬 업데이트 ===
     useEffect(() => {
-        setIsLoading(true); // 로딩창 활성화
-        setError(null); // 에러 초기화
-        // 데이터 fetch
-        setTimeout(async () => {
+        const fetchStockData = async () => {
+            setIsLoading(true); // 로딩창 활성화
+            setError(null); // 에러 초기화
+
+            // 현 view 기반한 액티브 세팅
+            const isProducts = activeView === 'products';
+            const endpoint = isProducts ? 'products/stock' : 'ingredients/stock';
+            const currentPage = isProducts ? productCurrentPage : ingredientCurrentPage;
+            const sortConfig = isProducts ? productSortConfig : ingredientSortConfig;
+
+            // 데이터 fetch
             try {
-                // productController vs. AdminController ? = AdminController 에서 하자. 
-                const productResponse = await axios.get(`${API_BASE_URL}/api/admin/products/stock`, { withCredentials: true });
+                // 쿼리 파라미터 빌드
+                const params = new URLSearchParams();
+                params.append('page', currentPage);
+                params.append('size', pageSize);
+                params.append('sort', `${sortConfig.key},${sortConfig.direction}`);
 
-                if (Array.isArray(productResponse.data)) {
-                    setProducts(productResponse.data);
-                } else {
-                    console.error("Product data is not an array:", productResponse.data);
-                    setError("Failed to load product data (invalid format).");
+                // 검색어 있을 시 검색어 파라미터에 포함
+                if (debouncedSearchTerm) {
+                    params.append('search', debouncedSearchTerm);
                 }
+                // productController vs. AdminController ? = AdminController 에서 하자. 
+                const url = `${API_BASE_URL}/api/admin/${endpoint}?${params.toString()}`;
+                const response = await axios.get(url, { withCredentials: true });
 
-                const ingredientResponse = await axios.get(`${API_BASE_URL}/api/admin/ingredients/stock`, { withCredentials: true });
-                if (Array.isArray(ingredientResponse.data)) {
-                    setIngredients(ingredientResponse.data);
+                // Set state for the correct table
+                if (isProducts) {
+                    setProducts(response.data.content || []);
+                    setProductTotalPages(response.data.totalPages);
                 } else {
-                    console.error("Ingredient data is not an array:", ingredientResponse.data);
-                    setError("Failed to load ingredient data (invalid format).");
+                    setIngredients(response.data.content || []);
+                    setIngredientTotalPages(response.data.totalPages);
                 }
             } catch (err) {
                 console.error("Failed to fetch stock data:", err);
@@ -64,9 +93,20 @@ function StockManagement() {
             } finally {
                 setIsLoading(false);
             }
-        }, 500);
-    }, []);
+        };
+        fetchStockData();
+    }, [activeView, productCurrentPage, productSortConfig, ingredientCurrentPage, ingredientSortConfig, pageSize, debouncedSearchTerm]);
 
+    // 검색창 딜레이 훅
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300); // 300ms delay
+
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [searchTerm]);
 
     // === 이벤트 핸들러 ===
     const handleAdjustClick = (item, type) => {
@@ -79,6 +119,12 @@ function StockManagement() {
         }
         updateStockOnServer(item.id, newStock, type);
     };
+
+    // 검색 핸들러
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+
 
     /**
      * 체크박스 이용, 개별 아이템 선택
@@ -144,6 +190,35 @@ function StockManagement() {
 
         // // 액션 후 선택사항들 초기화
         setSelectedItems(prev => ({ ...prev, [activeView]: new Set() }));
+    };
+
+
+    // 정렬 핸들러
+    const handleSort = (key) => {
+        const isProducts = activeView === 'products';
+        const currentSortConfig = isProducts ? productSortConfig : ingredientSortConfig;
+
+        let direction = 'asc';
+        if (currentSortConfig.key === key && currentSortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+
+        if (isProducts) {
+            setProductSortConfig({ key, direction });
+            setProductCurrentPage(0); // Reset to first page
+        } else {
+            setIngredientSortConfig({ key, direction });
+            setIngredientCurrentPage(0); // Reset to first page
+        }
+    };
+
+    // 페이지 변경 핸들러
+    const handlePageChange = (page) => {
+        if (activeView === 'products') {
+            setProductCurrentPage(page);
+        } else {
+            setIngredientCurrentPage(page);
+        }
     };
 
 
@@ -258,6 +333,20 @@ function StockManagement() {
         }
     };
 
+    // === 정렬 화살표 헬퍼 ===
+    const getSortArrow = (key, type) => {
+        const sortConfig = type === 'products' ? productSortConfig : ingredientSortConfig;
+        if (sortConfig.key !== key) return null;
+        if (sortConfig.direction === 'asc') {
+            return <ArrowUp size={16} className={styles.sortIcon} />;
+        }
+        return <ArrowDown size={16} className={styles.sortIcon} />;
+    };
+
+    // 필터링, 검색 로직
+
+
+
     // === 렌더 로직 ===
 
     const renderTable = (items, type) => {
@@ -265,76 +354,119 @@ function StockManagement() {
         const allSelected = items.length > 0 && currentSelection.size === items.length;
 
         return (
-            <table className={styles.stockTable}>
-                <thead>
-                    <tr>
-                        <th className={styles.checkboxColumn}>
-                            <input
-                                type="checkbox"
-                                checked={allSelected}
-                                onChange={handleSelectAll}
-                                aria-label="Select all items"
-                            />
-                        </th>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>현 재고</th>
-                        <th>재고 변동</th>
-                        <th>기능</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {items.map((item) => {
-                        const isLowStock = item.stock < 10; // 10개 이하면 강조
+            <div>
+                <table className={styles.stockTable}>
+                    <thead>
+                        <tr>
+                            <th className={styles.checkboxColumn}>
+                                <input
+                                    type="checkbox"
+                                    checked={allSelected}
+                                    onChange={handleSelectAll}
+                                    aria-label="Select all items"
+                                />
+                            </th>
+                            <th onClick={() => handleSort('id')} className={styles.sortableHeader}>
+                                ID {getSortArrow('id', type)}
+                            </th>
+                            <th onClick={() => handleSort('name')} className={styles.sortableHeader}>
+                                이름 {getSortArrow('name', type)}
+                            </th>
+                            <th onClick={() => handleSort('stock')} className={styles.sortableHeader}>
+                                현 재고 {getSortArrow('stock', type)}
+                            </th>
+                            <th>재고 변동</th>
+                            <th>기능</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                        return (
-                            <tr key={item.id} className={isLowStock ? styles.lowStockRow : ''}>
-                                <td className={styles.checkboxColumn}>
-                                    <input
-                                        type="checkbox"
-                                        checked={currentSelection.has(item.id)}
-                                        onChange={() => handleSelectItem(item.id)}
-                                        aria-label={`Select ${item.name}`}
-                                    />
-                                </td>
-                                <td>#{item.id}</td>
-                                <td>{item.name}</td>
-                                <td>
-                                    <span className={isLowStock ? styles.lowStockText : ''}>
-                                        {item.stock}
-                                    </span>
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        className={styles.stockInput}
-                                        placeholder="발주수량"
-                                        value={adjustmentValues[item.id] || ''}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            setAdjustmentValues(prev => ({
-                                                ...prev,
-                                                [item.id]: value === '' ? '' : Number(value)
-                                            }));
-                                        }}>
-                                    </input>
-                                </td>
-                                <td>
-                                    <div className={styles.actionButtons}>
-                                        <button className={`${styles.actionButton} ${styles.adjustButton}`} onClick={() => handleAdjustClick(item, type)} title="Adjust Stock">
-                                            <Edit size={16} /> 재고 수정
-                                        </button>
-                                    </div>
+                        {items.length > 0 ? items.map((item) => {
+                            const isLowStock = item.stock < 10; // 10개 이하면 강조
+
+                            return (
+                                <tr key={item.id} className={isLowStock ? styles.lowStockRow : ''}>
+                                    <td className={styles.checkboxColumn}>
+                                        <input
+                                            type="checkbox"
+                                            checked={currentSelection.has(item.id)}
+                                            onChange={() => handleSelectItem(item.id)}
+                                            aria-label={`Select ${item.name}`}
+                                        />
+                                    </td>
+                                    <td>#{item.id}</td>
+                                    <td>{item.name}</td>
+                                    <td>
+                                        <span className={isLowStock ? styles.lowStockText : ''}>
+                                            {item.stock}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            className={styles.stockInput}
+                                            placeholder="발주수량"
+                                            value={adjustmentValues[item.id] || ''}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setAdjustmentValues(prev => ({
+                                                    ...prev,
+                                                    [item.id]: value === '' ? '' : Number(value)
+                                                }));
+                                            }}>
+                                        </input>
+                                    </td>
+                                    <td>
+                                        <div className={styles.actionButtons}>
+                                            <button className={`${styles.actionButton} ${styles.adjustButton}`} onClick={() => handleAdjustClick(item, type)} title="Adjust Stock">
+                                                <Edit size={16} /> 재고 수정
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        }) : (
+                            <tr>
+                                <td colSpan="6" className={styles.noResults}>
+                                    {searchTerm ? "검색 결과가 없습니다." : "데이터가 없습니다."}
                                 </td>
                             </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         );
     }
 
-    if (isLoading) {
+    {/**페이징 렌더링 */ }
+    const renderPagination = () => {
+        const isProducts = activeView === 'products';
+        const currentPage = isProducts ? productCurrentPage : ingredientCurrentPage;
+        const totalPages = isProducts ? productTotalPages : ingredientTotalPages;
+
+        if (totalPages <= 1) return null; // Don't show pagination if only 1 page
+
+        return (
+            <div className={styles.paginationContainer}>
+                <span className={styles.pageInfo}>
+                    Page {currentPage + 1} of {totalPages}
+                </span>
+                <Pagination>
+                    <Pagination.Prev
+                        onClick={() => handlePageChange(Math.max(currentPage - 1, 0))}
+                        disabled={currentPage === 0}
+                    />
+                    <Pagination.Item active>{currentPage + 1}</Pagination.Item>
+                    <Pagination.Next
+                        onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages - 1))}
+                        disabled={currentPage >= totalPages - 1}
+                    />
+                </Pagination>
+            </div>
+        );
+    }
+
+    if (isLoading && products.length === 0 && ingredients.length === 0) {
         return <div className={styles.loading}>재고 로딩중...</div>;
     }
 
@@ -346,6 +478,15 @@ function StockManagement() {
 
     return (
         <div className={styles.stockManagementPage}>
+            <div className={styles.searchBar}>
+                <Search size={18} className={styles.searchIcon} />
+                <input
+                    type="text"
+                    placeholder="Search by ID, Name... 검색"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                />
+            </div>
             <div className={styles.header}>
                 <div className={styles.viewToggle}>
                     <button
@@ -380,8 +521,11 @@ function StockManagement() {
             </div>
 
             <div className={styles.tableContainer}>
-                {activeView === 'products' ? renderTable(products, 'products') : renderTable(ingredients, 'ingredients')}
+                {activeView === 'products'
+                    ? renderTable(products, 'products')
+                    : renderTable(ingredients, 'ingredients')}
             </div>
+            {renderPagination()}
         </div>
     );
 }

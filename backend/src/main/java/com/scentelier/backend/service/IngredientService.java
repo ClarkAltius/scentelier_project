@@ -7,16 +7,16 @@ import com.scentelier.backend.entity.Ingredient;
 import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.repository.IngredientRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 // 주문 취소 이벤트 & 리스너
 import com.scentelier.backend.event.OrderCancelledEvent;
@@ -31,11 +31,22 @@ public class IngredientService {
         ingredientRepository.save(ingredient);
     }
 
-    // 상품 재고 가져오기 서비스
-    public List<IngredientStockDto> getIngredientStock() {
-        return ingredientRepository.findAll().stream()
-                .map(ingredient -> new IngredientStockDto(ingredient.getId(), ingredient.getName(), ingredient.getStock()))
-                .collect(Collectors.toList());
+    // 관리자창 원액 재고 가져오기 서비스 (pageable로 변경)
+    public Page<IngredientStockDto> getIngredientStock(String search, Pageable pageable) {
+       Page<Ingredient> ingredientPage;
+
+        if (search != null && !search.isBlank()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            ingredientPage = ingredientRepository.findAllByIsDeletedFalseAndSearch(searchPattern, pageable);
+        } else {
+            ingredientPage = ingredientRepository.findAllByIsDeleted(false, pageable);
+        }
+
+       return ingredientPage.map(ingredient -> new IngredientStockDto(
+               ingredient.getId(),
+               ingredient.getName(),
+               ingredient.getStock()
+       ));
     }
 
     public List<Ingredient> findAll() {

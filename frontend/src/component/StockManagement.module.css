@@ -226,3 +226,100 @@
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+/* Add these new classes to your StockManagement.module.css file */
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+    /* Prevents text selection on click */
+}
+
+.sortableHeader:hover {
+    background-color: #f8f9fa;
+    /* Or your preferred table hover color */
+}
+
+.sortIcon {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+    opacity: 0.7;
+}
+
+/* loading overlay for re-fetches */
+.tableContainer {
+    position: relative;
+}
+
+.loadingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 10;
+}
+
+/* Pagination styles */
+.paginationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pageInfo {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.filterDropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filterDropdown select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    flex-grow: 1;
+    min-width: 250px;
+}
+
+.searchBar input {
+    border: none;
+    outline: none;
+    padding: 10px 8px;
+    font-size: 14px;
+    background: transparent;
+    width: 100%;
+}
+
+.searchIcon {
+    color: #999;
+    margin-right: 6px;
+}

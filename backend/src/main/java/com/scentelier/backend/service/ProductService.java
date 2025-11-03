@@ -1,12 +1,10 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.constant.OrderStatus;
-import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.CartItemRepository;
 import com.scentelier.backend.repository.OrderRepository;
 import com.scentelier.backend.repository.ProductRepository;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,10 +13,8 @@ import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
 import jakarta.transaction.Transactional;
 
@@ -79,11 +75,22 @@ public class ProductService {
     }
 
 
-    // 상품 재고 가져오기 서비스
-    public List<ProductStockDto> getProductStock() {
-        return productRepository.findAll().stream()
-                .map(product -> new ProductStockDto(product.getId(), product.getName(), product.getStock()))
-                .collect(Collectors.toList());
+    // 관리자창 상품 재고 가져오기 서비스
+    public Page<ProductStockDto> getProductStock(String search, Pageable pageable) {
+        Page<Products> productPage;
+
+        if (search != null && !search.isBlank()) {
+            String searchPattern = "%" + search.toLowerCase() + "%";
+            productPage = productRepository.findAllByIsDeletedFalseAndSearch(searchPattern, pageable);
+                   } else {
+            productPage = productRepository.findAllByIsDeleted(false, pageable);
+                   }
+
+        return productPage.map(product -> new ProductStockDto(
+           product.getId(),
+           product.getName(),
+           product.getStock()
+        ));
     }
 
 

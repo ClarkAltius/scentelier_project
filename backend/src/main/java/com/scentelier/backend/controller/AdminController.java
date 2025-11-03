@@ -54,14 +54,20 @@ public class AdminController {
     }
 
     @GetMapping("/products/stock")
-    public ResponseEntity<List<ProductStockDto>> getProductStock() {
-        List<ProductStockDto> stockData = productService.getProductStock();
+    public ResponseEntity<Page<ProductStockDto>> getProductStock(
+            Pageable pageable,
+            @RequestParam(value = "search", required = false) String search
+            ) {
+        Page<ProductStockDto> stockData = productService.getProductStock(search, pageable);
         return ResponseEntity.ok(stockData);
     }
 
     @GetMapping("/ingredients/stock")
-    public ResponseEntity<List<IngredientStockDto>> getIngredientStock() {
-        List<IngredientStockDto> stockData = ingredientService.getIngredientStock();
+    public ResponseEntity<Page<IngredientStockDto>> getIngredientStock(
+            Pageable pageable,
+            @RequestParam(value="search", required = false) String search
+    ) {
+        Page<IngredientStockDto> stockData = ingredientService.getIngredientStock(search, pageable);
         return ResponseEntity.ok(stockData);
     }
 

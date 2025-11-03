@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './OrderManagement.module.css';
-import { Search, Filter, Eye, Edit, XCircle } from 'lucide-react';
+import { Search, Filter, Eye, Edit, XCircle, ArrowUp, ArrowDown } from 'lucide-react';
+import { Pagination } from 'react-bootstrap';
 import { API_BASE_URL } from '../config/config';
 import axios from 'axios';
 import OrderDetailsModal from './OrderDetailsModal';
@@ -32,16 +33,29 @@ function OrderManagement() {
     // 모달 표기용 스테이트
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+    // 페이징, 정렬 용 스테이트 추가
+    const [sortConfig, setSortConfig] = useState({ key: 'orderDate', direction: 'desc' });
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize, setPageSize] = useState(20);
 
-    //주문 리스트 가져오기
+
+    //주문 리스트 가져오기. UPDATE : 페이징, 정렬 기능 추가
     useEffect(() => {
         const fetchOrders = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, { withCredentials: true });
+                // 페이징과 정렬 기능을 위한 쿼리 파라미터
+                const params = new URLSearchParams();
+                params.append('page', currentPage);
+                params.append('size', pageSize);
+                params.append('sort', `${sortConfig.key},${sortConfig.direction}`);
+
+                const response = await axios.get(`${API_BASE_URL}/api/admin/orders?${params.toString()}`, { withCredentials: true });
                 // console.log(response.data);
                 setOrders(response.data.content || []);
+                setTotalPages(response.data.totalPages);
             } catch (err) {
                 console.error("Failed to fetch orders:", err);
                 setError("주문 목록을 불러오는 데 실패했습니다.");
@@ -51,7 +65,7 @@ function OrderManagement() {
             }
         };
         fetchOrders();
-    }, []);
+    }, [currentPage, sortConfig, pageSize]);
 
 
     // === EVENT HANDLERS ===
@@ -77,8 +91,20 @@ function OrderManagement() {
         setSelectedOrder(null);
     };
 
+    // 정렬 기능 핸들러
+    const handleSort = (key) => {
+        let direction = 'asc';
+        // 같은 키를 누르면 정렬 옵션 반대로
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        // 정렬이 바뀌면 첫번째 페이지로 리셋. 0base
+        setCurrentPage(0);
+        setSortConfig({ key, direction });
+    };
 
-    // 상태 변경 핸들러
+
+    // [모달] 상태 변경 핸들러
     const handleUpdateStatus = async (orderId, newStatus) => {
         if (!window.confirm(`정말로 #${orderId}의 상태를 ${newStatus}로 변경하시겠습니다?`)) {
             return;
@@ -139,11 +165,20 @@ function OrderManagement() {
         return matchesStatus && matchesSearch;
     });
 
+    // 정렬 화살표 헬퍼
+    const getSortArrow = (key) => {
+        if (sortConfig.key !== key) return null;
+        if (sortConfig.direction === 'asc') {
+            return <ArrowUp size={16} className={styles.sortIcon} />;
+        }
+        return <ArrowDown size={16} className={styles.sortIcon} />;
+    };
 
     // === 렌더링 로직 ===
 
     // 데이터 fetch 도중엔 로딩 표기
-    if (isLoading) {
+
+    if (isLoading && !orders.length) {
         return <div className={styles.loading}>Loading products...</div>;
     }
     if (error) {
@@ -177,15 +212,29 @@ function OrderManagement() {
             </div>
 
             {/* Order Table */}
+            {isLoading && <div className={styles.loadingOverlay}></div>} {/** 정렬, 페이징 변경시 재로딩  */}
             <div className={styles.tableContainer}>
                 <table className={styles.orderTable}>
                     <thead>
                         <tr>
-                            <th>주문 ID</th>
-                            <th>고객</th>
-                            <th>날짜</th>
-                            <th>합계</th>
-                            <th>상태</th>
+                            <th onClick={() => handleSort('id')} className={styles.sortableHeader}>
+                                주문 ID{getSortArrow('id')}
+                            </th>
+                            <th onClick={() => handleSort('recipientName')} className={styles.sortableHeader}>
+                                고객 {getSortArrow('recipientName')}
+                            </th>
+                            <th onClick={() => handleSort('orderDate')} className={styles.sortableHeader}>
+                                날짜 {getSortArrow('orderDate')}
+                            </th>
+                            <th onClick={() => handleSort('totalPrice')} className={styles.sortableHeader}>
+                                합계 {getSortArrow('totalPrice')}
+                            </th>
+                            <th onClick={() => handleSort('address')} className={styles.sortableHeader}>
+                                주소 {getSortArrow('address')}
+                            </th>
+                            <th onClick={() => handleSort('status')} className={styles.sortableHeader}>
+                                상태 {getSortArrow('status')}
+                            </th>
                             <th>행동</th>
                         </tr>
                     </thead>
@@ -200,6 +249,7 @@ function OrderManagement() {
                                     </td>
                                     <td>{order.orderDate}</td>
                                     <td>₩{order.totalAmount.toLocaleString()}</td>
+                                    <td>{order.address}</td>
                                     <td>
                                         {/* 상태 + 상태 아이콘 표시*/}
                                         <span className={`${styles.statusBadge} ${styles[`status${order.status}`]}`}>
@@ -260,6 +310,22 @@ function OrderManagement() {
             </div>
 
             {/* TODO: 페이징 처리 여기에 추가 */}
+            <div className={styles.PaginationContainer}>
+                <span className={styles.pageInfo}>
+                    페이지 {currentPage + 1} / {totalPages}
+                </span>
+                <Pagination>
+                    <Pagination.Prev
+                        onClick={() => setCurrentPage(p => Math.max(p - 1, 0))}
+                        disabled={currentPage === 0}
+                    />
+                    <Pagination.Item active>{currentPage + 1}</Pagination.Item>
+                    <Pagination.Next
+                        onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages - 1))}
+                        disabled={currentPage >= totalPages - 1}
+                    />
+                </Pagination>
+            </div>
 
             <OrderDetailsModal
                 order={selectedOrder}
