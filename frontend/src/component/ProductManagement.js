@@ -1,357 +1,242 @@
 import { useEffect, useState } from 'react';
 import styles from './ProductManagement.module.css';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-
 function ProductManagement({ setActiveView }) {
-    const [products, setProducts] = useState([]);
-    const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(true); //로딩 스테이트
-    const [error, setError] = useState(null); // 에러 표기용 스테이트
-    const [selectedIds, setSelectedIds] = useState([]); // 체크박스용 스테이트
+  const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
-    const isAllSelected = products.length > 0 && selectedIds.length === products.length; // 모든 행 선택 
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-    //페이지네이션 대비
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+  const [showDetail, setShowDetail] = useState(false);
+  const [detail, setDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
+  const [searchText, setSearchText] = useState(''); // 입력값
+  const [query, setQuery] = useState('');     
 
-
-            //상품 로딩 기능. 페이지네이션 기능 포함
-        useEffect(() => {
-        let ignore = false;                        // 늦은 응답 무시 플래그
-        const controller = new AbortController();  // axios 취소용
-
-        const fetchProducts = async () => {
-            setIsLoading(true);
-            setError(null);
-
-            try {
-            const response = await axios.get(
-                `${API_BASE_URL}/product/list`,
-                { params: { page, size: 10 }, signal: controller.signal } // <= 중요
-            );
-
-            const data = response.data;
-            const raw =
-                Array.isArray(data) ? data :
-                Array.isArray(data.content) ? data.content :
-                Array.isArray(data.data) ? data.data :
-                Array.isArray(data.rows) ? data.rows : [];
-
-            if (ignore) return; // 늦게 도착한 응답은 버림
-                const normalized = raw.map(p => {
-                const isDelRaw = p.isDeleted ?? p.is_deleted ?? p.isdeleted ?? 0;
-                const isDel = Number(isDelRaw) === 1 || isDelRaw === true ? 1 : 0;
-
-                // 서버가 PENDING 주면 우선
-                const base =
-                    p.status ??
-                    (p.selling === true ? 'SELLING' : (p.selling === false ? 'STOPPED' : 'SELLING'));
-
-                // is_deleted=1 이면 화면상 STOPPED로 강제
-                const computedStatus = isDel ? 'STOPPED' : base;
-
-                return {
-                    ...p,
-                    isDeleted: isDel,
-                    status: computedStatus,
-                };
-                });
-                setProducts(normalized);
-
-            const tp =
-                Number.isFinite(data?.totalPages) ? data.totalPages :
-                Number.isFinite(data?.page?.totalPages) ? data.page.totalPages :
-                1;
-            setTotalPages(tp);
-            } catch (err) {
-            if (axios.isCancel?.(err)) return; // 사용자가 페이지 이동/리렌더로 취소된 경우
-            if (err?.name === 'CanceledError') return; // axios@1의 취소 에러명
-            console.error('상품 불러오기 에러:', err);
-            setError('상품을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
-            } finally {
-            if (!ignore) setIsLoading(false);
-            }
-        };
-
-        fetchProducts();
-
-        // cleanup: 다음 렌더/언마운트 시 이전 요청 무시/취소
-        return () => {
-            ignore = true;
-            controller.abort();
-        };
-        }, [page, API_BASE_URL]);
-
-    const renderStatusBadge = (status) => {
-        if (status === "SELLING")
-            return <span className={`${styles.badge} ${styles.badgeSelling}`}>판매중</span>;
-        if (status === "STOPPED")
-            return <span className={`${styles.badge} ${styles.badgeStopped}`}>판매중지</span>;
-        if (status === "PENDING")
-            return <span className={`${styles.badge} ${styles.badgePending}`}>주문중</span>;
-
-        return <span>알수없음</span>;
-    };
+  const isAllSelected = products.length > 0 && selectedIds.length === products.length;
 
 
-    //페이징 핸들러
-    const handleNextPage = () => {
-        // 페이지 0 인덱스, 총 페이지 1 인덱스
-        if (page < totalPages - 1) {
-            setPage(prevPage => prevPage + 1);
-        }
-    };
+  useEffect(() => {
+  const t = setTimeout(() => {
+    setQuery(searchText.trim());
+    setPage(0);
+  }, 300);
+  return () => clearTimeout(t);
+}, [searchText]);
 
-    const handlePrevPage = () => {
-        if (page > 0) {
-            setPage(prevPage => prevPage - 1);
-        }
-    };
 
-    // 개별 선택 토글
-    const handleSelect = (id) => {
-        setSelectedIds(prev =>
-            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-        );
-    };
+  // 상태 배지
+  const renderStatusBadge = (p) => {
+    const status = p.isDeleted ? 'STOPPED' : (p.status ?? 'SELLING');
+    if (status === 'SELLING') return <span className={`${styles.badge} ${styles.badgeSelling}`}>판매중</span>;
+    if (status === 'STOPPED') return <span className={`${styles.badge} ${styles.badgeStopped}`}>판매중지</span>;
+    if (status === 'PENDING') return <span className={`${styles.badge} ${styles.badgePending}`}>주문중</span>;
+    return <span>알수없음</span>;
+  };
 
-    // 전체 선택 토글
-    const handleSelectAll = () => {
-        if (isAllSelected) {
-            setSelectedIds([]);
+  // 목록 로딩
+  useEffect(() => {
+    let ignore = false;
+    const controller = new AbortController();
 
-        } else {
-            setSelectedIds(products.map((p) => p.id));
-        }
-    };
-
-       const tryRestoreOnServer = async (id) => {
-        const url = `${API_BASE_URL}/product/restore/${encodeURIComponent(id)}`;
-        try {
-          return await axios.patch(url, null, { withCredentials: true });
-        } catch (err) {
-          if (err?.response?.status === 404) {
-            // 백엔드 복구 API가 없다면 여기서 명확히 알림
-            throw new Error('복구 API(/product/restore/{id})가 없습니다. 백엔드 추가가 필요해요.');
-          }
-          throw err;
-        }
-        };
-
-// 기존 handleToggleStatus가 없으면 추가, 있으면 이 로직으로 교체
-const handleToggleStatus = async (id, currentStatus, isDeletedFlag) => {
-  // 1) 주문중이면 금지
-  // if (currentStatus === 'PENDING') {
-  //   alert('주문중(PENDING) 상태에서는 판매 상태를 변경할 수 없습니다.');
-  //   return;
-  // }
-
-  // 2) 판매중 → 판매중지: 기존처럼 소프트삭제 DELETE /product/{id}
-  if (currentStatus === 'SELLING') {
-    console.log('[SELLING → STOPPED] try DELETE /product/', id);
-    const snapshot = [...products];
-    setProducts(prev =>
-      prev.map(p => p.id === id ? { ...p, isDeleted: 1, status: 'STOPPED' } : p)
-    );
-
-    try {
-      await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, {
-        withCredentials: true,
-      });
-      alert('해당 상품을 판매중지했습니다.');
-      return;
-    } catch (err) {
-      setProducts(snapshot);
-      const msg = err?.response?.data || '판매중지 실패';
-      alert(typeof msg === 'string' ? msg : '판매중지 실패');
-      return;
-    }
-  }
-
-  // 3) 판매시작(STOPPED) → 복구 PATCH /product/restore/{id}
-  if (currentStatus === 'STOPPED' || isDeletedFlag === 1 || isDeletedFlag === true) {
-    console.log('[STOPPED → SELLING] try RESTORE /product/restore/', id);
-    const snapshot = [...products];
-    // 낙관적 업데이트
-    setProducts(prev =>
-      prev.map(p => p.id === id ? { ...p, isDeleted: 0, status: 'SELLING' } : p)
-    );
-
-    try {
-      const res = await tryRestoreOnServer(id);
-      const isDel = res?.data?.is_deleted ?? 0;
-
-      // 서버 결과로 확정 반영
-      setProducts(prev =>
-        prev.map(p =>
-          p.id === id
-            ? { ...p, isDeleted: isDel, status: isDel ? 'STOPPED' : 'SELLING' }
-            : p
-        )
-      );
-      alert(res?.data?.message || '상품이 복구되었습니다.');
-      return;
-    } catch (err) {
-      // 롤백
-      setProducts(snapshot);
-      const msg = err?.message || err?.response?.data || '판매시작(복구) 실패';
-      alert(typeof msg === 'string' ? msg : '판매시작(복구) 실패');
-      return;
-    }
-  }
-
-  // 이외 케이스 방어
-  alert('상태 변경을 진행할 수 없습니다.');
-};
-
-    // CRUD 기능 플레이스홀더
-    const handleAddNew = () => {
-        setActiveView('productInsert');
-    };
-
-    const handleEdit = (productId) => {
-        console.log(`TODO: Open 'Edit' modal for product ${productId}`);
-
-    };
-
-    const handleDelete = async (productId) => {
-
-        if (!window.confirm('정말 삭제하시겠습니까?'))
-            return;
-
-        const del = products;
-        setProducts((prev) => prev.filter((p) => p.id !== productId));
-
-    try {
-        await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, {
-        withCredentials: true,
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
+          params: { page, size: 10, q: query || undefined, keyword: query || undefined },
+          signal: controller.signal,
         });
-        alert('상품이 삭제되었습니다.'); 
-        setSelectedIds(prev => prev.filter(id => id !== productId)); 
-    } catch (error) {
-        console.error('삭제 중 오류:', error);
-        setProducts(del);
-        alert('상품 삭제 중 오류가 발생하였습니다.');
+
+        const data = res.data;
+        const raw =
+          Array.isArray(data) ? data :
+          Array.isArray(data?.content) ? data.content :
+          Array.isArray(data?.data) ? data.data :
+          Array.isArray(data?.rows) ? data.rows : [];
+
+        if (ignore) return;
+
+        const normalized = raw.map((p) => {
+          const isDelRaw = p.isDeleted ?? p.is_deleted ?? p.isdeleted ?? 0;
+          const isDeleted = isDelRaw === true || Number(isDelRaw) === 1;
+          const base = p.status ?? (p.selling === true ? 'SELLING' : (p.selling === false ? 'STOPPED' : 'SELLING'));
+          const status = isDeleted ? 'STOPPED' : base;
+          return { ...p, isDeleted, status };
+        });
+
+        setProducts(normalized);
+
+        const tp =
+          Number.isFinite(data?.totalPages) ? data.totalPages :
+          Number.isFinite(data?.page?.totalPages) ? data.page.totalPages :
+          1;
+        setTotalPages(tp);
+      } catch (err) {
+        if (axios.isCancel?.(err) || err?.name === 'CanceledError') return;
+        console.error('상품 불러오기 에러:', err);
+        setError('상품을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [page], [query]);
+
+  // 선택 토글
+  const handleSelect = (id) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+  const handleSelectAll = () => {
+    setSelectedIds(isAllSelected ? [] : products.map((p) => p.id));
+  };
+
+  // 상태 토글(판매중지/판매시작)
+  const handleToggleStatus = async (item) => {
+    if (!item || !item.id) {
+      alert('상품 ID가 없어 상태를 변경할 수 없습니다.');
+      return;
     }
-    };
+    const next =
+      (item.isDeleted === true || item.isDeleted === 1 || item.status === 'STOPPED')
+        ? 'SELLING'
+        : 'STOPPED';
 
-    const handleSelectDelete = async () => {
-        if (selectedIds.length === 0) return;
+    const snapshot = [...products];
 
-        if (!window.confirm(`선택된 ${selectedIds.length}개의 상품을 삭제하시겠습니까?`))
+    // 낙관적 업데이트
+    setProducts((prev) =>
+      prev.map((p) => (p.id === item.id ? { ...p, isDeleted: next === 'STOPPED', status: next } : p)),
+    );
 
-            return alert('상품 삭제가 취소되었습니다');
-
-        setProducts((prev) => prev.filter((products) => !selectedIds.includes(products.id)));
-
-        const del = products;
-
-        try {
-            const result = await Promise.allSettled(
-                selectedIds.map((id) =>
-                    axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, { withCredentials: true })));
-
-
-            const successCount = result.filter((result) => result.status === 'fulfilled').length;
-            const failCount = result.length - successCount;
-
-            if (failCount > 0) {
-                // 실패한부분 롤백
-                const failedIds = result
-                    .map((r, idx) => ({ r, id: selectedIds[idx] }))
-                    .filter((x) => x.r.status === 'rejected')
-                    .map((x) => x.id);
-
-
-                setProducts((curr) => {
-
-                    const failedItems = del.filter((item) => failedIds.includes(item.id));
-                    const survivors = curr.filter((item) => !failedIds.includes(item.id));
-                    return [...survivors, ...failedItems].sort((a, b) => a.id - b.id);
-                });
-
-                alert(`일부 항목 삭제 실패: 성공 ${successCount}개, 실패 ${failCount}개`);
-            } else {
-                alert(`선택한 ${successCount}개 상품을 삭제했습니다.`);
-            }
-            setSelectedIds([]);
-        } catch (err) {
-            console.error('선택 삭제 오류 :', err);
-            setProducts(del); // 전면 롤백
-            alert('선택 삭제 중 오류가 발생했습니다');
-        }
-    };
+    try {
+      const { data } = await axios.patch(
+        `${API_BASE_URL}/api/admin/products/${encodeURIComponent(item.id)}/status`,
+        null,
+        { params: { status: next }, withCredentials: true },
+      );
+      const serverStatus = data?.status ?? next;
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === item.id ? { ...p, isDeleted: serverStatus === 'STOPPED', status: serverStatus } : p,
+        ),
+      );
+    } catch (err) {
+      setProducts(snapshot);
+      const msg = err?.response?.data || '상태 변경 실패';
+      alert(typeof msg === 'string' ? msg : '상태 변경 실패');
+    }
+  };
+  // 상세 열기/닫기 함수 추가
+  const openDetail = async (id) => {
+  setShowDetail(true);
+  setDetailLoading(true);
+  try {
+    // 백엔드 상세 엔드포인트(예: GET /api/admin/products/{id})
+    const res = await axios.get(`${API_BASE_URL}/api/admin/products/${encodeURIComponent(id)}`, { withCredentials: true });
+    setDetail(res.data ?? null);
+  } catch (e) {
+    // 실패하면 목록의 데이터라도 보여주기
+    const fallback = products.find(p => p.id === id) ?? null;
+    setDetail(fallback);
+  } finally {
+    setDetailLoading(false);
+  }
+};
+const closeDetail = () => { setShowDetail(false); setDetail(null); };
 
 
-                        
-    //페이지 렌더링 용 함수
-    const renderTable = () => {
-        if (isLoading) {
-            return <div className={styles.loading}>Loading products...</div>;
-        }
 
-        if (error) {
-            return <div className={styles.error}>{error}</div>;
-        }
 
-            // const handleToggleStatus = async (id, currentStatus, isDeletedFlag) => {
-            //     // 프리체크
-            //     if (isDeletedFlag === true || isDeletedFlag === 1) {
-            //         alert('삭제된(is_deleted=1) 상품은 상태 변경할 수 없습니다.');
-            //         return;
-            //     }
-            //     if (currentStatus === 'PENDING') {
-            //         alert('주문중(PENDING) 상태에서는 판매 상태를 변경할 수 없습니다.');
-            //         return;
-            //     }
+  // CRUD
+  const handleAddNew = () => setActiveView('productInsert');
 
-            //     // 다음 상태 계산
-            //     const nextStatus = currentStatus === 'SELLING' ? 'STOPPED' : 'SELLING';
+  const handleEdit = (productId) => {
+    console.log(`TODO: Open 'Edit' modal for product ${productId}`);
+  };
 
-            //     // 낙관적 업데이트
-            //     const snapshot = [...products];
-            //     setProducts(prev => prev.map(p => p.id === id ? { ...p, status: nextStatus } : p));
+  const handleDelete = async (productId) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
-            //     try {
-            //         const res = await tryToggleStatusOnServer(id, nextStatus); // ★ 여기! 필수
+    const snapshot = [...products];
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
 
-            //         // 서버 응답 정규화: 문자열 or 객체 모두 수용
-            //         let serverStatus = null;
-            //         if (typeof res.data === 'string') {
-            //         serverStatus = res.data; // 'SELLING' | 'STOPPED' | 'PENDING'
-            //         } else if (res.data && typeof res.data === 'object') {
-            //         // { is_deleted: 0|1, message?: string } 같은 형태일 수 있음
-            //         const isDel = res.data.isDeleted ?? res.data.is_deleted;
-            //         if (isDel !== undefined) {
-            //             serverStatus = isDel ? 'STOPPED' : 'SELLING';
-            //         }
-            //         }
+    try {
+      await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, { withCredentials: true });
+      alert('상품이 삭제되었습니다.');
+      setSelectedIds((prev) => prev.filter((id) => id !== productId));
+    } catch (error) {
+      console.error('삭제 중 오류:', error);
+      setProducts(snapshot);
+      alert('상품 삭제 중 오류가 발생하였습니다.');
+    }
+  };
 
-            //         if (serverStatus) {
-            //         setProducts(prev =>
-            //             prev.map(p =>
-            //             p.id === id
-            //                 ? { ...p, status: serverStatus, isDeleted: serverStatus === 'STOPPED' ? 1 : 0 }
-            //                 : p
-            //             )
-            //         );
-            //         }
-            //     } catch (err) {
-            //         // 롤백 + 메시지
-            //         setProducts(snapshot);
-            //         const msg = err?.response?.data || '상태 변경 실패';
-            //         alert(typeof msg === 'string' ? msg : '상태 변경 실패');
-            //     }
-            //     };
+  const handleSelectDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`선택된 ${selectedIds.length}개의 상품을 삭제하시겠습니까?`)) {
+      alert('상품 삭제가 취소되었습니다');
+      return;
+    }
 
-        return (
+    const snapshot = [...products];
+    setProducts((prev) => prev.filter((p) => !selectedIds.includes(p.id)));
+
+    try {
+      const result = await Promise.allSettled(
+        selectedIds.map((id) =>
+          axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, { withCredentials: true }),
+        ),
+      );
+
+      const successCount = result.filter((r) => r.status === 'fulfilled').length;
+      const failCount = result.length - successCount;
+
+      if (failCount > 0) {
+        const failedIds = result
+          .map((r, idx) => ({ r, id: selectedIds[idx] }))
+          .filter((x) => x.r.status === 'rejected')
+          .map((x) => x.id);
+
+        setProducts(() => {
+          const failedItems = snapshot.filter((item) => failedIds.includes(item.id));
+          const survivors = snapshot.filter((item) => !failedIds.includes(item.id));
+          return [...survivors, ...failedItems].sort((a, b) => a.id - b.id);
+        });
+
+        alert(`일부 항목 삭제 실패: 성공 ${successCount}개, 실패 ${failCount}개`);
+      } else {
+        alert(`선택한 ${successCount}개 상품을 삭제했습니다.`);
+      }
+      setSelectedIds([]);
+    } catch (err) {
+      console.error('선택 삭제 오류 :', err);
+      setProducts(snapshot);
+      alert('선택 삭제 중 오류가 발생했습니다');
+    }
+  };
+
+  // 테이블 렌더
+  const renderTable = () => {
+    if (isLoading) return <div className={styles.loading}>Loading products...</div>;
+    if (error) return <div className={styles.error}>{error}</div>;
+
+    return (
       <div className={styles.tableContainer}>
         <table className={styles.productTable}>
           <thead>
@@ -373,7 +258,6 @@ const handleToggleStatus = async (id, currentStatus, isDeletedFlag) => {
               <th>변경</th>
             </tr>
           </thead>
-
           <tbody>
             {products.length === 0 ? (
               <tr>
@@ -382,84 +266,113 @@ const handleToggleStatus = async (id, currentStatus, isDeletedFlag) => {
                 </td>
               </tr>
             ) : (
-              products.map((product) => (
-                <tr
-                  key={product.id}
-                  className={product.status === 'STOPPED' ? styles.rowStopped : undefined}
-                  onClick={(e) => {
-                    if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
-                    handleSelect(product.id);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(product.id)}
-                      onClick={(e) => {
-                      // e.stopPropagation();
-                      // handleToggleStatus(product.id, product.status, product.isDeleted);
-}}
-                      onChange={() => handleSelect(product.id)}
-                      aria-label={`${product.name} 선택`}
-                    />
-                  </td>
-
-                  <td>
-                    <img
-                      src={
-                        product.imageUrl
-                          ? `${API_BASE_URL}/uploads/products/${product.imageUrl}`
-                          : `${API_BASE_URL}/uploads/products/placeholder.jpg`
-                      }
-                      alt={product.name || '상품 이미지'}
-                      className={styles.productThumbnail}
-                    />
-                  </td>
-
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>
-                    {(typeof product.price === 'number'
-                      ? product.price.toLocaleString('ko-KR')
-                      : product.price) + '원'}
-                  </td>
-                  <td>{product.stock}</td>
-
-                  <td>{renderStatusBadge(product.status)}</td>
-
-                  <td>
-                    <div className={styles.actions}>
-                     <button
-                    className={styles.toggleStatusButton}
-                    disabled={product.status === 'PENDING'}
-                    title={
-                        product.status === 'PENDING'
-                        ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
-                        : (product.status === 'SELLING' ? '판매중지' : '판매시작')
-                    }
+              products.map((product) => {
+                const isStoppedRow = product.isDeleted === true || product.isDeleted === 1 || product.status === 'STOPPED';
+                return (
+                  <tr
+                    key={product.id}
+                    className={isStoppedRow ? styles.rowStopped : undefined}
                     onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleStatus(product.id, product.status, product.isDeleted);
+                      if (e.target.closest('button') || e.target.tagName === 'INPUT') return;
+                      handleSelect(product.id);
                     }}
-                    >
-                    {product.status === 'SELLING' ? '판매중지' : '판매시작'}
-                    </button>
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(product.id)}
+                        onChange={() => handleSelect(product.id)}
+                        aria-label={`${product.name} 선택`}
+                      />
+                    </td>
+                    <td>
+                      <img
+                        src={
+                          product.imageUrl
+                            ? `${API_BASE_URL}/uploads/products/${product.imageUrl}`
+                            : `${API_BASE_URL}/uploads/products/placeholder.jpg`
+                        }
+                        alt={product.name || '상품 이미지'}
+                        className={styles.productThumbnail}
+                      />
+                    </td>
+                    <td>{product.name}</td>
+                    <td>{product.category}</td>
+                    <td>
+                      {(typeof product.price === 'number'
+                        ? product.price.toLocaleString('ko-KR')
+                        : product.price) + '원'}
+                    </td>
+                    <td>{product.stock}</td>
+                    <td>{renderStatusBadge(product)}</td>
+                    <td>
+                      <div className={styles.actionButtons}>
+                        {/* <button
+                          className={styles.toggleStatusButton}
+                          disabled={product.status === 'PENDING'}
+                          title={
+                            product.status === 'PENDING'
+                              ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
+                              : product.status === 'SELLING'
+                              ? '판매중지'
+                              : '판매시작'
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleStatus(product); // 반드시 객체 통째로
+                          }}
+                        >
+                          {product.status === 'SELLING' ? '판매중지' : '판매시작'}
+                        </button> */}
 
-                      <button
-                        className={`${styles.actionButton} ${styles.deleteButton}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(product.id);
-                        }}
-                        aria-label={`${product.name} 삭제`}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        <td>
+                        <div className={styles.actionButtons}>
+                          {/* 상세 */}
+                          <button
+                            className={styles.viewButton}
+                            onClick={(e) => { e.stopPropagation(); openDetail(product.id); }}
+                            title="상세보기"
+                          >
+                            <Eye size={16} />
+                            <span style={{ marginLeft: 4 }}>상세</span>
+                          </button>
+
+                          {/* 토글 (판매중지/판매시작) */}
+                          <button
+                            className={styles.toggleStatusButton}
+                            disabled={product.status === 'PENDING'}
+                            title={
+                              product.status === 'PENDING'
+                                ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
+                                : product.status === 'SELLING'
+                                ? '판매중지'
+                                : '판매시작'
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleStatus(product);
+                            }}
+                          >
+                            {product.status === 'SELLING' ? '판매중지' : '판매시작'}
+                          </button>
+
+                          {/* 삭제 */}
+                          <button
+                            className={`${styles.actionButton} ${styles.deleteButton}`}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
+                            aria-label={`${product.name} 삭제`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>         
+
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -467,45 +380,140 @@ const handleToggleStatus = async (id, currentStatus, isDeletedFlag) => {
     );
   };
 
-    return (
-        <div className={styles.productPage}>
-            <div className={styles.header}>
-                <button className={styles.addButton} onClick={handleAddNew}>
-                    <Plus size={20} />
-                    신규 상품 추가
-                </button>
+  
 
-                {/* 선택 삭제 버튼 */}
-                <button
-                    className={styles.deleteButton}
-                    onClick={handleSelectDelete}
-                    disabled={selectedIds.length === 0}
-                    title={selectedIds.length === 0 ? '선택된 상품이 없습니다' : `${selectedIds.length}개 삭제`}
-                    style={{ marginRight: 12 }}
-                >
-                    < Trash2 size={18} />
-                    <span style={{ marginRight: 6 }}>선택 삭제</span>
-                </button>
-            </div>
+  // 여기서 컴포넌트 *안*에서 return
+  return (
+    <div className={styles.productPage}>
+      <div className={styles.header}>
 
-            {/* 로딩, 에러 혹은 표 내용물 표기 */}
-            {renderTable()}
+          {/* 검색창 */}
+        <div className={styles.searchBar}>
+          <Search size={18} className={styles.searchIcon} />
+          <input
+            type="search"
+            placeholder="상품명/카테고리/ID 검색"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            aria-label="검색"
+          />
+          {searchText && (
+            <button
+              className={styles.clearBtn}
+              onClick={() => setSearchText('')}
+              title="지우기"
+              type="button"
+            >
+              ×
+            </button>
+          )}
+  </div>
+        <button className={styles.addButton} onClick={handleAddNew}>
+          <Plus size={20} />
+          신규 상품 추가
+        </button>
 
-            {/* 페이징 컨트롤 */}
-            {!isLoading && !error && totalPages > 0 && (
-                <div className={styles.pagination}>
-                    <button onClick={handlePrevPage} disabled={page === 0}>
-                        이전
-                    </button>
-                    <span>
-                        Page {page + 1} of {totalPages}
-                    </span>
-                    <button onClick={handleNextPage} disabled={page >= totalPages - 1}>
-                        다음
-                    </button>
-                </div>
+        <button
+          className={styles.deleteButton}
+          onClick={handleSelectDelete}
+          disabled={selectedIds.length === 0}
+          title={selectedIds.length === 0 ? '선택된 상품이 없습니다' : `${selectedIds.length}개 삭제`}
+          style={{ marginRight: 12 }}
+        >
+          <Trash2 size={18} />
+          <span style={{ marginRight: 6 }}>선택 삭제</span>
+        </button>
+      </div>
+
+      {renderTable()}
+
+      {/* 상세 모달: 테이블 아래, 컴포넌트 하단에 위치 */}
+{showDetail && (
+  <div
+    style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+    }}
+    onClick={closeDetail}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        width: 'min(720px, 92vw)', maxHeight: '85vh', overflow: 'auto',
+        background: '#fff', borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,.15)', padding: 20
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h3 style={{ margin: 0 }}>상품 상세</h3>
+        <button className={styles.toggleStatusButton} onClick={closeDetail}>닫기</button>
+      </div>
+
+      {detailLoading ? (
+        <div className={styles.loading}>불러오는 중...</div>
+      ) : !detail ? (
+        <div className={styles.error}>상세 정보를 불러오지 못했습니다.</div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16 }}>
+          <div>
+            <img
+              src={
+                detail.imageUrl
+                  ? `${API_BASE_URL}/uploads/products/${detail.imageUrl}`
+                  : `${API_BASE_URL}/uploads/products/placeholder.jpg`
+              }
+              alt={detail.name ?? '상품 이미지'}
+              style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 6, border: '1px solid #eee' }}
+            />
+          </div>
+          <div style={{ lineHeight: 1.8 }}>
+            <div><strong>ID</strong> : {detail.id}</div>
+            <div><strong>상품명</strong> : {detail.name}</div>
+            <div><strong>카테고리</strong> : {detail.category ?? '-'}</div>
+            <div><strong>가격</strong> : {Number(detail.price)?.toLocaleString('ko-KR')}원</div>
+            <div><strong>재고</strong> : {detail.stock ?? 0}</div>
+            <div><strong>상태</strong> : {detail.isDeleted || detail.status === 'STOPPED' ? '판매중지' : (detail.status === 'PENDING' ? '주문중' : '판매중')}</div>
+            {detail.description && (
+              <div style={{ marginTop: 8 }}>
+                <strong>설명</strong><br />
+                <div style={{ whiteSpace: 'pre-wrap', color: '#555' }}>{detail.description}</div>
+              </div>
             )}
+          </div>
         </div>
-    );
+      )}
+
+      <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <button
+          className={styles.toggleStatusButton}
+          onClick={() => { closeDetail(); handleToggleStatus(detail); }}
+          disabled={detail?.status === 'PENDING'}
+          title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
+        >
+          {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
+        </button>
+        <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
+          <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+      {!isLoading && !error && totalPages > 0 && (
+        <div className={styles.pagination}>
+          <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+            이전
+          </button>
+          <span>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button onClick={() => setPage((p) => (p < totalPages - 1 ? p + 1 : p))} disabled={page >= totalPages - 1}>
+            다음
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
+
 export default ProductManagement;
