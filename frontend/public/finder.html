@@ -17,7 +17,6 @@
 
         #question {
             font-family: 'Gowun Batang', serif;
-            /* 질문 부분 */
         }
 
         #result {
@@ -75,6 +74,31 @@
             animation: fadeIn 0.8s ease-in;
         }
 
+
+        #prevBtn {
+            position: fixed;
+            /* 화면에 고정 */
+            top: 50px;
+            left: 70px;
+            display: none;
+            /* 처음에는 숨김 */
+            background-color: #f5ebe0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #4b3e2a;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: 0.2s ease;
+            z-index: 1000;
+            /* 다른 요소 위에 보이도록 */
+        }
+
+        #prevBtn:hover {
+            background-color: #e0d6c2;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -96,21 +120,20 @@
     <!-- 시작 버튼 화면 -->
     <div id="start-screen" style="text-align: center">
         <button id="startBtn">테스트 시작하기</button><br />
-        <!-- ✅ 이미지에 id 추가 -->
         <img id="start-image" src="/qqq.jpg" style="max-width: 100%; margin: 50px 0; width: 300px; height: 450px;" />
     </div>
-
-
 
     <!-- 퀴즈 화면 (처음에는 숨김) -->
     <div id="quiz-container" style="display: none;">
         <div id="question" class="question"></div>
         <div class="button-group">
+            <button id="prevBtn" style="display:none;">이전</button>
             <button id="yesBtn">YES</button>
             <button id="noBtn">NO</button>
         </div>
         <div id="result" class="result" style="display: none"></div>
     </div>
+
 </body>
 
 <script>
@@ -122,9 +145,11 @@
         const questionEl = document.getElementById("question");
         const yesBtn = document.getElementById("yesBtn");
         const noBtn = document.getElementById("noBtn");
+        const prevBtn = document.getElementById("prevBtn");
         const resultEl = document.getElementById("result");
 
         let currentQuestion = 1;
+        let history = []; // 이전 질문 기록
 
         const questions = {
             1: { text: "스릴러 영화보다는 로맨스 영화가 좋다", yes: 5, no: 2 },
@@ -146,20 +171,13 @@
         };
 
         const typeDescriptions = {
-            Powdery: "당신은 부드럽고 섬세한 감성을 가진 사람이에요.<br>포근한 파우더리 향은 마치 따뜻한 햇살 아래에서 안락한 이불 속에 안긴 듯한 편안함을 떠올리게 하죠.<br>깨끗하고 정제된 느낌이 강하게 느껴지며, 은은하게 퍼지는 잔향은 오랫동안 기억에 남는 인상을 남깁니다.<br>주변 사람들에게 안정감과 따뜻함을 주는 당신에게 잘 어울리는 향이에요."
-            ,
-            Fruity: "당신은 생기 넘치고 사랑스러운 매력을 가진 사람이에요.<br>달콤하고 상큼한 과일 향은 첫인상부터 밝고 긍정적인 에너지를 전해줍니다.<br>복숭아, 딸기, 사과, 베리 같은 과일의 향이 조화를 이루며, 발랄하고 유쾌한 분위기를 연출해줘요.<br>주변을 환하게 만드는 당신의 성격을 향기로도 표현해보세요."
-            ,
-            Chypre: "세련되고 우아한 매력을 지닌 당신에게는 고전적인 아름다움을 담은 시프레 향이 잘 어울려요. <br>시트러스 계열의 상큼함과 이끼, 패츌리, 머스크 같은 깊이 있는 베이스 노트가 조화를 이루며 클래식하면서도 감각적인 분위기를 만들어냅니다.<br>성숙하고 중성적인 매력을 지닌 향조로, 품격 있는 인상을 남기고 싶을 때 제격이에요.<br>독립적이고 자기 주관이 뚜렷한 당신에게 완벽한 선택입니다."
-            ,
-            Floral: "당신은 감성적이고 로맨틱한 분위기를 가진 사람이에요.<br>장미, 자스민, 백합 등 다양한 꽃들의 향기가 어우러진 플로럴 계열은 부드럽고 사랑스러운 매력을 극대화시켜 줍니다.<br>마치 봄날의 정원처럼 따스하고 아름다운 향이 당신의 섬세한 감정선을 표현해줘요.<br>누구에게나 편안하고 친근한 인상을 주고 싶은 당신에게 잘 어울립니다."
-            ,
-            Crystal: "당신은 투명하고 맑은 이미지가 돋보이는 사람이에요.<br>크리스탈 계열의 향은 깨끗하고 시원한 느낌을 주며, 비누향이나 물기 어린 공기 같은 청량한 분위기를 자아냅니다.<br>꾸미지 않은 자연스러운 아름다움을 추구하는 당신에게 딱 맞는 향이죠.<br>주변 사람들에게 깔끔하고 신뢰감 있는 인상을 주고 싶을 때 추천드려요."
-            ,
-            Woody: "당신은 차분하고 깊이 있는 매력을 지녔어요.<br>우디 계열의 향은 나무와 흙, 자연의 향기를 담고 있어 안정적이고 성숙한 느낌을 줍니다.<br>샌달우드, 시더우드, 베티버 같은 노트는 조용한 자신감과 내면의 강인함을 표현해줘요.<br>자연과 가까운 삶을 사랑하거나 잔잔한 분위기를 즐기는 당신에게 꼭 맞는 향입니다."
-            ,
-            Citrus: "당신은 활기차고 상쾌한 에너지를 지닌 사람이에요.<br>시트러스 계열의 향은 레몬, 오렌지, 자몽 등 과즙이 가득한 과일 향이 중심이 되어 기분 좋은 상쾌함을 선사합니다.<br>가볍고 산뜻한 향은 일상 속 피로를 날려주며, 누구에게나 밝은 인상을 남길 수 있어요.<br>여름이나 활동적인 하루를 시작할 때 특히 잘 어울리는 향입니다."
-            ,
+            Powdery: "당신은 부드럽고 섬세한 감성을 가진 사람이에요.<br>포근한 파우더리 향은 마치 따뜻한 햇살 아래에서 안락한 이불 속에 안긴 듯한 편안함을 떠올리게 하죠.<br>깨끗하고 정제된 느낌이 강하게 느껴지며, 은은하게 퍼지는 잔향은 오랫동안 기억에 남는 인상을 남깁니다.<br>주변 사람들에게 안정감과 따뜻함을 주는 당신에게 잘 어울리는 향이에요.",
+            Fruity: "당신은 생기 넘치고 사랑스러운 매력을 가진 사람이에요.<br>달콤하고 상큼한 과일 향은 첫인상부터 밝고 긍정적인 에너지를 전해줍니다.<br>복숭아, 딸기, 사과, 베리 같은 과일의 향이 조화를 이루며, 발랄하고 유쾌한 분위기를 연출해줘요.<br>주변을 환하게 만드는 당신의 성격을 향기로도 표현해보세요.",
+            Chypre: "세련되고 우아한 매력을 지닌 당신에게는 고전적인 아름다움을 담은 시프레 향이 잘 어울려요. <br>시트러스 계열의 상큼함과 이끼, 패츌리, 머스크 같은 깊이 있는 베이스 노트가 조화를 이루며 클래식하면서도 감각적인 분위기를 만들어냅니다.<br>성숙하고 중성적인 매력을 지닌 향조로, 품격 있는 인상을 남기고 싶을 때 제격이에요.<br>독립적이고 자기 주관이 뚜렷한 당신에게 완벽한 선택입니다.",
+            Floral: "당신은 감성적이고 로맨틱한 분위기를 가진 사람이에요.<br>장미, 자스민, 백합 등 다양한 꽃들의 향기가 어우러진 플로럴 계열은 부드럽고 사랑스러운 매력을 극대화시켜 줍니다.<br>마치 봄날의 정원처럼 따스하고 아름다운 향이 당신의 섬세한 감정선을 표현해줘요.<br>누구에게나 편안하고 친근한 인상을 주고 싶은 당신에게 잘 어울립니다.",
+            Crystal: "당신은 투명하고 맑은 이미지가 돋보이는 사람이에요.<br>크리스탈 계열의 향은 깨끗하고 시원한 느낌을 주며, 비누향이나 물기 어린 공기 같은 청량한 분위기를 자아냅니다.<br>꾸미지 않은 자연스러운 아름다움을 추구하는 당신에게 딱 맞는 향이죠.<br>주변 사람들에게 깔끔하고 신뢰감 있는 인상을 주고 싶을 때 추천드려요.",
+            Woody: "당신은 차분하고 깊이 있는 매력을 지녔어요.<br>우디 계열의 향은 나무와 흙, 자연의 향기를 담고 있어 안정적이고 성숙한 느낌을 줍니다.<br>샌달우드, 시더우드, 베티버 같은 노트는 조용한 자신감과 내면의 강인함을 표현해줘요.<br>자연과 가까운 삶을 사랑하거나 잔잔한 분위기를 즐기는 당신에게 꼭 맞는 향입니다.",
+            Citrus: "당신은 활기차고 상쾌한 에너지를 지닌 사람이에요.<br>시트러스 계열의 향은 레몬, 오렌지, 자몽 등 과즙이 가득한 과일 향이 중심이 되어 기분 좋은 상쾌함을 선사합니다.<br>가볍고 산뜻한 향은 일상 속 피로를 날려주며, 누구에게나 밝은 인상을 남길 수 있어요.<br>여름이나 활동적인 하루를 시작할 때 특히 잘 어울리는 향입니다.",
             Green: "당신은 자연을 닮은 순수하고 신선한 매력을 지녔어요.<br>그린 계열의 향은 풀잎, 허브, 숲속의 이슬을 연상케 하는 푸릇푸릇하고 상쾌한 느낌을 줍니다.<br>꾸밈없이 자연스러운 당신의 성격을 향으로도 표현할 수 있는 완벽한 선택이에요.<br>맑고 깨끗한 공기처럼, 존재만으로도 주변을 상쾌하게 만들어주는 사람이 바로 당신입니다."
         };
 
@@ -184,9 +202,14 @@
             questionEl.style.display = "block";
             questionEl.textContent = q.text;
             document.querySelector(".button-group").style.display = "flex";
+
+            // 이전 버튼 표시 여부
+            prevBtn.style.display = history.length > 0 ? "inline-block" : "none";
         }
 
         function answer(isYes) {
+            history.push(currentQuestion); // 현재 질문 저장
+
             const q = questions[currentQuestion];
             const next = isYes ? q.yes : q.no;
 
@@ -201,6 +224,13 @@
             }
         }
 
+        prevBtn.addEventListener("click", function () {
+            if (history.length > 0) {
+                currentQuestion = history.pop();
+                showQuestion();
+            }
+        });
+
         function showResult(type) {
             questionEl.style.display = "none";
             document.querySelector(".button-group").style.display = "none";
@@ -214,10 +244,16 @@
         `;
 
             document.getElementById("restartBtn").addEventListener("click", resetQuiz);
+
+            window.parent.postMessage(
+                { type: "TEST_RESULT", payload: type },
+                "*" // 동일 도메인이라면 "*" 가능
+            );
         }
 
         function resetQuiz() {
             currentQuestion = 1;
+            history = [];
             resultEl.style.display = "none";
             resultEl.innerHTML = "";
 
@@ -230,7 +266,6 @@
             startImage.style.display = "inline-block";
         }
 
-        // 이벤트 등록
         startBtn.addEventListener("click", () => {
             startScreen.style.display = "none";
             quizContainer.style.display = "block";
@@ -241,6 +276,5 @@
         noBtn.addEventListener("click", () => answer(false));
     });
 </script>
-</body>
 
 </html>
