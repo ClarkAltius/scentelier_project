@@ -21,7 +21,7 @@ import PrivateRoute from './PrivateRoute.js';
 import ReviewWriteForm from '../pages/ReviewWriteForm.js'
 import MyReviewListPage from '../pages/MyReviewListPage.js'
 import ReviewBoardPage from '../pages/ReviewBoardPage.js'
-import Signup from '../pages/Signup.js'
+import Signup from '../pages/SignUp.js'
 import Myperfume from '../pages/Myperfume.js'
 
 import Dashboard from '../component/Dashboard';
