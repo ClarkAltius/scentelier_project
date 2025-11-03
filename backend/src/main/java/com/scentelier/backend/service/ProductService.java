@@ -89,7 +89,8 @@ public class ProductService {
         return productPage.map(product -> new ProductStockDto(
            product.getId(),
            product.getName(),
-           product.getStock()
+           product.getStock(),
+           product.getImageUrl()
         ));
     }
 
@@ -175,7 +176,7 @@ public class ProductService {
         Products updateProduct = productRepository.save(product);
 
         // DTO 반환
-        return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock());
+        return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock(), updateProduct.getImageUrl());
     }
 
     public Page<Products> findAllSelling(Pageable pageable) {

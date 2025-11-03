@@ -45,7 +45,8 @@ public class IngredientService {
        return ingredientPage.map(ingredient -> new IngredientStockDto(
                ingredient.getId(),
                ingredient.getName(),
-               ingredient.getStock()
+               ingredient.getStock(),
+               ingredient.getImgUrl()
        ));
     }
 
@@ -65,7 +66,7 @@ public class IngredientService {
         ingredient.setStock(newStock + currentStock);
         Ingredient updatedIngredient = ingredientRepository.save(ingredient);
 
-        return new IngredientStockDto(updatedIngredient.getId(), updatedIngredient.getName(), updatedIngredient.getStock());
+        return new IngredientStockDto(updatedIngredient.getId(), updatedIngredient.getName(), updatedIngredient.getStock(), updatedIngredient.getImgUrl());
     }
 
     //주문 취소 이벤트 수신, 커스텀 향수에 사용된 원액 재고를 롤백

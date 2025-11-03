@@ -235,6 +235,7 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
                 <table className={styles.inquiryTable}>
                     <thead>
                         <tr>
+
                             <th className={styles.sortableHeader} onClick={() => handleSort('id')}>
                                 ID {renderSortIcon('id')}
                             </th>

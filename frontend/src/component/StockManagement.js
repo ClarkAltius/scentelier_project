@@ -79,6 +79,7 @@ function StockManagement() {
                 const url = `${API_BASE_URL}/api/admin/${endpoint}?${params.toString()}`;
                 const response = await axios.get(url, { withCredentials: true });
 
+
                 // Set state for the correct table
                 if (isProducts) {
                     setProducts(response.data.content || []);
@@ -87,6 +88,7 @@ function StockManagement() {
                     setIngredients(response.data.content || []);
                     setIngredientTotalPages(response.data.totalPages);
                 }
+                console.log(response.data.content);
             } catch (err) {
                 console.error("Failed to fetch stock data:", err);
                 setError("재고 정보를 불러오는 데 실패했습니다.");
@@ -356,6 +358,7 @@ function StockManagement() {
     const renderTable = (items, type) => {
         const currentSelection = selectedItems[type];
         const allSelected = items.length > 0 && currentSelection.size === items.length;
+        const imageBasePath = type === 'products' ? 'products' : 'ingredients'; // 이미지 경로 (완제, 원액) 판별
 
         return (
             <div>
@@ -370,6 +373,7 @@ function StockManagement() {
                                     aria-label="Select all items"
                                 />
                             </th>
+                            <th className={styles.imageColumn}>이미지</th>
                             <th onClick={() => handleSort('id')} className={styles.sortableHeader}>
                                 ID {getSortArrow('id', type)}
                             </th>
@@ -388,6 +392,16 @@ function StockManagement() {
                         {items.length > 0 ? items.map((item) => {
                             const isLowStock = item.stock < 10; // 10개 이하면 강조
 
+                            let imageUrl = '';
+                            if (type === 'products') {
+                                imageUrl = item.imageUrl
+                                    ? `${API_BASE_URL}/uploads/products/${item.imageUrl}`
+                                    : `${API_BASE_URL}/uploads/products/placeholder.jpg`;
+                            } else { // type === 'ingredients'
+                                imageUrl = item.imgUrl
+                                    ? `${API_BASE_URL}/uploads/ingredient/${item.imgUrl}`
+                                    : `${API_BASE_URL}/uploads/ingredient/placeholder.jpg`; // Using product placeholder as fallback
+                            }
                             return (
                                 <tr key={item.id} className={isLowStock ? styles.lowStockRow : ''}>
                                     <td className={styles.checkboxColumn}>
@@ -396,6 +410,13 @@ function StockManagement() {
                                             checked={currentSelection.has(item.id)}
                                             onChange={() => handleSelectItem(item.id)}
                                             aria-label={`Select ${item.name}`}
+                                        />
+                                    </td>
+                                    <td className={styles.imageCell}>
+                                        <img
+                                            src={imageUrl}
+                                            alt={item.name || 'item image'}
+                                            className={styles.itemImage}
                                         />
                                     </td>
                                     <td>#{item.id}</td>
