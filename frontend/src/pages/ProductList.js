@@ -465,7 +465,7 @@ function Productlist() {
             style={{
                 display: "flex",
                 flexWrap: "wrap",
-                justifyContent: "left",
+                justifyContent: "center",
                 gap: "40px",
                 marginTop: "60px",
                 padding: "0px 150px 0px 170px"

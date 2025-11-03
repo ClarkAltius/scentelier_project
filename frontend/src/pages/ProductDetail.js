@@ -194,8 +194,8 @@ function ProductDetail() {
                 >
                     <Tab eventKey="detail" title="Detail" className="full-width-tabs">
                         {/* Detail 이미지 */}
-                        <img src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`} style={{ margin: 100 }} />
-                        <img src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`} style={{ margin: 100 }} />
+                        <img src={`${API_BASE_URL}/uploads/Detail/${product.name}/Design.png`} style={{ margin: 100 }} /><br />
+                        <img src={`${API_BASE_URL}/uploads/Detail/${product.name}/2.png`} style={{ margin: 100 }} /><br />
                         <img src={`${API_BASE_URL}/uploads/Detail/${product.name}/3.png`} style={{ margin: 100 }} />
                     </Tab>
 
