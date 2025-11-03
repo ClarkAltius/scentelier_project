@@ -23,5 +23,4 @@ public class CustomPerfumeInfoDto {
 
     @NotNull(message = "비율을 선택해주세요.")
     private BigDecimal amount;
-
 }

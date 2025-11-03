@@ -87,6 +87,7 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/mypage`)}>마이 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/signup`)}>회원가입 페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>향수조합 저장페이지</NavDropdown.Item>
                     </NavDropdown>
                 </div>
             </Container>

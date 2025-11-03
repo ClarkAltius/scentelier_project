@@ -213,3 +213,84 @@ input.custom-range::-ms-thumb {
   box-shadow: 0 0 6px rgba(138, 126, 126, 0.158);
   font-weight: 500;
 }
+
+
+
+/* ------------------------------------ */
+
+.perfume-bottle {
+  position: relative;
+  width: 260px;
+  height: 400px;
+  background: "#ffff";
+  /* 요청하신 clip-path 적용 */
+  clip-path: path('M130,0 C -50,270 10,400 130,400 C 280,400 310,250 130,0 Z');
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.25));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-top: 50px;
+  margin-bottom: 50px;
+
+}
+
+/* 각 노트 레이어 */
+.layer {
+  width: 100%;
+  /* height는 JS에서 동적으로 설정 */
+  /* min-height: 50px; <-- 차오르는 효과를 위해 0에서 시작하도록 제거 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 5px;
+  box-sizing: border-box;
+  color: white;
+  /* 텍스트 색상 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.288);
+  /* 부드럽게 감속 */
+  min-height: 90px;
+  position: relative;
+  /* 1초 동안 부드럽게 변경 */
+  transition: height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+}
+
+
+/* 🟢 LAST note */
+.last-note-layer {
+  background-color: #ecf5f2;
+  transition-delay: 0s;
+}
+
+.last-note-layer:hover {
+  transform: scale(1.1);
+  filter: brightness(1.01)
+}
+
+/* 🔵 MIDDLE note */
+.middle-note-layer {
+  background-color: #deece8;
+  transition-delay: 0.2s;
+}
+
+.middle-note-layer:hover {
+  transform: scale(1.1);
+  filter: brightness(1.01)
+}
+
+/* 🟡 TOP note */
+.top-note-layer {
+  background-color: #d3e6e1;
+  transition-delay: 0.4s;
+}
+
+.top-note-layer h3 {
+  margin: 8px 0 0 0;
+
+}
+
+.top-note-layer:hover {
+  transform: scale(1.1);
+}

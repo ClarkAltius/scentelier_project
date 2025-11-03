@@ -2,13 +2,8 @@ package com.scentelier.backend.controller;
 
 import com.scentelier.backend.Embeddable.CustomPerfumeIngredientId;
 import com.scentelier.backend.constant.Note;
-import com.scentelier.backend.dto.CustomPerfumeInfoDto;
-import com.scentelier.backend.dto.CustomPerfumeRequestDto;
-import com.scentelier.backend.dto.CustomPerfumeResponseDto;
-import com.scentelier.backend.entity.CustomPerfume;
-import com.scentelier.backend.entity.CustomPerfumeIngredient;
-import com.scentelier.backend.entity.Ingredient;
-import com.scentelier.backend.entity.Users;
+import com.scentelier.backend.dto.*;
+import com.scentelier.backend.entity.*;
 import com.scentelier.backend.repository.CustomPerfumeRepository;
 import com.scentelier.backend.repository.IngredientRepository;
 import com.scentelier.backend.repository.UserRepository;
@@ -19,21 +14,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/customPerfume")
 @RequiredArgsConstructor
 public class CustomPerfumeController {
     private final CustomPerfumeIngredientService CustomPerfumeIngredientService;
+    private final CustomPerfumeService customPerfumeService;
     private final CustomPerfumeRepository customPerfumeRepository;
     private  final UserRepository userRepository;
+    private  final UserService userService;
     private  final IngredientRepository ingredientRepository;
 
     @PostMapping("/addCustom")
@@ -89,6 +86,30 @@ public class CustomPerfumeController {
 
         return ResponseEntity.ok(response);
     }
-    //-----------------------------------------------------------------
 
+    @GetMapping("/myPerfume/{userId}")
+    public ResponseEntity<List<CustomPerfumeDTO>> getCustomPerfume(@PathVariable Long userId) {
+        Optional<Users> optionalUsers = userService.findUserById(userId);
+        if (optionalUsers.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Users users = optionalUsers.get();
+        List<CustomPerfume> customPerfumes = customPerfumeService.findByUsers(users);
+
+        List<CustomPerfumeDTO> dtoList = customPerfumes.stream()
+                .map(CustomPerfumeDTO::new)
+                .collect(Collectors.toList());
+
+//        List<CustomPerfumeDTO> dtoList = customPerfumes.stream()
+//                .map(cp -> new CustomPerfumeDTO(
+//                        cp.getId(),
+//                        cp.getName(),
+//                        cp.getVolume(),
+//                        cp.getCreatedAt()
+//                ))
+//                .collect(Collectors.toList());
+        System.out.println(dtoList);
+        return ResponseEntity.ok(dtoList);
+    }
 }
