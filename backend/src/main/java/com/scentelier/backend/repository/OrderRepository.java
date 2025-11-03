@@ -24,6 +24,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         GROUP BY op.product_id
     ) recent ON p.product_id = recent.product_id
     WHERE p.is_deleted = 0            -- 삭제되지 않은 상품만
+     AND p.stock > 0 
     GROUP BY p.product_id             -- 혹시 모를 중복 방지
     ORDER BY recent.last_order DESC
     LIMIT 3;
@@ -41,6 +42,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         GROUP BY op.product_id
     ) recent ON p.product_id = recent.product_id
     WHERE p.is_deleted = 0            -- 삭제되지 않은 상품만
+     AND p.stock > 0 
+     
     GROUP BY p.product_id             -- 혹시 모를 중복 방지
     ORDER BY recent.last_order DESC
     LIMIT 5;

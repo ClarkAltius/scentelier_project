@@ -66,7 +66,7 @@ public class ProductService {
         return productRepository.findAll(pageable); //삭제 x 인 상품만
     }
     public List<Products> findAll() {
-        return productRepository.findAllByIsDeletedFalse();
+        return productRepository.findAllByIsDeletedFalseAndStockGreaterThan(0);
     }
 
     public Products ProductById(Long id) {
