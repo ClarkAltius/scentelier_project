@@ -15,7 +15,7 @@ const AllReviewsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAllReviews(page, page, 12).then((data) => {
+    getAllReviews(page, 12).then((data) => {
       setReviews(data.content);
       setTotalPages(data.totalPages);
     });

@@ -45,7 +45,7 @@ public class ProductController {
                 ? productImageLocation
                 : productImageLocation + File.separator;
 
-        File imageFile = new File(pathName + imageFileName);
+        File imageFile = new File(pathName + "products" + File.separator + imageFileName);
         String imageData = products.getImageUrl();
 
         try {

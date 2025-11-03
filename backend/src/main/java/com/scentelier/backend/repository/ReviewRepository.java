@@ -16,8 +16,10 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
     // 주문으로 리뷰 존재 확인
     Optional<Reviews> findByOrder(Orders order);
 
-    @Query("SELECT o FROM Orders o WHERE o.users.id = :userId AND NOT EXISTS " +
-            "(SELECT r FROM Reviews r WHERE r.order.id = o.id) " +
+    @Query("SELECT o FROM Orders o " +
+            "WHERE o.users.id = :userId " +
+            "AND o.status NOT IN ('PENDING', 'PAID', 'CANCELLED') " +
+            "AND NOT EXISTS (SELECT r FROM Reviews r WHERE r.order.id = o.id) " +
             "ORDER BY o.orderDate DESC")
     List<Orders> findUnwrittenOrdersEntities(@Param("userId") Long userId);
 
