@@ -61,18 +61,11 @@ const MyPerfume = () => {
             } catch (err) {
                 setError("Failed to fetch data");
                 setLoading(false);
-
-
             }
         };
 
         fetchPerfumes();  // 데이터를 가져오는 함수 호출
     }, [user.id]);  // userId가 변경될 때마다 데이터를 다시 가져옴
-
-    const [topHeight, setTopHeight] = useState(0);
-    const [middleHeight, setMiddleHeight] = useState(0);
-    const [lastHeight, setLastHeight] = useState(0);
-
 
     const [layerHeightsByPerfume, setLayerHeightsByPerfume] = useState({});
 
@@ -132,6 +125,29 @@ const MyPerfume = () => {
             }
         }
     };
+
+    const customDelete = async () => {
+        try {
+            const url = `${API_BASE_URL}/api/customPerfume/delete`;
+            const parameters = {
+                userId: user.id,
+                customId: openCard.id,
+            };
+
+            const response = await axios.post(url, parameters, { withCredentials: true });
+            alert(response.data);
+
+            setPerfumes(prev => prev.filter(perfume => perfume.customId !== openCard.id));
+            setOpenCard(null);
+
+        } catch (error) {
+            console.log('오류 발생 : ' + error);
+
+            if (error.response) {
+                alert('삭제 실패');
+            }
+        }
+    }
 
 
     return (
@@ -217,21 +233,21 @@ const MyPerfume = () => {
                                 <div>
                                     <div
                                         style={{
-                                            fontFamily: "'Gowun Batang', serif", backgroundColor: "#f5f5f5ff", // 연한 노란색
+                                            fontFamily: "'Gowun Batang', serif", backgroundColor: "#f5f5f5ff",
                                             border: "2px solid #e9e9e9ff",
-                                            color: "#c2c2c2ff",              // 글씨색
+                                            color: "#afafafff",
                                             fontWeight: "700",
-                                            fontSize: "14px",           // 글씨 크게
-                                            padding: "10px",       // 패딩 크게
-                                            borderRadius: "5px",       // 둥글기
-                                            minWidth: "50px",          // 최소 너비
+                                            fontSize: "14px",
+                                            padding: "10px",
+                                            borderRadius: "5px",
+                                            minWidth: "50px",
                                             textAlign: "center",
                                             margin: "20px"
                                         }}
                                     >{openCard.noteType}</div>
                                     {filteredNotes.map((note, i) => (
                                         <div
-                                            style={{ fontSize: "23px", color: "#949494ff", marginBottom: 30 }}
+                                            style={{ fontSize: "23px", color: "#6b6b6bff", marginBottom: 30 }}
                                             key={i}>
                                             {note.ingredientName}<br></br>
                                             <button
@@ -246,7 +262,7 @@ const MyPerfume = () => {
                                                     marginTop: "30px"
                                                 }}>add to cart</button>
                                             <button
-                                                onClick={addToCart}
+                                                onClick={customDelete}
                                                 style={{
                                                     fontSize: "15px",
                                                     borderRadius: '3px',

@@ -101,15 +101,23 @@ public class CustomPerfumeController {
                 .map(CustomPerfumeDTO::new)
                 .collect(Collectors.toList());
 
-//        List<CustomPerfumeDTO> dtoList = customPerfumes.stream()
-//                .map(cp -> new CustomPerfumeDTO(
-//                        cp.getId(),
-//                        cp.getName(),
-//                        cp.getVolume(),
-//                        cp.getCreatedAt()
-//                ))
-//                .collect(Collectors.toList());
         System.out.println(dtoList);
         return ResponseEntity.ok(dtoList);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteCustomPerfume(@RequestBody Map<String, Object> payload) {
+        try {
+            Long userId = Long.valueOf(payload.get("userId").toString());
+            Long customId = Long.valueOf(payload.get("customId").toString());
+
+            String result = customPerfumeService.deleteCustomPerfume(userId, customId);
+            return ResponseEntity.ok(result);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        }
     }
 }

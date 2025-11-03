@@ -9,7 +9,9 @@ import java.util.Optional;
 
 public interface CustomPerfumeRepository extends JpaRepository<CustomPerfume, Long> {
 
-
-
     List<CustomPerfume> findByUsers(Users user);
+
+    List<CustomPerfume> findByUsersAndIsDeletedFalse(Users users);
+
+    Optional<CustomPerfume> findByIdAndUsers(Long id, Users users);
 }
