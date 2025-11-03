@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Collapse, Table, Spinner, Button } from "react-bootstrap";
+import { Card, Collapse, Table, Spinner, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, Truck, Package, XCircle, Info, ChevronDown, ChevronUp, AlertTriangle, ScrollText, CircleCheckBig } from "lucide-react";
 import { useAuth } from "../component/AuthContext";
@@ -42,6 +42,17 @@ const OrderList = () => {
   const [openOrderId, setOpenOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // 배송 모달용 상태 추가
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [selectedOrderTracking, setSelectedOrderTracking] = useState(null);
+
+  const getFakeTrackingData = (trackingNumber) => [
+    { step: "상품 준비중", time: "2025-10-25 14:20", icon: <Package size={18} /> },
+    { step: "물류센터 도착", time: "2025-10-26 09:35", icon: <Truck size={18} /> },
+    { step: "배송 출발", time: "2025-10-27 11:50", icon: <Truck size={18} /> },
+    { step: "배송 완료", time: "2025-10-28 18:05", icon: <CheckCircle size={18} /> },
+  ];
+
   const navigate = useNavigate();
 
   // 주문 데이터 로딩
@@ -288,6 +299,25 @@ const OrderList = () => {
                   {/* 관리자 버튼 */}
                   {makeAdminButton(order)}
 
+                  {/* 배송 조회 버튼 */}
+                  {order.trackingNumber !== "미등록" && (
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="ms-2"
+                      onClick={() => {
+                        setSelectedOrderTracking({
+                          trackingNumber: order.trackingNumber,
+                          data: getFakeTrackingData(order.trackingNumber),
+                        });
+                        setShowTrackingModal(true);
+                      }}
+                    >
+                      <Truck size={16} className="me-1" /> 배송 조회
+                    </Button>
+                  )}
+
+
                   {/* 상태별 버튼 */}
                   <div className="mt-3 text-end">
                     {(order.status === "PENDING" || order.status === "PAID") && (
@@ -326,6 +356,51 @@ const OrderList = () => {
           </Card>
         );
       })}
+      {/* 모달 컴포넌트 */}
+      <Modal show={showTrackingModal} onHide={() => setShowTrackingModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <Truck size={20} className="me-2" /> 배송 조회
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedOrderTracking ? (
+            <>
+              <p><strong>운송장 번호:</strong> {selectedOrderTracking.trackingNumber}</p>
+              <div className="timeline mt-3">
+                {selectedOrderTracking.data.map((t, idx) => (
+                  <div key={idx} className="d-flex align-items-start mb-3">
+                    <div
+                      className="d-flex align-items-center justify-content-center rounded-circle"
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        backgroundColor: "#E7F5FF",
+                        color: "#1E81B0",
+                      }}
+                    >
+                      {t.icon}
+                    </div>
+                    <div className="ms-3">
+                      <strong>{t.step}</strong>
+                      <div className="text-muted" style={{ fontSize: "0.85rem" }}>
+                        {t.time}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="text-muted">배송 정보가 없습니다.</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowTrackingModal(false)}>
+            닫기
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

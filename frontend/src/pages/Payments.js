@@ -13,7 +13,7 @@ function Payments(props) {
     const products = location.state?.products || [];
     const { user } = useAuth();
 
-    const [method, setMethod] = useState("Card");
+    const [method, setMethod] = useState("CARD");
     const [showModal, setShowModal] = useState(false);
     const [delivery, setDelivery] = useState({
         recipientName: '',
@@ -29,7 +29,7 @@ function Payments(props) {
         }
         if (!location.state?.products?.length) {
             alert("선택한 상품이 없습니다. 장바구니로 이동합니다.");
-            navigate("/cart");
+            navigate("/cart/list");
             return;
         }
         setDelivery({
@@ -52,6 +52,9 @@ function Payments(props) {
     ];
 
     const handleChange = (e) => {
+        console.log(e.target.name);
+        console.log(e.target.value);
+
         setDelivery({ ...delivery, [e.target.name]: e.target.value });
     };
 
@@ -115,7 +118,7 @@ function Payments(props) {
                                         <Form.Label>수취인 이름</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            name="receiver"
+                                            name="recipientName"
                                             placeholder="홍길동"
                                             value={delivery.recipientName}
                                             onChange={handleChange}

@@ -6,15 +6,17 @@ import { getUserReviews } from "../api/reviewApi";
 import { useAuth } from "../component/AuthContext";
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Pagination } from "react-bootstrap";
 
 const MyReviewPage = () => {
     const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getUserReviews(user.id, 0, 12).then((data) => setReviews(data.content)).catch(console.error);
+    getUserReviews(user.id, page, 12).then((data) => {setReviews(data.content); setTotalPages(data.totalPages);}).catch(console.error);
   }, [user.id]);
 
   const handleUpdate = (updated) => {
@@ -65,6 +67,17 @@ const MyReviewPage = () => {
                 />
                 </div>
             ))}
+            <Pagination className="justify-content-center mt-4">
+            {[...Array(totalPages)].map((_, i) => (
+              <Pagination.Item
+                key={i}
+                active={i === page}
+                onClick={() => setPage(i)}
+              >
+                {i + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
             <Button variant="primary" onClick={() => navigate("/reviews/write")}>
                 리뷰 작성하러 가기
             </Button>

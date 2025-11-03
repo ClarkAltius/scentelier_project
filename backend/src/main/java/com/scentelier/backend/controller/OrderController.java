@@ -1,6 +1,7 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.constant.Payment;
 import com.scentelier.backend.constant.Role;
 import com.scentelier.backend.dto.OrderDto;
 import com.scentelier.backend.dto.OrderProductDto;
@@ -45,6 +46,8 @@ public class OrderController {
         orders.setTotalPrice(dto.getTotalPrice());
         orders.setStatus(dto.getStatus());
         orders.setPaymentMethod(dto.getPaymentMethod());
+
+        if (dto.getPaymentMethod().equals(Payment.CASH)) orders.setStatus(OrderStatus.PENDING);
 
         List<OrderProduct> orderProductList = new ArrayList<>();
         for (OrderProductDto item : dto.getOrderProducts()) {
