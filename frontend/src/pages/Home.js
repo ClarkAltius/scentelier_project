@@ -7,8 +7,6 @@ import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../component/AuthContext";
 
-
-
 function Home() {
     const containerRef = useRef();
     const [best, setBest] = useState([]);
@@ -80,8 +78,8 @@ function Home() {
         const url = `${API_BASE_URL}/order/list`
         axios.get(url)
             .then((response) => {
-                console.log("응답받은 데이터 :");
-                console.log(response.data);
+                // console.log("응답받은 데이터 :");
+                // console.log(response.data);
                 setBest(response.data);
             })
             .catch(error => {
@@ -98,6 +96,12 @@ function Home() {
 
 
     }, []);
+
+    const formatPrice = (price) => {
+        const n = typeof price === 'number' ? price : Number(price);
+        if (Number.isFinite(n)) return n.toLocaleString();
+        return '0';
+    };
 
     // ------------------------ 장바구니 ------------------------------------
 
@@ -329,9 +333,12 @@ function Home() {
             </div>
             {/* -----------------------------베스트리스트 ---------------------------- */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: "center" }}>
-                {best.map((item) => {
-                    return (<Card onClick={() => navigate(`/product/detail/${item.id}`)}
-                        style={{ width: '25rem', margin: '60px 50px 60px 0px' }}>
+                {best.map((item) => (
+                        <Card
+                            key={item.id}
+                            onClick={() => navigate(`/product/detail/${item.id}`)}
+                            style={{ width: '25rem', margin: '60px 50px 60px 0px' }}
+                        >
                         <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
                             style={{
                                 width: '100%',
@@ -341,8 +348,8 @@ function Home() {
                             }} />
                         <Card.Body>
                             <Card.Title>{item.name}</Card.Title>
-                            <Card.Text style={{ margin: '10px', textAlign: 'center' }}>
-                                <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>38,000</span>
+                            <div style={{ margin: '10px', textAlign: 'center' }}>
+                                <span style={{ fontSize: '1.3em', fontWeight: 'bold' }}>{formatPrice(item.price)}원</span>
                                 <br />
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
                                     {item.keyword
@@ -363,9 +370,8 @@ function Home() {
                                         ))
                                         : null}
                                 </div>
-                            </Card.Text>
+                            </div>
                             <Button
-                                key={item.id}
                                 onClick={(e) => {
                                     if (!user) {
                                         e.stopPropagation();
@@ -381,7 +387,7 @@ function Home() {
                                 style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>add to cart</Button>
                         </Card.Body>
                     </Card>)
-                })}
+                )}
             </div>
             {/* -----------------------------리스트 ---------------------------- */}
 
