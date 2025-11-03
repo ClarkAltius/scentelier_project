@@ -29,8 +29,8 @@ function Productlist() {
         const url2 = `${API_BASE_URL}/product/list`
         axios.get(url1)
             .then((response) => {
-                console.log("응답받은 데이터 :");
-                console.log(response.data);
+                // console.log("응답받은 데이터 :");
+                // console.log(response.data);
                 setBest(response.data);
                 setExtended([...response.data, ...response.data, ...response.data]);
             })
@@ -40,7 +40,7 @@ function Productlist() {
 
         axios.get(url2)
             .then((response) => {
-                console.log(response.data);
+                // console.log(response.data);
                 setProduct(response.data);
             })
             .catch(error => {
@@ -315,7 +315,7 @@ function Productlist() {
                                     }} />
                                 <Card.Body style={{ height: '150px' }}>
                                     <Card.Title style={{ textAlign: 'center' }}>{item.name}</Card.Title>
-                                    <Card.Text
+                                    <div
                                         style={{
                                             margin: '10px',
                                             textAlign: 'center',
@@ -351,7 +351,7 @@ function Productlist() {
                                         >
                                             add to cart
                                         </Button>
-                                    </Card.Text>
+                                    </div>
                                 </Card.Body>
                             </Card></div>
                     </div>
@@ -500,7 +500,7 @@ function Productlist() {
                         <Card.Title style={{ textAlign: "center" }}>
                             {item.name}
                         </Card.Title>
-                        <Card.Text style={{ margin: "10px", textAlign: "center" }}>
+                        <div style={{ margin: "10px", textAlign: "center" }}>
 
                             <span style={{ fontSize: "20px" }}><strong>{formatPrice(item.price)}원</strong></span>
 
@@ -532,7 +532,7 @@ function Productlist() {
                                     ))
                                     : null}
                             </div>
-                        </Card.Text>
+                        </div>
                         <Button
                             onClick={(e) => {
                                 if (!user) {
