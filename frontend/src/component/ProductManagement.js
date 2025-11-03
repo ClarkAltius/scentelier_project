@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './ProductManagement.module.css';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -24,7 +25,6 @@ function ProductManagement({ setActiveView }) {
   const [query, setQuery] = useState('');     
 
   const isAllSelected = products.length > 0 && selectedIds.length === products.length;
-
 
   useEffect(() => {
   const t = setTimeout(() => {
@@ -55,6 +55,7 @@ function ProductManagement({ setActiveView }) {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
           params: { page, size: 10, q: query || undefined, keyword: query || undefined },
+          params: { page, size: 10 },
           signal: controller.signal,
         });
 
