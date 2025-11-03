@@ -251,7 +251,11 @@ function Productlist() {
                 quantity: 1
             };
             const response = await axios.post(url, parameters, { withCredentials: true });
-            alert(response.data);
+
+            const goToCart = window.confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?");
+            if (goToCart) {
+                navigate("/cart/list");
+            }
         } catch (error) {
             console.log('오류 발생 : ' + error);
             if (error.response) {
@@ -329,6 +333,7 @@ function Productlist() {
                                                 }
 
                                                 // 로그인된 경우에만 장바구니 추가 실행
+                                                e.stopPropagation();
                                                 addToCart(e, item.id);
                                             }}
                                             style={{
@@ -535,6 +540,7 @@ function Productlist() {
                                 }
 
                                 // 로그인된 경우에만 장바구니 추가 실행
+                                e.stopPropagation();
                                 addToCart(e, item.id);
                             }}
                             style={{

@@ -70,8 +70,12 @@ function ProductDetail() {
             };
 
             const response = await axios.post(url, parameters, { withCredentials: true });
-            alert(response.data);
-            navigate('/product/list');
+
+            const goToCart = window.confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?");
+            if (goToCart) {
+                navigate("/cart/list");
+            }
+
         } catch (error) {
             console.log('오류 발생 : ' + error);
             alert('장바구니 추가 실패');
@@ -165,11 +169,14 @@ function ProductDetail() {
                             BUY IT NOW
                         </button>
                         <button
-                            onClick={() => {
+                            onClick={(e) => {
                                 if (!user) {
                                     alert('로그인이 필요한 서비스입니다.');
                                     return navigate('/user/login');
-                                } else { addToCart(); }
+                                } else {
+                                    e.stopPropagation();
+                                    addToCart();
+                                }
                             }}
                             style={{ backgroundColor: '#fff', width: '30%', height: '55px' }}>
                             CART

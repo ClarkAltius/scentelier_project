@@ -113,7 +113,10 @@ function Home() {
 
             const response = await axios.post(url, parameters, { withCredentials: true });
 
-            alert(response.data);
+            const goToCart = window.confirm("장바구니에 상품이 담겼습니다.\n장바구니로 이동하시겠습니까?");
+            if (goToCart) {
+                navigate("/cart/list");
+            }
         } catch (error) {
             console.log('오류 발생 : ' + error);
 
@@ -330,11 +333,11 @@ function Home() {
             {/* -----------------------------베스트리스트 ---------------------------- */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: "center" }}>
                 {best.map((item) => (
-                        <Card
-                            key={item.id}
-                            onClick={() => navigate(`/product/detail/${item.id}`)}
-                            style={{ width: '25rem', margin: '60px 50px 60px 0px' }}
-                        >
+                    <Card
+                        key={item.id}
+                        onClick={() => navigate(`/product/detail/${item.id}`)}
+                        style={{ width: '25rem', margin: '60px 50px 60px 0px' }}
+                    >
                         <Card.Img variant="top" src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
                             style={{
                                 width: '100%',
