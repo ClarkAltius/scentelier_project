@@ -45,7 +45,7 @@ function MenuItems() {
                     Scentelier
                 </Navbar.Brand>
                 <Nav className="me-auto">
-                    <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Product</Nav.Link>
+                    <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Products</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
                     <Nav.Link onClick={handleDesignClick} style={{ color: '#808080ff' }}>Design</Nav.Link>
                     <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link>
@@ -71,6 +71,7 @@ function MenuItems() {
                                 <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>내 문의사항</NavDropdown.Item>
                                 {/* 회원정보 링크 추가 예정 */}
                                 {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
+
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
                             </NavDropdown>

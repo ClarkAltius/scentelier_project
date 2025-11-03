@@ -306,3 +306,16 @@
     border-radius: 6px;
     margin-bottom: 12px;
 }
+
+/* Pagination styles */
+.paginationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pageInfo {
+    font-size: 0.9rem;
+    color: #555;
+}

@@ -12,8 +12,13 @@ import com.scentelier.backend.repository.InquiryRepository;
 import com.scentelier.backend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.scentelier.backend.constant.Type;
+import com.scentelier.backend.constant.InquiryStatus;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +32,7 @@ public class InquiryService {
     private InquiryRepository inquiryRepository;
     private final InquiryAnswerRepository inquiryAnswerRepository;
     private final UserRepository userRepository;
+
 
     @Autowired
     public InquiryService(InquiryRepository inquiryRepository, InquiryAnswerRepository inquiryAnswerRepository, UserRepository userRepository) {
@@ -57,13 +63,36 @@ public class InquiryService {
 //                .map(InquiryDto::new)
 //                .collect(Collectors.toList());
 //    }
+    // 관리자 페이지 백엔드에서 필터링 해서 반환
     @Transactional(readOnly = true)
-    public List<InquiryDto> findAllWithUser() {
-        List<Inquiry> inquiries = inquiryRepository.findAllWithUser();
+    public Page<InquiryDto> findAllWithUser(Pageable pageable,String search, String typeStr, String statusStr) {
+        String searchParam = (search == null || search.isBlank()) ? null : "%" + search.toLowerCase() + "%";
+        Type typeParam = null;
+        if (typeStr != null && !typeStr.equals("All") && !typeStr.isBlank()) {
+            try {
+                typeParam = Type.valueOf(typeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid inquiry type parameter received: " + typeStr);
+            }
+        }
 
-        return inquiries.stream()
-                .map(InquiryDto::new)
-                .collect(Collectors.toList());
+        InquiryStatus statusParam = null;
+        if (statusStr != null && !statusStr.equals("All") && !statusStr.isBlank()) {
+            try {
+                statusParam = InquiryStatus.valueOf(statusStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        // 3. Call the updated repository method
+        Page<Inquiry> inquiries = inquiryRepository.findAllWithUserForPage(
+                pageable,
+                searchParam,
+                typeParam,
+                statusParam
+        );
+
+        return inquiries.map(InquiryDto::new);
     }
 
     // 문의 아이디 검색 요청
@@ -145,4 +174,5 @@ public class InquiryService {
         inquiry.setDeletedAt(LocalDateTime.now());
         inquiryRepository.save(inquiry);
     }
+
 }

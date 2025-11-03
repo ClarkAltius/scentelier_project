@@ -79,9 +79,13 @@ public class AdminController {
     }
 
    @GetMapping("/inquiries")
-    public ResponseEntity<List<InquiryDto>> getInquiries(){
-        List<InquiryDto> inquiryList = inquiryService.findAllWithUser();
-        return ResponseEntity.ok(inquiryList);
+    public ResponseEntity<Page<InquiryDto>> getInquiries(
+            Pageable pageable,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "type", required = false) String type){
+        Page<InquiryDto> inquiryPage = inquiryService.findAllWithUser(pageable, search, type, status);
+        return ResponseEntity.ok(inquiryPage);
     }
 
     // 문의사항 상세내역 GET API 엔드포인트

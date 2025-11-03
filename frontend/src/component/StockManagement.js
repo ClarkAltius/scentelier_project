@@ -327,6 +327,10 @@ function StockManagement() {
             const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             saveAs(blob, `${poNumber}.xlsx`);
 
+            if (window.confirm("선택한 항목들을 발주하시겠습니까? (재고가 수정됩니다.)")) {
+                await handleBulkRestockRequest();
+            }
+
         } catch (err) {
             console.error("Failed to generate PO:", err);
             alert("발주서 생성에 실패했습니다. (서버 오류)");
@@ -478,15 +482,7 @@ function StockManagement() {
 
     return (
         <div className={styles.stockManagementPage}>
-            <div className={styles.searchBar}>
-                <Search size={18} className={styles.searchIcon} />
-                <input
-                    type="text"
-                    placeholder="Search by ID, Name... 검색"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                />
-            </div>
+
             <div className={styles.header}>
                 <div className={styles.viewToggle}>
                     <button
@@ -502,7 +498,17 @@ function StockManagement() {
                         <Beaker size={16} /> 원액
                     </button>
                 </div>
+                <div className={styles.searchBar}>
+                    <Search size={18} className={styles.searchIcon} />
+                    <input
+                        type="text"
+                        placeholder="Search by ID, Name... 검색"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                </div>
             </div>
+
             <div className={styles.bulkActions}>
                 <button
                     className={styles.bulkRequestButton}

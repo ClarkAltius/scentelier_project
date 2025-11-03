@@ -21,7 +21,7 @@ public class InquiryDto {
     private String content;
     private String userEmail;
     private String title;
-    private String type; //PRODUCE, DELIVERY etc
+    private String type;
     private LocalDateTime createdAt;
     private InquiryStatus status;
     private Products productId;

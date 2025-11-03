@@ -213,3 +213,26 @@
         transform: translateY(0);
     }
 }
+
+/* Pagination styles */
+.paginationContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.pageInfo {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortableHeader:hover {
+    background-color: #f8f9fa;
+}
