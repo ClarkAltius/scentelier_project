@@ -205,19 +205,15 @@ const Inquiry = () => {
 
           <Col>
             <Link to="/myinquiry" className="form-end">
-              
-                <span className="inline-link" href="$">My 문의사항</span>
-              
+
+              <span className="inline-link" href="$">My 문의사항</span>
+
             </Link>
           </Col>
           {successMessage && (
             <div style={styles.successMessage}>{successMessage}</div>
           )}
         </form>
-
-
-
-
       </div>
     </div>
   );
