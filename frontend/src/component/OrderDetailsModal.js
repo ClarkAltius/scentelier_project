@@ -75,6 +75,7 @@ function OrderDetailsModal({ order, show, handleClose, onCancelOrder }) {
                         { withCredentials: true }
                     );
                     setOrderDetails(response.data);
+                    console.log(response.data);
                 } catch (err) {
                     console.error("Failed to fetch order details:", err);
                     setError("주문 상세 정보를 불러오는 데 실패했습니다.");
@@ -99,7 +100,6 @@ function OrderDetailsModal({ order, show, handleClose, onCancelOrder }) {
             handleClose();
         }
     };
-
 
     // === Render Logic ===
     const renderModalContent = () => {
@@ -132,7 +132,7 @@ function OrderDetailsModal({ order, show, handleClose, onCancelOrder }) {
                             <hr className="mt-1" />
                             {InfoRow({ icon: <User size={16} className="me-1" />, label: "수령인", value: orderDetails.recipientName })}
                             {InfoRow({ icon: <Mail size={16} className="me-1" />, label: "이메일", value: orderDetails.customerEmail })}
-                            {InfoRow({ icon: <Phone size={16} className="me-1" />, label: "연락처", value: orderDetails.recipientPhone })}
+                            {InfoRow({ icon: <Phone size={16} className="me-1" />, label: "연락처", value: orderDetails.customerPhone })}
                         </div>
                     </Col>
 
@@ -141,8 +141,8 @@ function OrderDetailsModal({ order, show, handleClose, onCancelOrder }) {
                         <div className="p-3 border rounded h-100">
                             <h5 className="d-flex align-items-center"><Truck size={20} className="me-2" />배송 정보</h5>
                             <hr className="mt-1" />
-                            {InfoRow({ icon: <MapPin size={16} className="me-1" />, label: "주소", value: orderDetails.shippingAddress })}
-                            {InfoRow({ icon: <Mail size={16} className="me-1" />, label: "우편번호", value: orderDetails.shippingPostalCode })}
+                            {InfoRow({ icon: <MapPin size={16} className="me-1" />, label: "주소", value: orderDetails.address })}
+                            {InfoRow({ icon: <Truck size={16} className="me-1" />, label: "송장번호", value: orderDetails.trackingNumber })}
                         </div>
                     </Col>
 

@@ -139,7 +139,7 @@ public class AdminController {
             @PathVariable Long orderId,
             @Valid@RequestBody OrderUpdateDto updateDto)
     {
-        OrderAdminDto updatedOrder = orderService.updateOrderStatus(orderId, updateDto.getStatus());
+        OrderAdminDto updatedOrder = orderService.updateOrderStatus(orderId, updateDto);
 
         return ResponseEntity.ok(updatedOrder);
     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './OrderManagement.module.css';
 import { Search, Filter, Eye, Edit, XCircle, ArrowUp, ArrowDown } from 'lucide-react';
-import { Pagination } from 'react-bootstrap';
+import { Pagination, Modal, Button, Form } from 'react-bootstrap';
 import { API_BASE_URL } from '../config/config';
 import axios from 'axios';
 import OrderDetailsModal from './OrderDetailsModal';
@@ -38,6 +38,11 @@ function OrderManagement() {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(20);
+
+    // 배송 상태 모달 용 스테이트
+    const [showShipModal, setShowShipModal] = useState(false);
+    const [orderToShip, setOrderToShip] = useState(null);
+    const [trackingInput, setTrackingInput] = useState('');
 
 
     //주문 리스트 가져오기. UPDATE : 페이징, 정렬 기능 추가
@@ -103,28 +108,59 @@ function OrderManagement() {
         setSortConfig({ key, direction });
     };
 
+    // 배송, 운송장 번호 관련 모달
+    const handleOpenShipModal = (order) => {
+        setOrderToShip(order);
+        setTrackingInput(order.trackingNumber || ''); // Pre-fill if it already exists
+        setShowShipModal(true);
+    };
+
+    const handleCloseShipModal = () => {
+        setShowShipModal(false);
+        setOrderToShip(null);
+        setTrackingInput('');
+    };
+
+    const handleConfirmShipment = async () => {
+        if (!trackingInput) {
+            alert("송장번호를 입력해주세요.");
+            return;
+        }
+
+        await handleUpdateStatus(orderToShip.id, 'SHIPPED', trackingInput);
+
+        handleCloseShipModal();
+    };
+
 
     // [모달] 상태 변경 핸들러
-    const handleUpdateStatus = async (orderId, newStatus) => {
+    const handleUpdateStatus = async (orderId, newStatus, trackingNumber = null) => {
         if (!window.confirm(`정말로 #${orderId}의 상태를 ${newStatus}로 변경하시겠습니다?`)) {
             return;
         }
+
         const payload = { status: newStatus };
+        if (trackingNumber) {
+            payload.trackingNumber = trackingNumber;
+        }
+
         try {
-            await axios.patch(
+            const response = await axios.patch(
                 `${API_BASE_URL}/api/admin/orders/${orderId}`,
                 payload,
                 { withCredentials: true }
             );
+            const updatedOrderFromServer = response.data;
+
             setOrders(prevOrders =>
                 prevOrders.map(order =>
-                    order.id === orderId ? { ...order, status: newStatus } : order
+                    order.id === orderId ? updatedOrderFromServer : order
                 )
             );
             alert(`주문 #${orderId} 상태가 ${newStatus}(으)로 변경되었습니다.`);
         } catch (err) {
             console.log("상태 변경 실패: " + err);
-            alert("주문 상태 변경에 실패했습니다.")
+            alert("주문 상태 변경에 실패했습니다.");
         }
     };
 
@@ -232,6 +268,9 @@ function OrderManagement() {
                             <th onClick={() => handleSort('address')} className={styles.sortableHeader}>
                                 주소 {getSortArrow('address')}
                             </th>
+                            <th onClick={() => handleSort('trackingNumber')} className={styles.sortableHeader}>
+                                운송장 {getSortArrow('trackingNumber')}
+                            </th>
                             <th onClick={() => handleSort('status')} className={styles.sortableHeader}>
                                 상태 {getSortArrow('status')}
                             </th>
@@ -250,6 +289,7 @@ function OrderManagement() {
                                     <td>{order.orderDate}</td>
                                     <td>₩{order.totalAmount.toLocaleString()}</td>
                                     <td>{order.address}</td>
+                                    <td>{order.trackingNumber}</td>
                                     <td>
                                         {/* 상태 + 상태 아이콘 표시*/}
                                         <span className={`${styles.statusBadge} ${styles[`status${order.status}`]}`}>
@@ -270,7 +310,7 @@ function OrderManagement() {
                                             {(order.status === 'PENDING' || order.status === 'PAID') && (
                                                 <button
                                                     className={`${styles.actionButton} ${styles.updateButton}`}
-                                                    onClick={() => handleUpdateStatus(order.id, 'SHIPPED')}
+                                                    onClick={() => handleOpenShipModal(order)}
                                                     title="Mark as Shipped"
                                                 >
                                                     <Edit size={16} /> Mark Shipped
@@ -333,6 +373,30 @@ function OrderManagement() {
                 handleClose={handleCloseModal}
                 onCancelOrder={handleCancelOrder}
             />
+            <Modal show={showShipModal} onHide={handleCloseShipModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>송장번호 입력 (주문 #{orderToShip?.id})</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group controlId="trackingNumberInput">
+                        <Form.Label>송장 번호</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="송장번호를 입력하세요..."
+                            value={trackingInput}
+                            onChange={(e) => setTrackingInput(e.target.value)}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseShipModal}>
+                        취소
+                    </Button>
+                    <Button variant="primary" onClick={handleConfirmShipment}>
+                        'SHIPPED'로 변경 및 저장
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

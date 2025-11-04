@@ -358,3 +358,38 @@
     margin: 0 auto;
     /* Center the placeholder */
 }
+
+/* In StockManagement.module.css */
+
+.summaryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.summaryTable th,
+.summaryTable td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.summaryTable th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.summaryTable td:nth-child(2),
+.summaryTable td:nth-child(3),
+.summaryTable td:nth-child(4),
+.summaryTable th:nth-child(2),
+.summaryTable th:nth-child(3),
+.summaryTable th:nth-child(4) {
+    text-align: right;
+}
+
+.summaryTotal td {
+    font-weight: bold;
+    font-size: 1.1rem;
+    background-color: #f8f9fa;
+}

@@ -10,4 +10,6 @@ public class OrderUpdateDto {
 
     @NotBlank(message = "Status 는 필수사항입니다.")
     private String status;
+
+    private String trackingNumber;
 }

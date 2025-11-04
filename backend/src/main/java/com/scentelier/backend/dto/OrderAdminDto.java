@@ -17,6 +17,7 @@ public class OrderAdminDto {
     private java.math.BigDecimal totalAmount;
     private String status;
     private String address;
+    private String trackingNumber;
 
     public OrderAdminDto() {}
 
@@ -27,6 +28,8 @@ public class OrderAdminDto {
         this.totalAmount = order.getTotalPrice();
         this.status = order.getStatus().toString();
         this.address = order.getAddress();
+        this.trackingNumber = order.getTrackingNumber();
+
 
         // 사용자 정보
         if (order.getUsers() != null) {

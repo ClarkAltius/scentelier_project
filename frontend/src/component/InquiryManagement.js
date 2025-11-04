@@ -86,7 +86,7 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
                 });
 
                 setInquiries(response.data.content);
-                console.log(response.data.content);
+                // console.log(response.data.content);
                 setTotalPages(response.data.totalPages);
 
             } catch (err) {

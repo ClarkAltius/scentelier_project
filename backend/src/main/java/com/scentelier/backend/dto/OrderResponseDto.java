@@ -28,6 +28,8 @@ public class OrderResponseDto {
     private String trackingNumber;
     private String paymentMethod;
     private List<OrderItem> orderItems;
+    private String customerEmail;
+    private String customerPhone;
 
     @Data
     @AllArgsConstructor
@@ -47,6 +49,7 @@ public class OrderResponseDto {
             this.productName = name;
             this.quantity = quantity;
             this.price = price;
+
         }
     }
 
@@ -58,6 +61,7 @@ public class OrderResponseDto {
         this.address = order.getAddress();
         this.totalPrice = order.getTotalPrice();
         this.trackingNumber = order.getTrackingNumber();
+        this.customerPhone = order.getPhone();
 
         // ENUM 문자열로 변경, DTO에 반영
         if (order.getStatus() != null) {
@@ -65,6 +69,11 @@ public class OrderResponseDto {
         }
         if (order.getPaymentMethod() != null) {
             this.paymentMethod = order.getPaymentMethod().name();
+        }
+
+        if (order.getUsers() != null) {
+            this.customerEmail = order.getUsers().getEmail();
+            this.customerPhone = order.getUsers().getPhone();
         }
 
         if (order.getOrderProducts() != null) {
@@ -109,7 +118,6 @@ public class OrderResponseDto {
                         }
 
                         return item;
-                        // --- MERGED BLOCK END ---
                     })
                     .collect(Collectors.toList());
         } else {
