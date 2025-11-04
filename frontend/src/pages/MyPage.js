@@ -12,6 +12,10 @@ const MyPage = () => {
   const [profileImage, setProfileImage] = useState(user?.profileImage || ""); //progileImage : 실제 업로드할 파일
   const [preview, setPreview] = useState(user?.profileImage || ""); // 미리보기 preview : 화면에 보여줄 미리보기 URL
 
+  //비밀번호, 전화번호 형식
+  const PASSWORD_REGEX = /^[A-Z][A-Za-z0-9!@#$%^&*]{7,}$/;
+  const PHONE_REGEX = /^(\d{2,3}-\d{3,4}-\d{4})$/; // 000-0000-0000 형식
+
   // 초기 로딩
   useEffect(() => {
     if (!user) {
@@ -43,12 +47,23 @@ const MyPage = () => {
 
 
   //수정코드 시작
+
   // 수정용 state
   const [editForm, setEditForm] = useState({
     username: "",
     phone: "",
     address: "",
   });
+
+  // 전화번호 형식 에러 메시지용 state 추가
+  const [editError, setEditError] = useState({
+    phone: "",
+    general: "",
+  });
+
+  // 비밀번호 오류 메시지
+  const [pwError, setPwError] = useState("");
+
 
   // 수정 버튼 클릭 시
   const handleEditClick = () => {
@@ -64,7 +79,20 @@ const MyPage = () => {
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
+
+    // 전화번호 필드일 경우, 실시간 유효성 검사
+    if (value === "" || PHONE_REGEX.test(value)) {
+      setEditError((prev) => ({ ...prev, phone: "" })); // 올바르면 오류 제거
+    } else {
+      setEditError((prev) => ({
+        ...prev,
+        phone: "전화번호 형식이 올바르지 않습니다.\n000-0000-0000 형식으로 입력해 주세요.",
+      }));
+    }
   };
+
+
+
 
   // 수정 저장
   // const handleSaveEdit = async () => {
@@ -106,6 +134,21 @@ const MyPage = () => {
   // }; 
   // 
   const handleSaveEdit = async () => {
+
+    // 이전 전화번호 형식 에러 초기화
+    setEditError({ phone: "", general: "" });
+
+    // 전화번호 형식 검사
+    // if (editForm.phone && !PHONE_REGEX.test(editForm.phone)) {
+    //   setEditError((prev) => ({
+    //     ...prev,
+    //     phone: "전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요.",
+    //     general : "",
+    //   }));
+    //   return;
+    // }
+
+
     try {
       const formData = new URLSearchParams();
       formData.append("name", editForm.username); // username -> name
@@ -206,9 +249,20 @@ const MyPage = () => {
   const handlePwSave = async () => {
     const { currentPassword, newPassword } = pwForm;
     if (!currentPassword || !newPassword) {
-      alert("모든 정보를 입력하세요.");
+      setPwError("모든 정보를 입력하세요.");
       return;
     }
+
+    // 새 비밀번호 형식 검사
+    if (!PASSWORD_REGEX.test(newPassword)) {
+      setPwError("첫 글자가 대문자이고 8자 이상이어야 합니다.");
+      return;
+    }
+
+    //오류 초기화
+    setPwError("");
+
+
 
     try {
       const response = await fetch(`http://localhost:9000/user/change-password`, {
@@ -227,11 +281,11 @@ const MyPage = () => {
         alert("비밀번호가 성공적으로 변경되었습니다.");
         setPage("view");
       } else {
-        alert(`오류: ${result}`);
+        setPwError(`오류: ${result}`);
       }
     } catch (error) {
       console.error("비밀번호 변경 실패:", error);
-      alert("서버 오류가 발생했습니다.");
+      setPwError("서버 오류가 발생했습니다.");
     }
   };
   //비밀번호 변경 끝
@@ -353,6 +407,12 @@ const MyPage = () => {
                 onChange={handleEditChange}
                 style={styles.input}
               />
+
+              {/* 전화번호 형식 에러 메시지 표시 */}
+              {editError.phone && (
+                <div style={{ ...styles.errorText, whiteSpace: "pre-line" }}>{editError.phone}</div>
+              )}
+
             </div>
             <div style={styles.inputWrapper}>
               <label style={styles.label}>주소</label>
@@ -397,6 +457,7 @@ const MyPage = () => {
                 onChange={handlePwChange}
                 style={styles.input}
               />
+              {pwError && <div style={styles.errorText}>{pwError}</div>}
             </div>
             <div style={styles.buttonGroup}>
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePwSave}>
@@ -514,6 +575,11 @@ const styles = {
     borderRadius: "50%",
     objectFit: "cover",
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+  },
+  errorText: {
+    color: "#f44336",
+    fontSize: "13px",
+    marginTop: "5px",
   },
 };
 
