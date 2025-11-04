@@ -109,4 +109,11 @@ public class OrderService {
         return orderRepository.updateOrderStatus(orderId, status);
     }
 
+    // 관리자 유저관리창
+    @Transactional(readOnly = true)
+    public Page<OrderAdminDto> findOrdersByUserId(Long userId, Pageable pageable) {
+        Page<Orders> orderPage = orderRepository.findByUsers_IdOrderByOrderDateDesc(userId, pageable);
+        return orderPage.map(OrderAdminDto::new);
+    }
+
 }

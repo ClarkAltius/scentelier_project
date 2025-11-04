@@ -37,14 +37,16 @@ public class AdminController {
     private final OrderService orderService;
     private final InquiryService inquiryService;
     private final PurchaseOrderService purchaseOrderService;
+    private final UserService userService;
 
     @Autowired
-    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService, PurchaseOrderService purchaseOrderService) {
+    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService, PurchaseOrderService purchaseOrderService, UserService userService) {
         this.productService = productService;
         this.ingredientService = ingredientService;
         this.orderService = orderService;
         this.inquiryService = inquiryService;
         this.purchaseOrderService = purchaseOrderService;
+        this.userService = userService;
     }
 
 
@@ -267,6 +269,51 @@ public class AdminController {
             return ResponseEntity.internalServerError().body("복구 중 오류: " + e.getMessage());
         }
     }
+
+    // ======== 유저관리 엔드포인트 시작 ==========
+    @GetMapping("/users")
+    public ResponseEntity<Page<UserAdminDto>> getUsers(
+            Pageable pageable,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "status", required = false) String status
+    ) {
+        Page<UserAdminDto> userPage = userService.getUsers(pageable, search, status);
+        return ResponseEntity.ok(userPage);
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserAdminDto> getUserDetail(@PathVariable Long id) {
+        UserAdminDto userDetail = userService.getUserDetail(id);
+        return ResponseEntity.ok(userDetail);
+    }
+
+    @GetMapping("/users/{id}/orders")
+    public ResponseEntity<Page<OrderAdminDto>> getUserOrders(
+            @PathVariable Long id,
+            Pageable pageable
+    ) {
+        Page<OrderAdminDto> orderPage = orderService.findOrdersByUserId(id, pageable);
+        return ResponseEntity.ok(orderPage);
+    }
+
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<UserAdminDto> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserAdminUpdateDto updateDto
+    ) {
+        UserAdminDto updatedUser = userService.updateUser(id, updateDto);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PatchMapping("/users/{id}/status")
+    public ResponseEntity<UserAdminDto> updateUserStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UserStatusUpdateDto statusDto
+    ) {
+        UserAdminDto updatedUser = userService.updateUserStatus(id, statusDto);
+        return ResponseEntity.ok(updatedUser);
+    }
+    // ======== 유저관리 엔드포인트 끝 ==========
 }
 
 

@@ -4,6 +4,8 @@ import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -81,5 +83,5 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "GROUP BY month " +
             "ORDER BY month ASC")
     List<Object[]> findMonthlySales();
-
+    Page<Orders> findByUsers_IdOrderByOrderDateDesc(Long userId, Pageable pageable);
 }

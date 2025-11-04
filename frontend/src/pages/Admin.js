@@ -11,6 +11,8 @@ import OrderManagement from '../component/OrderManagement';
 import CustomerInquiries from '../component/InquiryManagement';
 import ProductInsertForm from './ProductInsertForm';
 import InquiryDetail from '../component/InquiryDetail';
+import UserManagement from '../component/UserManagement';
+import ReviewManagement from '../component/ReviewManagement';
 
 function Admin() {
 
@@ -30,7 +32,9 @@ function Admin() {
             'orders': <OrderManagement />,
             'inquiries': <CustomerInquiries setActiveView={setActiveView} setSelectedInquiryId={setSelectedInquiryId} />,
             'productInsert': <ProductInsertForm setActiveView={setActiveView} />,
-            'inquiryDetail': <InquiryDetail setActiveView={setActiveView} inquiryId={selectedInquiryId} />
+            'inquiryDetail': <InquiryDetail setActiveView={setActiveView} inquiryId={selectedInquiryId} />,
+            'userManagement': <UserManagement setActiveView={setActiveView} />,
+            'reviewManagement': <ReviewManagement setActiveView={setActiveView} />
         };
         return views[activeView] || <Dashboard />;
     };
