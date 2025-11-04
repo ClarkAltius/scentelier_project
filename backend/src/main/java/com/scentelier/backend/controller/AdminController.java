@@ -20,12 +20,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.security.Principal;
-
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import com.scentelier.backend.service.ReviewService;
+import com.scentelier.backend.dto.ReviewAdminDto;
+import com.scentelier.backend.dto.ReviewStatusUpdateDto;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -38,15 +39,17 @@ public class AdminController {
     private final InquiryService inquiryService;
     private final PurchaseOrderService purchaseOrderService;
     private final UserService userService;
+    private final ReviewService reviewService;
 
     @Autowired
-    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService, PurchaseOrderService purchaseOrderService, UserService userService) {
+    public AdminController(ProductService productService, IngredientService ingredientService, OrderService orderService, InquiryService inquiryService, PurchaseOrderService purchaseOrderService, UserService userService,ReviewService reviewService) {
         this.productService = productService;
         this.ingredientService = ingredientService;
         this.orderService = orderService;
         this.inquiryService = inquiryService;
         this.purchaseOrderService = purchaseOrderService;
         this.userService = userService;
+        this.reviewService = reviewService;
     }
 
 
@@ -314,6 +317,28 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
     // ======== 유저관리 엔드포인트 끝 ==========
+
+    // === REVIEW MANAGEMENT ENDPOINTS ===
+
+    @GetMapping("/reviews")
+    public ResponseEntity<Page<ReviewAdminDto>> getReviews(
+            Pageable pageable,
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "rating", required = false, defaultValue = "-1") int rating,
+            @RequestParam(value = "status", required = false) String status
+    ) {
+        Page<ReviewAdminDto> reviewPage = reviewService.getReviews(pageable, search, rating, status);
+        return ResponseEntity.ok(reviewPage);
+    }
+
+    @PatchMapping("/reviews/{id}/status")
+    public ResponseEntity<ReviewAdminDto> updateReviewStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewStatusUpdateDto statusDto
+    ) {
+        ReviewAdminDto updatedReview = reviewService.updateReviewStatus(id, statusDto);
+        return ResponseEntity.ok(updatedReview);
+    }
 }
 
 

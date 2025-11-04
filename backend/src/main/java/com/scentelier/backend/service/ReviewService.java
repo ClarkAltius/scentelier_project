@@ -5,14 +5,18 @@ import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Reviews;
 import com.scentelier.backend.repository.OrderRepository;
 import com.scentelier.backend.repository.ReviewRepository;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
+//import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional; //readonly 기능 위해서 변경
+
 
 @Service
 @RequiredArgsConstructor
@@ -216,4 +220,31 @@ public class ReviewService {
         }
         return text.replaceAll("(?<=.{1}).", maskChar);
     }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewAdminDto> getReviews(Pageable pageable, String search, int rating, String status) {
+        Page<Reviews> reviewPage = reviewRepository.findAdminReviews(
+                pageable,
+                search,
+                rating,
+                status
+        );
+        return reviewPage.map(ReviewAdminDto::new); // Convert Page<Reviews> to Page<ReviewAdminDto>
+    }
+
+    public ReviewAdminDto updateReviewStatus(Long reviewId, ReviewStatusUpdateDto statusDto) {
+        Reviews review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("Review not found with id: " + reviewId));
+
+        review.setDeleted(statusDto.getIsDeleted());
+        if (statusDto.getIsDeleted()) {
+            review.setDeletedAt(LocalDate.now());
+        } else {
+            review.setDeletedAt(null);
+        }
+
+        Reviews savedReview = reviewRepository.save(review);
+        return new ReviewAdminDto(savedReview);
+    }
+
 }

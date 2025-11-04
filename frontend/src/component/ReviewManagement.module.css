@@ -1,0 +1,85 @@
+/* ReviewManagement.module.css */
+
+.reviewManagementPage {
+    padding: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.searchBar {
+    max-width: 400px;
+    flex-grow: 1;
+}
+
+.filterDropdown {
+    max-width: 200px;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* --- Table Styles --- */
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 24px;
+}
+
+.sortableHeader:hover {
+    background-color: #f8f9fa;
+}
+
+.sortIcon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+}
+
+.contentCell {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 0;
+    align-items: center;
+}
+
+/* --- Star Rating Styles --- */
+.starRating {
+    display: inline-flex;
+    color: #ccc;
+}
+
+.starFilled {
+    color: #ffc107;
+    fill: #ffc107;
+}
+
+.starEmpty {
+    color: #ccc;
+}
