@@ -37,7 +37,7 @@ public class UserService {
     public Optional<Users> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-    //유저 검색, 비밀번호 수정 업데이트 예정
+    //유저 검색 업데이트 예정
 
     // 사용자 정보 저장/수정 by 마이페이지
     public Users saveUser(Users user) {

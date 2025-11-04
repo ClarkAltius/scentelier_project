@@ -26,14 +26,14 @@ function MyInquiry() {
 
         (async () => {
             try {
-                console.log(user);
+               // console.log(user);
                 const url = `${API_BASE_URL}/api/inquiries/my`;
                 // const params = { params: { userId: user.id, role: user.role } };
                 const res = await axios.get(url, { withCredentials: true });
-                console.log("응답:", res.data);
+                //console.log("응답:", res.data);
 
                 const data = res.data?.data ?? res.data ?? [];
-                console.log(res);
+                //console.log(res);
                 setInquiries(data);
             } catch (e) {
                 console.error(e);
@@ -81,7 +81,12 @@ function MyInquiry() {
             <Row>
                 <Col className="text-end">
                     <Link to="/inquiry" className="btn btn-outline-secondary">
-                        이전으로
+                        문의사항 페이지로
+                    </Link>
+                </Col>
+                <Col className="text-first">
+                    <Link to="/mypage" className="btn btn-outline-secondary">
+                        마이페이지로
                     </Link>
                 </Col>
             </Row>

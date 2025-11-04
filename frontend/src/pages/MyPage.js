@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../component/AuthContext";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
-  const { user, login, logout } = useAuth(); // 로그인한 사용자 정보, useAuth에서 logout 가져오기
-  const [userInfo, setUserInfo] = useState(null); // 초기값을 null로
+  const { user, login, logout } = useAuth();
+  const [userInfo, setUserInfo] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [page, setPage] = useState("view"); // "view" | "edit" | "password"
   const navigate = useNavigate();
 
+  const [profileImage, setProfileImage] = useState(user?.profileImage || ""); //progileImage : 실제 업로드할 파일
+  const [preview, setPreview] = useState(user?.profileImage || ""); // 미리보기 preview : 화면에 보여줄 미리보기 URL
+
+  // 초기 로딩
   useEffect(() => {
     if (!user) {
       if (!isDeleting) {
@@ -16,69 +21,143 @@ const MyPage = () => {
       }
       return;
     }
-
-    // 로그인된 사용자 정보로 상태 초기화
     setUserInfo({
       username: user.username || "",
       email: user.email || "",
       phone: user.phone || "",
       address: user.address || "",
+      profileImage: user.profileImage || "",
     });
+    setPreview(user.profileImage || ""); //초기 미리보기 설정
   }, [user, navigate, isDeleting]);
+
+  //프로필 사진 설정 시작
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setProfileImage(file);
+  //     setPreview(URL.createObjectURL(file)); // 브라우저 미리보기
+  //   }
+  // };
+  //프로필 사진 설정 끝
 
 
   //수정코드 시작
-  const handleEdit = async () => {
-    const newName = prompt("이름을 입력하세요", userInfo.name);
-    //const newEmail = prompt("이메일을 입력하세요", userInfo.email);
-    const newPhone = prompt("전화번호를 입력하세요", userInfo.phone);
-    const newAddress = prompt("주소를 입력하세요", userInfo.address);
+  // 수정용 state
+  const [editForm, setEditForm] = useState({
+    username: "",
+    phone: "",
+    address: "",
+  });
 
-    // 사용자가 취소하면 아무 것도 안 함
-    if (
-      newName === null &&
-      //newEmail === null &&
-      newPhone === null &&
-      newAddress === null
-    ) return;
+  // 수정 버튼 클릭 시
+  const handleEditClick = () => {
+    setEditForm({
+      username: userInfo.username,
+      phone: userInfo.phone,
+      address: userInfo.address,
+    });
+    setPage("edit");
+  };
 
+  // 수정 입력 변경
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-    // 업데이트할 정보 준비
-    const updatedInfo = {
-      name: newName !== null ? newName : userInfo.username,
-      email: userInfo.email, //이메일 변경불가 
-      //newEmail !== null ? newEmail : userInfo.email,
-      phone: newPhone !== null ? newPhone : userInfo.phone,
-      address: newAddress !== null ? newAddress : userInfo.address,
-    };
+  // 수정 저장
+  // const handleSaveEdit = async () => {
+  //   try {
+  //     const updatedInfo = {
+  //       name: editForm.username,
+  //       email: userInfo.email,
+  //       phone: editForm.phone,
+  //       address: editForm.address,
+  //     };
 
+  //     const params = new URLSearchParams(updatedInfo).toString();
+  //     const response = await fetch(`http://localhost:9000/user/update?${params}`, {
+  //       method: "PUT",
+  //       credentials: "include",
+  //       headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  //     });
+
+  //     const result = await response.json();
+  //     if (response.ok) {
+  //       const newUserData = {
+  //         username: result.username,
+  //         email: result.email,
+  //         phone: result.phone,
+  //         address: result.address,
+  //       };
+
+  //       setUserInfo(newUserData);
+  //       login(newUserData);
+  //       alert("회원 정보가 성공적으로 업데이트되었습니다.");
+  //       setPage("view");
+  //     } else {
+  //       alert(`업데이트 실패: ${result}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("업데이트 요청 실패:", error);
+  //     alert("서버 오류가 발생했습니다.");
+  //   }
+  // }; 
+  // 
+  const handleSaveEdit = async () => {
     try {
-      // URLSearchParams를 사용해 쿼리스트링으로 변환
-      const params = new URLSearchParams(updatedInfo).toString();
-      const response = await fetch(`http://localhost:9000/user/update?${params}`, {
-        method: "PUT",
-        credentials: "include", // 쿠키 전송
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      const formData = new URLSearchParams();
+      formData.append("name", editForm.username); // username -> name
+      formData.append("email", userInfo.email);    // 필수!
+      formData.append("phone", editForm.phone);
+      formData.append("address", editForm.address);
 
-      //const result = await response.text(); // 백엔드에서 받은 문자열
+      let response;
+
+      // 새 이미지가 선택되었으면 업로드
+      if (profileImage instanceof File) {
+        const multipartData = new FormData();
+        multipartData.append("name", editForm.username);
+        multipartData.append("email", userInfo.email);
+        multipartData.append("phone", editForm.phone);
+        multipartData.append("address", editForm.address);
+        // multipartData.append("profileImage", profileImage);
+
+
+        response = await fetch("http://localhost:9000/user/update", {
+          method: "PUT",
+          credentials: "include",
+          body: multipartData, // multipart/form-data로 전송
+        });
+      } else {
+        response = await fetch("http://localhost:9000/user/update", {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData.toString(),
+        });
+      }
+
       const result = await response.json();
+
       if (response.ok) {
+        // 서버에서 새로운 이미지 URL 반환했다고 가정
         const newUserData = {
-          //setUserInfo({
           username: result.username,
           email: result.email,
           phone: result.phone,
           address: result.address,
+          // profileImage: result.profileImage || preview, // 기존 preview 유지
         };
 
         setUserInfo(newUserData);
-        login(newUserData); // AuthContext도 갱신
-        alert("회원 정보가 성공적으로 업데이트되었습니다.")
+        // setPreview(newUserData.profileImage); // 미리보기 갱신
+        login(newUserData);
+        alert("회원 정보가 성공적으로 업데이트되었습니다.");
+        setPage("view");
       } else {
-        alert(`업데이트 실패: ${result}`);
+        alert(`업데이트 실패: ${result.message || result}`);
       }
     } catch (error) {
       console.error("업데이트 요청 실패:", error);
@@ -86,35 +165,94 @@ const MyPage = () => {
     }
   };
 
+
+
   //수정 코드 끝
-
-
 
   const handleMyInquiry = () => {
     navigate("/myinquiry"); // 문의사항 페이지로 이동
   };
 
-  //탈퇴코드 시작
+  const handleCartList = () => {
+    navigate("/cart/list"); // 장바구니 페이지로 이동
+  };
+
+  const handleOrderList = () => {
+    navigate("/order/list"); // 주문내역 페이지로 이동
+  };
+
+  const handlePayments = () => {
+    navigate("/payments"); // 결제 페이지로 이동
+  };
+
+  const handleMyReviewListPage = () => {
+    navigate("/mypage/review"); // 내가 쓴 리뷰 조회하기 페이지로 이동
+  };
+
+
+  // 비밀번호 변경
+  const [pwForm, setPwForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+  });
+
+  const handleChangePassword = () => setPage("password");
+
+  const handlePwChange = (e) => {
+    const { name, value } = e.target;
+    setPwForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePwSave = async () => {
+    const { currentPassword, newPassword } = pwForm;
+    if (!currentPassword || !newPassword) {
+      alert("모든 정보를 입력하세요.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:9000/user/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          email: userInfo.email,
+          currentPassword,
+          newPassword,
+        }).toString(),
+        credentials: "include",
+      });
+
+      const result = await response.text();
+      if (response.ok) {
+        alert("비밀번호가 성공적으로 변경되었습니다.");
+        setPage("view");
+      } else {
+        alert(`오류: ${result}`);
+      }
+    } catch (error) {
+      console.error("비밀번호 변경 실패:", error);
+      alert("서버 오류가 발생했습니다.");
+    }
+  };
+  //비밀번호 변경 끝
+
+  // 탈퇴
   const handleDelete = async () => {
     const confirmed = window.confirm("정말 탈퇴하시겠습니까?");
     if (!confirmed) return;
-    setIsDeleting(true); // 탈퇴 중임을 표시
+    setIsDeleting(true);
     try {
       const response = await fetch(
         `http://localhost:9000/user/delete?email=${encodeURIComponent(userInfo.email)}`,
         {
           method: "DELETE",
-          credentials: "include", // 쿠키 전송
+          credentials: "include",
         }
       );
-
       const text = await response.text();
       if (response.ok) {
         alert(text);
-        setUserInfo({ name: "", email: "", address: "", phone: "" });
-        localStorage.removeItem("user"); // 혹시 로컬 스토리지에 user가 저장되어 있다면 삭제
-        sessionStorage.clear();
-        await logout(); // user context 상태 초기화 + sessionStorage 제거 + 고르아웃이 완료된 후 이동
+        await logout();
         navigate("/");
       } else {
         alert(`오류: ${text}`);
@@ -124,37 +262,158 @@ const MyPage = () => {
       alert("서버 오류가 발생했습니다.");
     }
   };
-  //탈퇴 코드 끝
 
-  // 아직 사용자 정보가 로드되지 않았다면 로딩 표시
   if (!userInfo) return <div>로딩 중...</div>;
-
+  //탈퇴끝
+  // --------------------------------------------------------------------
+  // 렌더링 구간
+  // --------------------------------------------------------------------
   return (
     <div style={styles.pageWrapper}>
       <div style={styles.container}>
-        <h2 style={styles.title}>마이페이지</h2>
+        {page === "view" && (
+          <>
+            <h2 style={styles.title}>마이페이지</h2>
 
-        <InfoItem label="이름" value={userInfo.username || ""} />
-        <InfoItem label="이메일" value={userInfo.email} />
-        <InfoItem label="전화번호" value={userInfo.phone} />
-        <InfoItem label="주소" value={userInfo.address} />
+            {/* 프로필 이미지 표시
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+              <img
+                src={preview || "/default-profile.png"}
+                alt="프로필 이미지"
+                style={{ width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover" }}
+              />
+            </div> */}
 
-        <div style={styles.buttonGroup}>
-          <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleEdit}>
-            수정
-          </button>
-          <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyInquiry}>
-            나의 문의사항
-          </button>
-          <button style={{ ...styles.button, backgroundColor: "#f44336" }} onClick={handleDelete}>
-            탈퇴
-          </button>
-        </div>
+
+            <InfoItem label="이름" value={userInfo.username} />
+            <InfoItem label="이메일" value={userInfo.email} />
+            <InfoItem label="전화번호" value={userInfo.phone} />
+            <InfoItem label="주소" value={userInfo.address} />
+
+            <div style={styles.buttonGroup}>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleEditClick}>
+                회원정보 수정
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyInquiry}>
+                나의 문의사항
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleCartList}>
+                장바구니
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleOrderList}>
+                주문내역
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePayments}>
+                결제 페이지
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyReviewListPage}>
+                내가 쓴 리뷰 조회
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleChangePassword}>
+                비밀번호 변경
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#f44336" }} onClick={handleDelete}>
+                탈퇴
+              </button>
+            </div>
+          </>
+        )}
+
+        {page === "edit" && (
+          <>
+            <h2 style={styles.title}>회원 정보 수정</h2>
+
+            {/* 프로필 이미지
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+              <img
+                src={preview || "/default-profile.png"}
+                alt="프로필 이미지"
+                style={{ width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover" }}
+              />
+              <input type="file" accept="image/*" onChange={handleImageChange} style={{ marginTop: "10px" }} />
+            </div> */}
+
+
+
+
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>이름</label>
+              <input
+                name="username"
+                value={editForm.username}
+                onChange={handleEditChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>전화번호</label>
+              <input
+                name="phone"
+                value={editForm.phone}
+                onChange={handleEditChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>주소</label>
+              <input
+                name="address"
+                value={editForm.address}
+                onChange={handleEditChange}
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.buttonGroup}>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleSaveEdit}>
+                저장
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#ccc", color: "#000" }} onClick={() => setPage("view")}>
+                취소
+              </button>
+            </div>
+          </>
+        )}
+
+        {page === "password" && (
+          <>
+            <h2 style={styles.title}>비밀번호 변경</h2>
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>현재 비밀번호</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={pwForm.currentPassword}
+                onChange={handlePwChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>새 비밀번호</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={pwForm.newPassword}
+                onChange={handlePwChange}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.buttonGroup}>
+              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePwSave}>
+                저장
+              </button>
+              <button style={{ ...styles.button, backgroundColor: "#ccc", color: "#000" }} onClick={() => setPage("view")}>
+                취소
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
+// 정보 표시용
 const InfoItem = ({ label, value }) => (
   <div style={styles.infoItem}>
     <label style={styles.label}>{label}</label>
@@ -164,55 +423,97 @@ const InfoItem = ({ label, value }) => (
 
 const styles = {
   pageWrapper: {
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f5f5f5",
-    height: "100vh",
-    margin: 0,
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    backgroundColor: "#eef2f5",
+    minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    padding: "20px",
   },
   container: {
     backgroundColor: "#fff",
-    padding: "40px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    width: "400px",
-    boxSizing: "border-box",
+    padding: "50px 30px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+    width: "100%",
+    maxWidth: "450px",
   },
   title: {
-    fontSize: "28px",
-    marginBottom: "30px",
     textAlign: "center",
+    marginBottom: "25px",
+    fontSize: "24px",
+    color: "#333",
   },
   infoItem: {
-    marginBottom: "20px",
+    marginBottom: "15px"
   },
   label: {
     display: "block",
-    fontWeight: "bold",
+    fontWeight: "600",
     marginBottom: "5px",
+    color: "#555",
   },
   valueBox: {
     display: "block",
-    fontSize: "16px",
-    padding: "10px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
+    padding: "12px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
     backgroundColor: "#fafafa",
+    fontSize: "14px",
+    color: "#333",
+  },
+  inputWrapper: { marginBottom: "20px" },
+  input: {
+    width: "100%",
+    padding: "12px",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    fontSize: "14px",
+    outline: "none",
+    transition: "all 0.2s",
+  },
+  inputFocus: {
+    borderColor: "#67AB9F",
+    boxShadow: "0 0 5px rgba(103,171,159,0.4)",
   },
   buttonGroup: {
-    marginTop: "30px",
     display: "flex",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: "10px",
+    marginTop: "20px",
   },
   button: {
-    padding: "10px 20px",
-    fontSize: "16px",
+    flex: "1 1 48%",
+    padding: "12px 0",
+    fontSize: "15px",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "8px",
     cursor: "pointer",
     color: "#fff",
+    transition: "all 0.2s",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+  },
+  primaryButton: {
+    backgroundColor: "#67AB9F",
+  },
+  dangerButton: {
+    backgroundColor: "#f44336",
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+    color: "#333",
+  },
+  profileImageWrapper: {
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+  profileImage: {
+    width: "110px",
+    height: "110px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
   },
 };
 

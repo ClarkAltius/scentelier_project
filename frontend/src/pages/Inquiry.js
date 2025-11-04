@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
 import { Row, Col } from "react-bootstrap";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from "../component/AuthContext";
 
 const Inquiry = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,41 @@ const Inquiry = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [checkedLogin, setCheckedLogin] = useState(false);
+  const [inquiries, setInquiries] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
+
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+    setCheckedLogin(true);
+
+    (async () => {
+      try {
+        //console.log(user);
+        const url = `${API_BASE_URL}/api/inquiries/my`;
+
+        const res = await axios.get(url, { withCredentials: true });
+        //console.log("응답:", res.data);
+
+        const data = res.data?.data ?? res.data ?? [];
+        //console.log(res);
+        setInquiries(data);
+      } catch (e) {
+        console.error(e);
+        setError(e.response?.data?.message || "문의사항을 불러오는 데 실패하였습니다.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -169,10 +204,10 @@ const Inquiry = () => {
           </div>
 
           <Col>
-            <Link to={`/myinquiry`}>
-              <div class="form-end">
-                <a class="inline-link" href="$">My 문의사항</a>
-              </div>
+            <Link to="/myinquiry" className="form-end">
+              
+                <span className="inline-link" href="$">My 문의사항</span>
+              
             </Link>
           </Col>
           {successMessage && (

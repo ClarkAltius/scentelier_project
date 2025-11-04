@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -15,14 +16,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-
+        this.passwordEncoder = passwordEncoder;
      }
 
     // 회원 정보 수정
@@ -32,6 +33,7 @@ public class UserController {
             @RequestParam String email,
             @RequestParam String phone,
             @RequestParam String address
+
     ) {
         Optional<Users> optionalUser = userService.findByEmail(email);
 
@@ -62,26 +64,6 @@ public class UserController {
         }
     }
 
-
-    //비밀번호 찾기
-//    @PostMapping("/reset-password")
-//    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> requestData) {
-//        String name = requestData.get("name");
-//        String email = requestData.get("email");
-//        String phone = requestData.get("phone");
-//        String newPassword = requestData.get("newPassword");
-//
-//        try {
-//            Users updatedUser = userService.resetPassword(name, email, phone, newPassword);
-//            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(404).body("해당 이메일의 사용자를 찾을 수 없습니다.");
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(400).body("입력한 정보가 일치하지 않습니다.");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
-//        }
-//    }
     @PostMapping(value = "/reset-password",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> resetPassword(
@@ -104,4 +86,30 @@ public class UserController {
 
     //비밀번호 찾기 끝
 
+//마이페이지 비밀번호 변경
+    @PostMapping(value = "/change-password", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> changePassword(
+            @RequestParam String email,
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword
+    ) {
+        Optional<Users> optionalUser = userService.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        }
+
+        Users user = optionalUser.get();
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return ResponseEntity.status(400).body("현재 비밀번호가 틀렸습니다.");
+        }
+
+        // 새 비밀번호 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userService.saveUser(user);
+
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+    //마이페이지 비밀번호 변경 끝
 }
