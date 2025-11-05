@@ -442,10 +442,46 @@ function Home() {
                     <div style={{ textAlign: 'center', color: '#808080' }}>
                     ⭐ {item.avgRating} ({item.reviewCount})
                     <br />
+                    
                     <span style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
                         {formatPrice(item.price)}원
                     </span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '20px', justifyContent: 'center' }}>
+                        {item.keyword
+                            ? item.keyword.split(",").map((tag, idx) => (
+                                <span
+                                    key={idx}
+                                    style={{
+                                        padding: "4px 10px",
+                                        backgroundColor: "#ebebebff",
+                                        borderRadius: "20px",
+                                        fontSize: "0.85em",
+                                        color: "#555",
+                                        border: "1px solid transparent",
+                                    }}
+                                >
+                                    #{tag}
+                                </span>
+                            ))
+                            : null}
                     </div>
+                    </div>
+                    <Button
+                        onClick={(e) => {
+                            if (!user) {
+                                e.stopPropagation();
+
+                                alert('로그인이 필요한 서비스입니다.');
+                                navigate('/login');
+                                return; // 로그인 페이지로 이동 후 종료
+                            }
+
+                            // 로그인된 경우에만 장바구니 추가 실행
+                            addToCart(e, item.id);
+                        }}
+                        style={{ backgroundColor: 'transparent', color: '#808080ff', border: '2px solid hsla(0, 0%, 50%, 1.00)', margin: '20px' }}>
+                        add to cart
+                    </Button>
                 </Card.Body>
                 </Card>
             ))}

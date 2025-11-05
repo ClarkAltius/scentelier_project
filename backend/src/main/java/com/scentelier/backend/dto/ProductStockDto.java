@@ -10,5 +10,12 @@ public class ProductStockDto {
         private String name;
         private int stock;
         private String imageUrl;
+
+    public ProductStockDto(Long id, String name, int stock) {
+        this.id = id;
+        this.name = name;
+        this.stock = stock;
+    }
 }
+
 

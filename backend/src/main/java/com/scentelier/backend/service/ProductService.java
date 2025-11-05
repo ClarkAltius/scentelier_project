@@ -5,6 +5,7 @@ import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.CartItemRepository;
 import com.scentelier.backend.repository.OrderRepository;
 import com.scentelier.backend.repository.ProductRepository;
+import com.scentelier.backend.repository.ReviewRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +49,8 @@ public class ProductService {
     private ProductRepository productRepository;
     private CartItemRepository cartItemRepository;
     private OrderRepository orderRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     public ProductService(
             ProductRepository productRepository,
