@@ -13,6 +13,7 @@ import ProductInsertForm from './ProductInsertForm';
 import InquiryDetail from '../component/InquiryDetail';
 import UserManagement from '../component/UserManagement';
 import ReviewManagement from '../component/ReviewManagement';
+import Analytics from '../component/Analytics';
 
 function Admin() {
 
@@ -34,7 +35,8 @@ function Admin() {
             'productInsert': <ProductInsertForm setActiveView={setActiveView} />,
             'inquiryDetail': <InquiryDetail setActiveView={setActiveView} inquiryId={selectedInquiryId} />,
             'userManagement': <UserManagement setActiveView={setActiveView} />,
-            'reviewManagement': <ReviewManagement setActiveView={setActiveView} />
+            'reviewManagement': <ReviewManagement setActiveView={setActiveView} />,
+            'analytics': <Analytics setActiveView={setActiveView} />
         };
         return views[activeView] || <Dashboard />;
     };

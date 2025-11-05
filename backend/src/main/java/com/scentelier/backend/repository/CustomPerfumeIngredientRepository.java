@@ -7,7 +7,6 @@ import com.scentelier.backend.dto.MostUsedIngredientDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
-import java.util.List;
 
 public interface CustomPerfumeIngredientRepository extends JpaRepository<CustomPerfumeIngredient, Long> {
     List<CustomPerfumeIngredient> findByCustomPerfume(CustomPerfume customPerfume);
@@ -18,5 +17,6 @@ public interface CustomPerfumeIngredientRepository extends JpaRepository<CustomP
             "GROUP BY i.id, i.name " +
             "ORDER BY SUM(cpi.amount) DESC")
     List<MostUsedIngredientDto> findMostUsedIngredients(Pageable pageable);
+
 
 }
