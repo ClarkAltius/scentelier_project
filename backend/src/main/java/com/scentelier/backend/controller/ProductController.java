@@ -131,4 +131,12 @@ public class ProductController {
             return ResponseEntity.internalServerError().body("복구 중 오류: " + e.getMessage());
         }
     }
+
+    // 평균 별점 상위 5개
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<Map<String, Object>>> getTopRatedProducts() {
+        List<Map<String, Object>> result = productService.getTopRatedProducts();
+        return ResponseEntity.ok(result);
+    }
+
 }

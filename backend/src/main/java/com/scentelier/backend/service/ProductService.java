@@ -5,17 +5,19 @@ import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.CartItemRepository;
 import com.scentelier.backend.repository.OrderRepository;
 import com.scentelier.backend.repository.ProductRepository;
+import com.scentelier.backend.repository.ReviewRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import jakarta.transaction.Transactional;
 
 // 주문 취소 리스너용
@@ -42,6 +44,8 @@ public class ProductService {
     private ProductRepository productRepository;
     private CartItemRepository cartItemRepository;
     private OrderRepository orderRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     public ProductService(
             ProductRepository productRepository,
@@ -230,6 +234,31 @@ public class ProductService {
             p.setDeletedAt(null);
         }
         return productRepository.save(p);
+    }
+
+    // 평균 별점 상위 5개
+    public List<Map<String, Object>> getTopRatedProducts() {
+        Pageable limit = PageRequest.of(0, 5);
+        List<Object[]> results = reviewRepository.findTopRatedProducts(limit);
+
+        return results.stream().map(obj -> {
+            Long productId = (Long) obj[0];
+            Double avgRating = (Double) obj[1];
+            Long reviewCount = (Long) obj[2];
+
+            Products product = productRepository.findById(productId).orElse(null);
+            if (product == null) return null;
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", product.getId());
+            map.put("name", product.getName());
+            map.put("price", product.getPrice());
+            map.put("imageUrl", product.getImageUrl());
+            map.put("keyword", product.getKeyword());
+            map.put("avgRating", Math.round(avgRating * 10) / 10.0);
+            map.put("reviewCount", reviewCount);
+            return map;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
 }
