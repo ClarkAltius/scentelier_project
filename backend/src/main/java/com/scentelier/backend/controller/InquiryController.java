@@ -2,6 +2,7 @@ package com.scentelier.backend.controller;
 
 import com.scentelier.backend.dto.InquiryDto;
 import com.scentelier.backend.entity.Inquiry;
+import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.InquiryRepository;
 import com.scentelier.backend.repository.UserRepository;
@@ -38,6 +39,7 @@ public class InquiryController {
     public Map<String, Object> handleInquiry(@RequestBody Inquiry inquiry) {
         Map<String, Object> response = new HashMap<>();
         try {
+            //로그인된 사용자 정보 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
 
@@ -45,6 +47,18 @@ public class InquiryController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             inquiry.setUser(loggedInUser);
+
+            // Product 객체 존재 여부 확인 후 매핑
+            if (inquiry.getProduct() != null && inquiry.getProduct().getId() != null) {
+                Products product = new Products();
+                product.setId(inquiry.getProduct().getId());
+                inquiry.setProduct(product);
+            } else {
+                inquiry.setProduct(null);
+            }
+
+
+
             Inquiry saved = inquiryService.saveInquiry(inquiry);
 
             response.put("success", true);

@@ -19,7 +19,6 @@ const MyPerfume = () => {
     const [filteredNotesByPerfume, setFilteredNotesByPerfume] = useState({}); // { [customId]: [...] }
 
     const handleLayerClick = (noteType, id) => {
-        console.log("Clicked customId:", id);
 
         // 🔹 같은 향수 + 같은 노트 클릭 시 닫기
         if (openCard?.id === id && openCard?.noteType === noteType) {
@@ -34,14 +33,11 @@ const MyPerfume = () => {
         const perfume = perfumes.find(item => item.customId === id);
         if (!perfume) return;
 
-        console.log("Clicked perfume:", perfume);
 
         const ingredients = perfume.ingredients || [];
-        console.log("Ingredients:", ingredients);
 
         // 🔹 선택한 노트 타입 필터링
         const filtered = ingredients.filter(item => item.noteType === noteType);
-        console.log("Filtered Ingredients:", filtered);
 
 
         // 향수별 노트 저장
@@ -55,7 +51,6 @@ const MyPerfume = () => {
         const fetchPerfumes = async () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/api/customPerfume/myPerfume/${user.id}`);
-                console.log(response.data)
                 setPerfumes(response.data);  // 응답 데이터로 perfumes 상태 업데이트
                 setLoading(false);  // 로딩 완료
             } catch (err) {

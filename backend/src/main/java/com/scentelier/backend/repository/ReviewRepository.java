@@ -46,4 +46,36 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
             "WHERE r.order.id IN (SELECT o.id FROM Orders o JOIN o.orderProducts op WHERE op.products.id = :productId) " +
             "AND r.isDeleted = false")
     Long countReviewsByProductId(@Param("productId") Long productId);
+
+    // 평균 별점 상위 n개
+    @Query("""
+        SELECT p.id, AVG(r.rating), COUNT(r)
+        FROM Reviews r
+        JOIN r.order o
+        JOIN o.orderProducts op
+        JOIN op.products p
+        WHERE r.isDeleted = false
+          AND p.isDeleted = false
+        GROUP BY p.id
+        ORDER BY AVG(r.rating) DESC
+    """)
+    List<Object[]> findTopRatedProducts(Pageable pageable);
+
+
+    // 관리자 리뷰관리 페이지 용 쿼리
+    @Query("SELECT r FROM Reviews r JOIN r.user u JOIN r.order o " +
+            "WHERE (:search IS NULL OR r.content LIKE %:search% OR u.username LIKE %:search% OR u.email LIKE %:search%) " +
+            "AND (:rating = -1 OR r.rating = :rating) " +
+            "AND (:status IS NULL " +
+            "  OR (:status = 'VISIBLE' AND r.isDeleted = false) " +
+            "  OR (:status = 'DELETED' AND r.isDeleted = true)" +
+            ")")
+    Page<Reviews> findAdminReviews(
+            Pageable pageable,
+            @Param("search") String search,
+            @Param("rating") int rating, // Use -1 to signify "All Ratings"
+            @Param("status") String status // "VISIBLE", "DELETED", or null
+    );
 }
+
+

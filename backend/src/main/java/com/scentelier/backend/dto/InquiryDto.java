@@ -26,6 +26,7 @@ public class InquiryDto {
     private InquiryStatus status;
     private Products productId;
     private List<InquiryAnswerResponseDto> answers;
+    private String productName; // 상품 이름만 담기
 
     public InquiryDto(Inquiry inquiry) {
         this.id = inquiry.getId();
@@ -39,5 +40,13 @@ public class InquiryDto {
         this.userEmail = (user != null) ? user.getEmail() : "Unknown Email";
         this.type = (inquiry.getType() != null) ? inquiry.getType().name() : "OTHER";
         this.status = (inquiry.getStatus() != null) ? inquiry.getStatus() : InquiryStatus.PENDING;
+
+        // product가 있으면 이름 담기
+        if (inquiry.getProduct() != null) {
+            this.productName = inquiry.getProduct().getName();
+        } else {
+            this.productName = null;
+        }
+
     }
 }

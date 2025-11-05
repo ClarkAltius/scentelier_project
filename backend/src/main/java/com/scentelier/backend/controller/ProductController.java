@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 //페이징 임포트
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -171,4 +170,12 @@ public class ProductController {
             return ResponseEntity.internalServerError().body(Map.of("message", "이미지 업로드 실패", "error", e.getMessage()));
         }
     }
+
+    // 평균 별점 상위 5개
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<Map<String, Object>>> getTopRatedProducts() {
+        List<Map<String, Object>> result = productService.getTopRatedProducts();
+        return ResponseEntity.ok(result);
+    }
+
 }

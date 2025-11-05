@@ -1,7 +1,6 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.constant.OrderStatus;
-import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.CartItemRepository;
 import com.scentelier.backend.repository.OrderRepository;
@@ -13,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,7 +93,8 @@ public class ProductService {
         return productPage.map(product -> new ProductStockDto(
            product.getId(),
            product.getName(),
-           product.getStock()
+           product.getStock(),
+           product.getImageUrl()
         ));
     }
 
@@ -109,6 +111,34 @@ public class ProductService {
         return true;
     }
 
+//    @Transactional
+//    public boolean toggleStatus(Long id) {
+//        Products p = productRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("상품 없음"));
+//
+//        if (p.getStatus() == ProductStatus.SELLING) {
+//            // STOPPED로 내리기 전 “장바구니/주문” 점검
+//            long inCarts = cartItemRepository.countActiveByProductId(id);
+//            long inPendingOrders = orderRepository.countPendingOrdersByProductId(id, PENDING_STATUSES);
+//
+//            if (inCarts > 0 || inPendingOrders > 0) {
+//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
+//                boolean first = true;
+//                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
+//                if (inPendingOrders > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPendingOrders).append("건"); }
+//                sb.append("이 존재합니다.");
+//                // 커스텀 예외 굳이 안 쓰고 RuntimeException으로 409 응답 유도
+//                throw new RuntimeException(sb.toString());
+//            }
+//            p.setStatus(ProductStatus.STOPPED);
+//        } else {
+//            // STOPPED → SELLING은 제한 없이 허용
+//            p.setStatus(ProductStatus.SELLING);
+//        }
+//
+//        productRepository.save(p);
+//        return true;
+//    }
 
     @EventListener
     @Transactional
@@ -248,6 +278,32 @@ public class ProductService {
         // isDeleted / createdAt / deletedAt은 유지
         return productRepository.save(p);
     }
+
+    // 평균 별점 상위 5개
+    public List<Map<String, Object>> getTopRatedProducts() {
+        Pageable limit = PageRequest.of(0, 5);
+        List<Object[]> results = reviewRepository.findTopRatedProducts(limit);
+
+        return results.stream().map(obj -> {
+            Long productId = (Long) obj[0];
+            Double avgRating = (Double) obj[1];
+            Long reviewCount = (Long) obj[2];
+
+            Products product = productRepository.findById(productId).orElse(null);
+            if (product == null) return null;
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", product.getId());
+            map.put("name", product.getName());
+            map.put("price", product.getPrice());
+            map.put("imageUrl", product.getImageUrl());
+            map.put("keyword", product.getKeyword());
+            map.put("avgRating", Math.round(avgRating * 10) / 10.0);
+            map.put("reviewCount", reviewCount);
+            return map;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
 }
 
 

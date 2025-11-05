@@ -9,4 +9,5 @@ public class IngredientStockDto {
     private Long id;
     private String name;
     private int stock;
+    private String imgUrl;
 }

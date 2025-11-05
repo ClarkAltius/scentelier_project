@@ -51,11 +51,13 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderAdminDto updateOrderStatus(Long orderId, String newStatus) {
+    public OrderAdminDto updateOrderStatus(Long orderId, com.scentelier.backend.dto.OrderUpdateDto updateDto) {
         // 주문 검색. 없으면 에러
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
-        // status 갱신
+
+        // 1. DTO에서 상태 값 가져오기
+        String newStatus = updateDto.getStatus();
         OrderStatus newOrderStatus;
         try {
             newOrderStatus = OrderStatus.valueOf(newStatus.toUpperCase());
@@ -63,16 +65,29 @@ public class OrderService {
             throw new IllegalArgumentException("Invalid status value: " + newStatus);
         }
 
+        // 2. 상태 갱신
         order.setStatus(newOrderStatus);
+
+        // --- 3. NEW: 송장번호 갱신 ---
+        // DTO에 송장번호가 있고, 상태가 'SHIPPED'일 때 설정
+        if (updateDto.getTrackingNumber() != null && !updateDto.getTrackingNumber().isEmpty()) {
+            order.setTrackingNumber(updateDto.getTrackingNumber());
+        }
+        // --- End of NEW ---
+
+        // 4. 저장
         Orders savedOrder = orderRepository.save(order);
 
+        // 5. 이벤트 발행 (CANCELLED일 경우)
         if (newOrderStatus == OrderStatus.CANCELLED) {
             eventPublisher.publishEvent(new OrderCancelledEvent(savedOrder));
         }
 
-        // DTO 반환
+        // 6. DTO 반환
         return new OrderAdminDto(savedOrder);
     }
+
+
     public List<Orders> findByUserId(Long userId) {
         return orderRepository.findByUsers_IdOrderByOrderDateDesc(userId);
     }
@@ -92,6 +107,13 @@ public class OrderService {
 
     public int updateUserOrderStatus(Long orderId, OrderStatus status) {
         return orderRepository.updateOrderStatus(orderId, status);
+    }
+
+    // 관리자 유저관리창
+    @Transactional(readOnly = true)
+    public Page<OrderAdminDto> findOrdersByUserId(Long userId, Pageable pageable) {
+        Page<Orders> orderPage = orderRepository.findByUsers_IdOrderByOrderDateDesc(userId, pageable);
+        return orderPage.map(OrderAdminDto::new);
     }
 
 }

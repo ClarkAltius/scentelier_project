@@ -115,11 +115,13 @@ function Login() {
                                 </Row>
                                 <Row>
                                     <Col>
-                                        <Link to={`/findpass`}>
-                                            <div class="form-end">
-                                                <a class="inline-link" href="$">비밀번호를 잊으셨나요?</a>
-                                            </div>
-                                        </Link>
+                                        <div className="form-end">
+                                            <Link to="/findpass" className="inline-link">
+
+                                                비밀번호를 잊으셨나요?
+
+                                            </Link>
+                                        </div>
                                     </Col>
                                 </Row>
                             </Form>

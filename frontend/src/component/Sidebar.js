@@ -6,14 +6,16 @@ import {
     Warehouse,
     ClipboardList,
     MessageSquare,
-    LogOut
+    Users,
+    Star,
+    BarChart4
 } from 'lucide-react';
 
 
 function Sidebar({ activeView, setActiveView }) {
 
     const handleNavClick = (e, viewName) => {
-        e.preventDefault();  //stop a tag from reloading
+        e.preventDefault();
         setActiveView(viewName);
     };
 
@@ -66,6 +68,34 @@ function Sidebar({ activeView, setActiveView }) {
                         <span className={styles.navText}>고객 문의사항</span>
                     </a>
                 </li>
+                <li className={styles.navItem}>
+                    <a
+                        href="#"
+                        className={`${styles.navLink} ${activeView === 'userManagement' ? styles.active : ''}`}
+                        onClick={(e) => handleNavClick(e, 'userManagement')}>
+                        <Users className={styles.icon} />
+                        <span className={styles.navText}>사용자 관리</span>
+                    </a>
+                </li>
+                <li className={styles.navItem}>
+                    <a
+                        href="#"
+                        className={`${styles.navLink} ${activeView === 'reviewManagement' ? styles.active : ''}`}
+                        onClick={(e) => handleNavClick(e, 'reviewManagement')}>
+                        <Star className={styles.icon} />
+                        <span className={styles.navText}>후기 관리</span>
+                    </a>
+                </li>
+                <li className={styles.navItem}>
+                    <a
+                        href="#"
+                        className={`${styles.navLink} ${activeView === 'analytics' ? styles.active : ''}`}
+                        onClick={(e) => handleNavClick(e, 'analytics')}>
+                        <BarChart4 className={styles.icon} />
+                        <span className={styles.navText}>상세 통계</span>
+                    </a>
+                </li>
+
             </ul>
         </div >
     );

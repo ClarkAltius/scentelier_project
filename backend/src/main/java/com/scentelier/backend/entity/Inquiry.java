@@ -1,5 +1,6 @@
 package com.scentelier.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.scentelier.backend.constant.InquiryStatus;
 import com.scentelier.backend.constant.Type;
 import jakarta.persistence.*;
@@ -47,6 +48,7 @@ public class Inquiry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Products product;
 
 

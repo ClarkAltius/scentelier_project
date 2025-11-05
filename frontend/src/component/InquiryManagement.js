@@ -86,7 +86,7 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
                 });
 
                 setInquiries(response.data.content);
-                console.log(response.data.content);
+                // console.log(response.data.content);
                 setTotalPages(response.data.totalPages);
 
             } catch (err) {
@@ -235,6 +235,7 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
                 <table className={styles.inquiryTable}>
                     <thead>
                         <tr>
+
                             <th className={styles.sortableHeader} onClick={() => handleSort('id')}>
                                 ID {renderSortIcon('id')}
                             </th>

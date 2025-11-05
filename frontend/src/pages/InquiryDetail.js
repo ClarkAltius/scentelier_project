@@ -8,6 +8,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:900
 function InquiryDetail() {
     const { id } = useParams(); // URL에서 문의 id 가져오기
     const [inquiry, setInquiry] = useState(null);
+    const [productName, setProductName] = useState(""); // 상품명 상태 추가
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -25,7 +26,16 @@ function InquiryDetail() {
             try {
                 const url = `${API_BASE_URL}/api/inquiries/${id}`;
                 const res = await axios.get(url, { withCredentials: true });
-                setInquiry(res.data?.data ?? res.data);
+                const inquiryData = res.data?.data ?? res.data;
+                setInquiry(inquiryData);
+                //setInquiry(res.data?.data ?? res.data);
+
+                // productId가 존재하면 상품 정보 가져오기
+                if (inquiryData.productId) {
+                    const productRes = await axios.get(`${API_BASE_URL}/api/products/${inquiryData.productId}`);
+                    setProductName(productRes.data?.name || "상품명 없음");
+                }
+
             } catch (e) {
                 console.error(e);
                 setError(e.response?.data?.message || "문의사항 정보를 불러오는 데 실패하였습니다.");
@@ -56,10 +66,13 @@ function InquiryDetail() {
     return (
         <div style={{ padding: "20px" }}>
             <h2>{inquiry.title}</h2>
-            <p><strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}</p>
-            <p><strong>내용:</strong></p>
+            <p><strong>작성일자 :</strong> {new Date(inquiry.createdAt).toLocaleString()}</p>
+            {inquiry.productName && (
+                <p><strong>문의 상품명 :</strong> {inquiry.productName}</p>
+            )}
+            <p><strong>내용</strong></p>
             <p>{inquiry.content}</p>
-            <p><strong>상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}</p>
+            <p><strong>상태 :</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}</p>
 
             <div style={{ marginTop: "20px" }}>
                 <Link to="/myinquiry" className="btn btn-outline-secondary me-2">

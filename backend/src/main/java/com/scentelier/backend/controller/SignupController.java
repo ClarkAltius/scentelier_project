@@ -5,8 +5,11 @@ import com.scentelier.backend.service.SignupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.Map;
 import com.scentelier.backend.constant.Role;
+
 @RestController
 @RequestMapping("/")
 @CrossOrigin(origins = "http://localhost:3000") // React 프론트 허용
@@ -43,4 +46,14 @@ public class SignupController {
         // 회원가입 성공 시 200 OK 반환
         return ResponseEntity.ok(result);
     }
+
+//이메일 중복 확인
+@GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        boolean exists = signupService.isEmailExists(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
+    }
+
 }

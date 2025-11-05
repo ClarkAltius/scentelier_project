@@ -79,7 +79,6 @@ function PerfumeBlending() {
         setSelectedType(type);
         setLoading(true);
         try {
-            console.log(`${type}`)
             const url = `${API_BASE_URL}/api/perfume/type?type=${type}`;
             const response = await axios.get(url);
             setNotesByType(response.data.reduce((acc, item) => {
@@ -151,7 +150,6 @@ function PerfumeBlending() {
             });
 
             alert(`[${response.data.name}] 향수가 저장되었습니다.`);
-            console.log(response.data);
 
             return response.data; // ← 향수 데이터를 반환
         } catch (error) {
@@ -166,7 +164,6 @@ function PerfumeBlending() {
 
         // 1. 커스텀 향수 생성
         const perfume = await createCustomPerfume();
-        // console.log(perfume.id)
         if (!perfume) return; // 실패 시 장바구니 추가 안함
 
         // 2. 장바구니에 추가

@@ -31,12 +31,12 @@ function ProductManagement({ setActiveView }) {
   const isAllSelected = products.length > 0 && selectedIds.length === products.length;
 
   useEffect(() => {
-  const t = setTimeout(() => {
-    setQuery(searchText.trim());
-    setPage(0);
-  }, 300);
-  return () => clearTimeout(t);
-}, [searchText]);
+    const t = setTimeout(() => {
+      setQuery(searchText.trim());
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchText]);
 
 
   // 상태 배지
@@ -66,9 +66,9 @@ function ProductManagement({ setActiveView }) {
         const data = res.data;
         const raw =
           Array.isArray(data) ? data :
-          Array.isArray(data?.content) ? data.content :
-          Array.isArray(data?.data) ? data.data :
-          Array.isArray(data?.rows) ? data.rows : [];
+            Array.isArray(data?.content) ? data.content :
+              Array.isArray(data?.data) ? data.data :
+                Array.isArray(data?.rows) ? data.rows : [];
 
         if (ignore) return;
 
@@ -84,8 +84,8 @@ function ProductManagement({ setActiveView }) {
 
         const tp =
           Number.isFinite(data?.totalPages) ? data.totalPages :
-          Number.isFinite(data?.page?.totalPages) ? data.page.totalPages :
-          1;
+            Number.isFinite(data?.page?.totalPages) ? data.page.totalPages :
+              1;
         setTotalPages(tp);
       } catch (err) {
         if (axios.isCancel?.(err) || err?.name === 'CanceledError') return;
@@ -384,35 +384,34 @@ function ProductManagement({ setActiveView }) {
                             <span style={{ marginLeft: 4 }}>상세</span>
                           </button>
 
-                          {/* 토글 (판매중지/판매시작) */}
-                          <button
-                            className={styles.toggleStatusButton}
-                            disabled={product.status === 'PENDING'}
-                            title={
-                              product.status === 'PENDING'
-                                ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
-                                : product.status === 'SELLING'
-                                ? '판매중지'
-                                : '판매시작'
-                            }
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleStatus(product);
-                            }}
-                          >
-                            {product.status === 'SELLING' ? '판매중지' : '판매시작'}
-                          </button>
-
-                          {/* 삭제 */}
-                          <button
-                            className={`${styles.actionButton} ${styles.deleteButton}`}
-                            onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
-                            aria-label={`${product.name} 삭제`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                      </div>
-                    </td>
+                            {/* 토글 (판매중지/판매시작) */}
+                            <button
+                              className={styles.toggleStatusButton}
+                              disabled={product.status === 'PENDING'}
+                              title={
+                                product.status === 'PENDING'
+                                  ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
+                                  : product.status === 'SELLING'
+                                    ? '판매중지'
+                                    : '판매시작'
+                              }
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleStatus(product);
+                              }}
+                            >
+                              {product.status === 'SELLING' ? '판매중지' : '판매시작'}
+                              </button>
+                            {/* 삭제 */}
+                            <button
+                              className={`${styles.actionButton} ${styles.deleteButton}`}
+                              onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
+                              aria-label={`${product.name} 삭제`}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
                   </tr>
                 );
               })
@@ -423,14 +422,14 @@ function ProductManagement({ setActiveView }) {
     );
   };
 
-  
+
 
   // 여기서 컴포넌트 *안*에서 return
   return (
     <div className={styles.productPage}>
       <div className={styles.header}>
 
-          {/* 검색창 */}
+        {/* 검색창 */}
         <div className={styles.searchBar}>
           <Search size={18} className={styles.searchIcon} />
           <input
@@ -450,7 +449,7 @@ function ProductManagement({ setActiveView }) {
               ×
             </button>
           )}
-  </div>
+        </div>
         <button className={styles.addButton} onClick={handleAddNew}>
           <Plus size={20} />
           신규 상품 추가
@@ -470,61 +469,90 @@ function ProductManagement({ setActiveView }) {
       {renderTable()}
 
       {/* 상세 모달: 테이블 아래, 컴포넌트 하단에 위치 */}
-{showDetail && (
-  <div
-    style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-    }}
-    onClick={closeDetail}
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        width: 'min(720px, 92vw)', maxHeight: '85vh', overflow: 'auto',
-        background: '#fff', borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,.15)', padding: 20
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 style={{ margin: 0 }}>상품 상세</h3>
-        <button className={styles.toggleStatusButton} onClick={closeDetail}>닫기</button>
+      {showDetail && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+          }}
+          onClick={closeDetail}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: 'min(720px, 92vw)', maxHeight: '85vh', overflow: 'auto',
+              background: '#fff', borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,.15)', padding: 20
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ margin: 0 }}>상품 상세</h3>
+              <button className={styles.toggleStatusButton} onClick={closeDetail}>닫기</button>
+            </div>
+
+{detailLoading ? (
+  <div className={styles.loading}>불러오는 중...</div>
+) : !detail ? (
+  <div className={styles.error}>상세 정보를 불러오지 못했습니다.</div>
+) : (
+  <>
+    <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16 }}>
+      <div>
+        <img
+          src={
+            detail.imageUrl
+              ? `${API_BASE_URL}/uploads/products/${detail.imageUrl}`
+              : `${API_BASE_URL}/uploads/products/placeholder.jpg`
+          }
+          alt={detail.name ?? '상품 이미지'}
+          style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 6, border: '1px solid #eee' }}
+        />
       </div>
-
-      {detailLoading ? (
-        <div className={styles.loading}>불러오는 중...</div>
-      ) : !detail ? (
-        <div className={styles.error}>상세 정보를 불러오지 못했습니다.</div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16 }}>
-          <div>
-            <img
-              src={
-                detail.imageUrl
-                  ? `${API_BASE_URL}/uploads/products/${detail.imageUrl}`
-                  : `${API_BASE_URL}/uploads/products/placeholder.jpg`
-              }
-              alt={detail.name ?? '상품 이미지'}
-              style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 6, border: '1px solid #eee' }}
-            />
-          </div>
-          <div style={{ lineHeight: 1.8 }}>
-            <div><strong>ID</strong> : {detail.id}</div>
-            <div><strong>상품명</strong> : {detail.name}</div>
-            <div><strong>카테고리</strong> : {detail.category ?? '-'}</div>
-            <div><strong>가격</strong> : {Number(detail.price)?.toLocaleString('ko-KR')}원</div>
-            <div><strong>재고</strong> : {detail.stock ?? 0}</div>
-            <div><strong>상태</strong> : {detail.stock === 0 || detail.isDeleted || detail.status === 'STOPPED' ? '판매중지' : (detail.status === 'PENDING' ? '주문중' : '판매중')}</div>
-            {detail.description && (
-              <div style={{ marginTop: 8 }}>
-                <strong>설명</strong><br />
-                <div style={{ whiteSpace: 'pre-wrap', color: '#555' }}>{detail.description}</div>
-              </div>
-            )}
-          </div>
+      <div style={{ lineHeight: 1.8 }}>
+        <div><strong>ID</strong> : {detail.id}</div>
+        <div><strong>상품명</strong> : {detail.name}</div>
+        <div><strong>카테고리</strong> : {detail.category ?? '-'}</div>
+        <div><strong>가격</strong> : {Number(detail.price)?.toLocaleString('ko-KR')}원</div>
+        <div><strong>재고</strong> : {detail.stock ?? 0}</div>
+        <div>
+          <strong>상태</strong> : {detail.stock === 0 || detail.isDeleted || detail.status === 'STOPPED'
+            ? '판매중지'
+            : (detail.status === 'PENDING' ? '주문중' : '판매중')}
         </div>
-      )}
+        {detail.description && (
+          <div style={{ marginTop: 8 }}>
+            <strong>설명</strong><br />
+            <div style={{ whiteSpace: 'pre-wrap', color: '#555' }}>{detail.description}</div>
+          </div>
+        )}
+      </div>
+    </div>
 
-      <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+    {/* 하단 버튼 */}
+    <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+      <button
+        className={styles.editButton}
+        onClick={() => { closeDetail(); handleEdit(detail); }}
+      >
+        <Edit size={16} style={{ verticalAlign: 'text-bottom' }} /> 수정
+      </button>
+      {/* <button
+        className={styles.toggleStatusButton}
+        onClick={() => { closeDetail(); handleToggleStatus(detail); }}
+        disabled={detail?.status === 'PENDING'}
+        title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
+      >
+        {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
+      </button> */}
+      {/* <button
+        className={styles.deleteButton}
+        onClick={() => { closeDetail(); handleDelete(detail.id); }}
+      >
+        <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
+      </button> */}
+    </div>
+  </>
+)}
+<div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
         {/* 수정 버튼 */}
         <button
           className={styles.editButton}
@@ -574,7 +602,7 @@ function ProductManagement({ setActiveView }) {
         />
       )}
     </div>
-  );
+  )
 }
 
 export default ProductManagement;

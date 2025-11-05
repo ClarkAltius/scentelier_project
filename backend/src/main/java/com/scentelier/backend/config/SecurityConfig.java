@@ -46,8 +46,9 @@ public class SecurityConfig {
                 .csrf(csrf->csrf.disable())
                 //권한부여 규칙 설정
                 .authorizeHttpRequests(authz ->authz
-                                .requestMatchers("/member/login","/signup","/user/reset-password").permitAll()
-                               .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**","/api/perfume/**", "/api/customPerfume/**", "/reviews/**").permitAll()
+                                .requestMatchers("/member/login","/signup").permitAll()
+                                .requestMatchers("/user/reset-password", "/user/change-password").permitAll()
+                                .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**","/api/perfume/**", "/api/customPerfume/**", "/reviews/**", "/product/top-rated").permitAll()
                                 .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
                         
                                 // 관리자 전용 엔드포인트

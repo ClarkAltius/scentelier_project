@@ -1,10 +1,14 @@
 package com.scentelier.backend.repository;
 
+import com.scentelier.backend.dto.analytics.DailySalesDto;
 import com.scentelier.backend.entity.OrderProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.scentelier.backend.dto.BestSellerDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderProductRepository extends JpaRepository<OrderProduct, Long> {

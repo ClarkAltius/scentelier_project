@@ -16,6 +16,10 @@ const Findpass = () => {
   const [message, setMessage] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
 
+  //비밀번호 형식
+  const PASSWORD_REGEX = /^[A-Z][A-Za-z0-9!@#$%^&*]{7,}$/;
+
+
   const handleChange = e => {
     setInputs({
       ...inputs,
@@ -24,7 +28,7 @@ const Findpass = () => {
     setMessage("");
   };
 
-  const handleEditChange = e => {
+  const handleEditChange = (e) => {
     setEditInputs({
       ...editInputs,
       [e.target.id]: e.target.value,
@@ -55,6 +59,13 @@ const Findpass = () => {
       setSaveMessage("새 비밀번호를 입력해주세요.");
       return;
     }
+
+    // 비밀번호 형식 검사
+    if (!PASSWORD_REGEX.test(newPassword)) {
+      setSaveMessage("비밀번호는 첫 글자가 대문자이고, 8자 이상이어야 합니다.");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setSaveMessage("비밀번호가 일치하지 않습니다.");
       return;
@@ -178,6 +189,7 @@ const Findpass = () => {
                 onChange={handleEditChange}
                 style={styles.input}
               />
+
             </div>
             <div style={styles.inputWrapper}>
               <label style={styles.label}>비밀번호 확인</label>

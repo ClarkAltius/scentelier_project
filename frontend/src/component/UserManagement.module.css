@@ -1,0 +1,119 @@
+/* UserManagement.module.css */
+
+.userManagementPage {
+    padding: 20px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.searchBar {
+    max-width: 400px;
+    flex-grow: 1;
+}
+
+.filterDropdown {
+    max-width: 200px;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Detail View */
+.detailView {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.backButton {
+    margin-bottom: 15px;
+    font-weight: 500;
+    padding-left: 0;
+}
+
+.statCol {
+    border-left: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .statCol {
+        border-left: none;
+        border-top: 1px solid #e9ecef;
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+}
+
+.detailView h5 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.detailView p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+    /* Prevents text selection on click */
+    position: relative;
+    padding-right: 24px;
+    /* Make space for the icon */
+}
+
+.sortableHeader:hover {
+    background-color: #f8f9fa;
+    /* Light hover effect */
+}
+
+.sortIcon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+}
+
+/* Optional: if you want a subtle icon on non-active headers */
+.sortIconPlaceholder {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.15;
+}
