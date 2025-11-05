@@ -192,7 +192,7 @@ function CartList() {
       <div
         style={{
           backgroundColor: "#f9f9f9",
-          padding: "64px 0 48px 0",
+          padding: "50px 0 40px 0",
           textAlign: "center",
           borderBottom: "1px solid #eee",
         }}
@@ -220,10 +220,17 @@ function CartList() {
         {/* 상단  */}
         <div className="d-flex gap-2 justify-content-center mt-3">
           <Button
-            variant="outline-dark"
             size="sm"
-            style={{ borderRadius: 0, minWidth: 140, fontWeight: 600 }}
             onClick={goProducts}
+            style={{
+              borderRadius: 10,
+              minWidth: 140,
+              fontWeight: 600,
+              border: "2px solid #a5a5a5ff",
+              color: "#a5a5a5ff",
+              backgroundColor: "transparent",
+              boxShadow: "none",
+            }}
           >
             상품 더 보러가기
           </Button>
@@ -271,33 +278,47 @@ function CartList() {
                     </Col>
 
                     <Col>
-                      <div className="d-flex justify-content-between">
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{p.name}</div>
-                          <div className="mt-2" style={{ fontSize: "0.9rem", lineHeight: "1.5" }}>
-                            <div className="text-muted">
-                              정상가 <span className="ms-2">{p.originalPrice.toLocaleString()}원</span>
+                      <div
+                        className="d-flex justify-content-between align-items-start"
+                        style={{ marginLeft: "10px" }}
+                      >
+                        {/* 왼쪽 상품 정보 */}
+                        <div className="flex-grow-1">
+                          {/* 상품명 */}
+                          <div style={{ fontWeight: 600, marginBottom: "8px", fontSize: "17px" }}>{p.name}</div>
+
+                          {/* 가격 정보 묶음 */}
+                          <div style={{ fontSize: "0.9rem", lineHeight: "1.5" }}>
+                            {/* 정상가 */}
+                            <div className="d-flex justify-content-between text-muted">
+                              <span>정상가</span>
+                              <span>{p.originalPrice.toLocaleString()}원</span>
                             </div>
 
+                            {/* 할인가 */}
                             {discount > 0 && (
-                              <div className="text-danger fw-semibold">
-                                할인가 <span className="ms-2">-{discount.toLocaleString()}원</span>
+                              <div className="d-flex justify-content-between text-danger fw-semibold">
+                                <span>할인가</span>
+                                <span>-{discount.toLocaleString()}원</span>
                               </div>
                             )}
 
                             <hr className="my-2" style={{ opacity: 0.3 }} />
 
+                            {/* 상품금액 */}
                             <div className="d-flex justify-content-between align-items-center">
-                              <span className="fw-semibold">상품금액</span>&nbsp;
-                              <span className="fw-bold fs-6 text-success">
-                                {lineTotal.toLocaleString()}원
+                              <span className="fw-semibold">상품금액</span>
+                              <span style={{ color: "#67AB9F", fontSize: "18px" }}>
+                                <strong>{lineTotal.toLocaleString()}원</strong>
                               </span>
                             </div>
                           </div>
                         </div>
+
+                        {/* 오른쪽 X 버튼 */}
                         <Button
                           variant="link"
-                          className="text-muted"
+                          className="text-muted ms-2"
                           onClick={() => removeOne(p.cartItemId)}
                           title="삭제"
                         >
@@ -339,10 +360,22 @@ function CartList() {
             {/* 전체선택 / 선택삭제 */}
             <div className="d-flex justify-content-between flex-wrap gap-2 my-3">
               <div className="d-flex gap-2">
-                <Button variant="outline-dark" onClick={() => toggleAll(!allChecked)}>
+                <Button variant="outline-dark" onClick={() => toggleAll(!allChecked)}
+                  style={{
+                    border: "2px solid #a5a5a5ff", // ✅ 원하는 색상 테두리
+                    color: "#808080ff",             // ✅ 글자색도 동일하게
+                    backgroundColor: "transparent", // ✅ 배경 투명
+                    boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+                  }}>
                   전체선택
                 </Button>
-                <Button variant="outline-dark" onClick={removeSelected}>
+                <Button variant="outline-dark" onClick={removeSelected}
+                  style={{
+                    border: "2px solid #a5a5a5ff", // ✅ 원하는 색상 테두리
+                    color: "#808080ff",             // ✅ 글자색도 동일하게
+                    backgroundColor: "transparent", // ✅ 배경 투명
+                    boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+                  }}>
                   선택삭제
                 </Button>
               </div>
@@ -363,7 +396,7 @@ function CartList() {
                 <Col>
                   <strong>결제예정금액</strong>
                 </Col>
-                <Col className="text-end">
+                <Col className="text-end" style={{ fontSize: "20px" }}>
                   <strong>{payable.toLocaleString()}원</strong>
                 </Col>
               </Row>
@@ -372,9 +405,14 @@ function CartList() {
             {/* 주문 버튼 */}
             <div className="d-grid gap-3">
               <Button
-                variant="outline-success"
                 size="lg"
-                style={{ borderRadius: "0", fontWeight: "600" }}
+                style={{
+                  borderRadius: "10", fontWeight: "600",
+                  border: "2px solid #67AB9F", // ✅ 원하는 색상 테두리
+                  color: "white",             // ✅ 글자색도 동일하게
+                  backgroundColor: "#67AB9F", // ✅ 배경 투명
+                  boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+                }}
                 onClick={() => goToPayment(items)}
               >
                 전체상품주문
@@ -382,7 +420,13 @@ function CartList() {
               <Button
                 variant="outline-dark"
                 size="lg"
-                style={{ borderRadius: "0", fontWeight: "600" }}
+                style={{
+                  borderRadius: "10", fontWeight: "600",
+                  border: "2px solid #a5a5a5ff", // ✅ 원하는 색상 테두리
+                  color: "#808080ff",             // ✅ 글자색도 동일하게
+                  backgroundColor: "transparent", // ✅ 배경 투명
+                  boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+                }}
                 onClick={() => goToPayment(items.filter((p) => p.checked))}
               >
                 선택상품주문
@@ -420,7 +464,13 @@ function CartList() {
           <Button
             variant="outline-success"
             size="lg"
-            style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}
+            style={{
+              minWidth: 220, borderRadius: 10, fontWeight: 600,
+              border: "2px solid #a5a5a5ff", // ✅ 원하는 색상 테두리
+              color: "#a5a5a5ff",             // ✅ 글자색도 동일하게
+              backgroundColor: "transparent", // ✅ 배경 투명
+              boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+            }}
             onClick={goProducts}
           >
             추천 향수 보러가기
@@ -428,7 +478,13 @@ function CartList() {
           <Button
             variant="outline-dark"
             size="lg"
-            style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}
+            style={{
+              minWidth: 220, borderRadius: 10, fontWeight: 600,
+              border: "2px solid #a5a5a5ff", // ✅ 원하는 색상 테두리
+              color: "#a5a5a5ff",             // ✅ 글자색도 동일하게
+              backgroundColor: "transparent", // ✅ 배경 투명
+              boxShadow: "none",              // ✅ 클릭 시 그림자 제거
+            }}
             onClick={goFinder}
           >
             나만의 향 찾기 테스트
