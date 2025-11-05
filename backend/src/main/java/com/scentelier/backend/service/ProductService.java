@@ -1,6 +1,7 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.constant.ProductStatus;
 import com.scentelier.backend.entity.Products;
 import com.scentelier.backend.repository.CartItemRepository;
 import com.scentelier.backend.repository.OrderRepository;
@@ -12,8 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.NoSuchElementException;
 import jakarta.transaction.Transactional;
@@ -106,34 +109,6 @@ public class ProductService {
         return true;
     }
 
-//    @Transactional
-//    public boolean toggleStatus(Long id) {
-//        Products p = productRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("상품 없음"));
-//
-//        if (p.getStatus() == ProductStatus.SELLING) {
-//            // STOPPED로 내리기 전 “장바구니/주문” 점검
-//            long inCarts = cartItemRepository.countActiveByProductId(id);
-//            long inPendingOrders = orderRepository.countPendingOrdersByProductId(id, PENDING_STATUSES);
-//
-//            if (inCarts > 0 || inPendingOrders > 0) {
-//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
-//                boolean first = true;
-//                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
-//                if (inPendingOrders > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPendingOrders).append("건"); }
-//                sb.append("이 존재합니다.");
-//                // 커스텀 예외 굳이 안 쓰고 RuntimeException으로 409 응답 유도
-//                throw new RuntimeException(sb.toString());
-//            }
-//            p.setStatus(ProductStatus.STOPPED);
-//        } else {
-//            // STOPPED → SELLING은 제한 없이 허용
-//            p.setStatus(ProductStatus.SELLING);
-//        }
-//
-//        productRepository.save(p);
-//        return true;
-//    }
 
     @EventListener
     @Transactional
@@ -230,7 +205,49 @@ public class ProductService {
         }
         return productRepository.save(p);
     }
+    @Transactional
+    public Products update(Long id, Products req) {
+        Products p = productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));
 
+        // name
+        if (req.getName() != null && !req.getName().isBlank()) {
+            p.setName(req.getName());
+        }
+        // category
+        if (req.getCategory() != null && !req.getCategory().isBlank()) {
+            p.setCategory(req.getCategory());
+        }
+        // description
+        if (req.getDescription() != null) {
+            p.setDescription(req.getDescription());
+        }
+        // price
+        if (req.getPrice() != null) {
+            if (req.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("가격은 0보다 큰 값이어야 합니다.");
+            }
+            p.setPrice(req.getPrice());
+        }
+        // stock (0도 유효값이므로 무조건 반영)
+        p.setStock(req.getStock());
+
+        // imageUrl
+        if (req.getImageUrl() != null && !req.getImageUrl().isBlank()) {
+            p.setImageUrl(req.getImageUrl());
+        }
+        // season (Enum) — null이면 유지
+        if (req.getSeason() != null) {
+            p.setSeason(req.getSeason());
+        }
+        // keyword — null/빈문자면 유지
+        if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
+            p.setKeyword(req.getKeyword());
+        }
+
+        // isDeleted / createdAt / deletedAt은 유지
+        return productRepository.save(p);
+    }
 }
 
 
