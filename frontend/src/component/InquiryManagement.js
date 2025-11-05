@@ -202,7 +202,7 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
                     <Search size={18} className={styles.searchIcon} />
                     <input
                         type="text"
-                        placeholder="Search by ID, Name, Email, Title..."
+                        placeholder="ID, Name, Email, Title...로 검색"
                         value={searchTerm}
                         onChange={handleSearchChange}
                     />
@@ -311,10 +311,6 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
             {totalPages > 0 && (
                 <div className={styles.paginationContainer}>
                     <Pagination>
-                        <Pagination.First
-                            onClick={() => handlePageChange(1)}
-                            disabled={currentPage === 0}
-                        />
                         <Pagination.Prev
                             onClick={() => handlePageChange(currentPage)} // currentPage is 0-indexed, (currentPage+1) - 1 = currentPage
                             disabled={currentPage === 0}
@@ -335,10 +331,6 @@ function InquiryManagement({ setActiveView, setSelectedInquiryId }) {
 
                         <Pagination.Next
                             onClick={() => handlePageChange(currentPage + 2)} // (currentPage+1) + 1 = currentPage + 2
-                            disabled={currentPage >= totalPages - 1}
-                        />
-                        <Pagination.Last
-                            onClick={() => handlePageChange(totalPages)}
                             disabled={currentPage >= totalPages - 1}
                         />
                     </Pagination>

@@ -350,10 +350,7 @@ function OrderManagement() {
             </div>
 
             {/* TODO: 페이징 처리 여기에 추가 */}
-            <div className={styles.PaginationContainer}>
-                <span className={styles.pageInfo}>
-                    페이지 {currentPage + 1} / {totalPages}
-                </span>
+            <div className={styles.paginationContainer}>
                 <Pagination>
                     <Pagination.Prev
                         onClick={() => setCurrentPage(p => Math.max(p - 1, 0))}

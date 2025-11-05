@@ -147,7 +147,6 @@ function ReviewManagement() {
     };
 
     const renderPagination = () => {
-        if (totalPages <= 1) return null;
         return (
             <Pagination className={styles.paginationContainer}>
                 <Pagination.Prev onClick={() => handlePageChange(Math.max(currentPage - 1, 0))} disabled={currentPage === 0} />

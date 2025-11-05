@@ -4,7 +4,6 @@ import styles from './StockManagement.module.css';
 import { Package, Beaker, Edit, Save, X, PlusCircle, FileText, ArrowUp, ArrowDown, Search, Filter } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { Pagination, Modal, Button, Form } from 'react-bootstrap';
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 
@@ -397,88 +396,6 @@ function StockManagement() {
         }
     };
 
-    // // 발주서 생성, 다운로드 로직
-    // const handleGeneratePurchaseOrder = async () => {
-    //     const selection = selectedItems[activeView];
-    //     if (selection.size === 0) {
-    //         alert("발주서를 생성할 항목을 선택해주세요.");
-    //         return;
-    //     }
-
-    //     const sourceData = activeView === 'products' ? products : ingredients;
-    //     const itemsToOrder = [];
-
-    //     for (const itemId of selection) {
-    //         const item = sourceData.find(i => i.id === itemId);
-    //         const quantity = adjustmentValues[itemId]; // '발주수량' input 값
-
-    //         if (!item || quantity === undefined || quantity <= 0) {
-    //             // 수량이 없거나 0 이하인 항목은 건너뜁니다.
-    //             continue;
-    //         }
-
-    //         // 품목 별 가격은 통일. 개별 단가로 책정하고자 하면 엔티티 수정까지 필요. 
-    //         const unitPrice = activeView === 'products' ? 10000 : 1000;
-
-    //         if (unitPrice === undefined || unitPrice === null) {
-    //             alert(`'${item.name}'의 단가(price) 정보가 없습니다. 백엔드를 확인해주세요.`);
-    //             return;
-    //         }
-
-    //         itemsToOrder.push({
-    //             name: item.name,
-    //             quantity: quantity,
-    //             unitPrice: unitPrice
-    //         });
-    //     }
-
-    //     if (itemsToOrder.length === 0) {
-    //         alert("발주할 유효한 항목이 없습니다. '발주수량'을 입력했는지 확인해주세요.");
-    //         return;
-    //     }
-
-    //     // --- 1. Request DTO 빌드 ---
-    //     const today = new Date();
-    //     const poNumber = `PO-${today.toISOString().split('T')[0]}`;
-    //     const orderDate = today.toLocaleDateString('ko-KR');
-    //     // 임시. 입고일은 주문 3일 후
-    //     const dueDate = new Date(today.setDate(today.getDate() + 3)).toLocaleDateString('ko-KR');
-    //     // 임시. 지급일은 주문 30일 후
-    //     const payDate = new Date(today.setDate(today.getDate() + 27)).toLocaleDateString('ko-KR'); // (3 + 27 = 30)
-
-    //     const poRequestData = {
-    //         poNumber: poNumber,
-    //         supplierName: "Pefumare Co.",
-    //         orderDate: orderDate,
-    //         dueDate: dueDate,
-    //         payDate: payDate,
-    //         remarks: "비고란 코멘트", // 텍스트 입력창 도입 필요 (TODO)
-    //         items: itemsToOrder
-    //     };
-
-    //     try {
-    //         const response = await axios.post(
-    //             `${API_BASE_URL}/api/admin/generate-purchase-order`,
-    //             poRequestData,
-    //             {
-    //                 withCredentials: true,
-    //                 responseType: 'blob'
-    //             }
-    //         );
-
-    //         // --- 3. Save the file from the server ---
-    //         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    //         saveAs(blob, `${poNumber}.xlsx`);
-
-    //         if (window.confirm("선택한 항목들을 발주하시겠습니까? (재고가 수정됩니다.)")) {
-    //             await handleBulkRestockRequest();
-    //         }
-
-    //     } catch (err) {
-    //         console.error("Failed to generate PO:", err);
-    //         alert("발주서 생성에 실패했습니다. (서버 오류)");
-    //     }
-    // };
 
     // === 정렬 화살표 헬퍼 ===
     const getSortArrow = (key, type) => {
@@ -609,14 +526,8 @@ function StockManagement() {
         const isProducts = activeView === 'products';
         const currentPage = isProducts ? productCurrentPage : ingredientCurrentPage;
         const totalPages = isProducts ? productTotalPages : ingredientTotalPages;
-
-        if (totalPages <= 1) return null; // Don't show pagination if only 1 page
-
         return (
             <div className={styles.paginationContainer}>
-                <span className={styles.pageInfo}>
-                    Page {currentPage + 1} of {totalPages}
-                </span>
                 <Pagination>
                     <Pagination.Prev
                         onClick={() => handlePageChange(Math.max(currentPage - 1, 0))}

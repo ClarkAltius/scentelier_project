@@ -1,37 +1,37 @@
 /* Container for the whole page */
 .productPage {
-    animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Page Header (Title + Button) */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .header h1 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 600;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 /* Primary "Add" Button */
 .addButton {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #fff;
-    background-color: #007bff;
-    /* A standard "primary" blue */
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #007bff;
+  /* A standard "primary" blue */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .badge {
@@ -42,12 +42,27 @@
   font-weight: 600;
   line-height: 18px;
   border: 1px solid transparent;
-  vertical-align: middle; /* 수직 정렬 보정 */
+  vertical-align: middle;
+  /* 수직 정렬 보정 */
 }
 
-.badgeSelling { background: #e8f6ef; color: #087f5b; border-color: #b7e4cf; }
-.badgePending { background: #fff4e6; color: #995e00; border-color: #ffd8a8; }
-.badgeStopped { background: #ffe3e3; color: #c92a2a; border-color: #ffa8a8; }
+.badgeSelling {
+  background: #e8f6ef;
+  color: #087f5b;
+  border-color: #b7e4cf;
+}
+
+.badgePending {
+  background: #fff4e6;
+  color: #995e00;
+  border-color: #ffd8a8;
+}
+
+.badgeStopped {
+  background: #ffe3e3;
+  color: #c92a2a;
+  border-color: #ffa8a8;
+}
 
 .badgeSelling {
   background: #e8f6ef;
@@ -78,169 +93,189 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
 .toggleStatusButton:hover {
   background: #eee;
 }
 
 .addButton:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* Table styling */
 .tableContainer {
-    width: 100%;
-    overflow-x: auto;
-    /* For responsiveness */
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  overflow-x: auto;
+  /* For responsiveness */
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .productTable {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .productTable th,
 .productTable td {
-    padding: 16px;
-    text-align: left;
-    border-bottom: 1px solid #e0e0e0;
-    vertical-align: middle;
-    color: #374151;
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+  color: #374151;
 }
 
 /* Table Header */
 .productTable th {
-    font-size: 12px;
-    font-weight: 700;
-    color: #555;
-    text-transform: uppercase;
-    background-color: #f9f9f9;
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  background-color: #f9f9f9;
 }
 
 /* 칼럼별 정렬/폭: 선택/이미지/가격/액션 */
 .productTable th.colCheckbox,
-.productTable td.colCheckbox { width: 44px; text-align: center; }
+.productTable td.colCheckbox {
+  width: 44px;
+  text-align: center;
+}
+
 .productTable th.colImage,
-.productTable td.colImage { width: 88px; }
+.productTable td.colImage {
+  width: 88px;
+}
+
 .productTable th.colPrice,
-.productTable td.colPrice { text-align: right; }
+.productTable td.colPrice {
+  text-align: right;
+}
+
 .productTable th.colAction,
-.productTable td.colAction { width: 210px; text-align: center; }
+.productTable td.colAction {
+  width: 210px;
+  text-align: center;
+}
 
 /* Alternating row colors */
 .productTable tbody tr:nth-child(even) {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 
 .productTable tbody tr:hover {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 /* 판매중지 행 강조 + hover에서도 유지 */
-.rowStopped { background: #fff6f6 !important; }
-.productTable tbody tr.rowStopped:hover { background: #ffecec !important; }
+.rowStopped {
+  background: #fff6f6 !important;
+}
+
+.productTable tbody tr.rowStopped:hover {
+  background: #ffecec !important;
+}
 
 /* Action Buttons (Edit/Delete) */
 .actionButtons {
-    display: flex;
-    gap: 8px;
-    white-space: nowrap; /* 줄바꿈 방지 */
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+  /* 줄바꿈 방지 */
 }
 
 .actionButton {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .editButton {
-    color: #333;
-    background-color: #f0f0f0;
+  color: #333;
+  background-color: #f0f0f0;
 }
 
 .editButton:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 .deleteButton {
-    color: #d9534f;
-    /* A standard "danger" red */
-    background-color: #fdf2f2;
+  color: #d9534f;
+  /* A standard "danger" red */
+  background-color: #fdf2f2;
 }
 
 .deleteButton:hover {
-    background-color: #f8e0e0;
+  background-color: #f8e0e0;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 로딩, 에러 메시지 */
 .loading,
 .error {
-    text-align: center;
-    padding: 40px;
-    font-size: 1.2rem;
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
 }
 
 .error {
-    color: red;
+  color: red;
 }
 
 /* 제품 없음 메시지 */
 .emptyCell {
-    text-align: center;
-    padding: 40px;
-    color: #888;
+  text-align: center;
+  padding: 40px;
+  color: #888;
 }
 
 /* 제품 이미지 */
 .productThumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 4px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 /* 페이징 컨트롤 */
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .pagination button {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    cursor: pointer;
-    border-radius: 4px;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .pagination button:disabled {
-    background-color: #f5f5f5;
-    color: #aaa;
-    cursor: not-allowed;
+  background-color: #f5f5f5;
+  color: #aaa;
+  cursor: not-allowed;
 }
 
 /* 🔹상태 배지 수직 정렬 */
@@ -325,36 +360,44 @@
 }
 
 .viewToggle {
-    display: flex;
-    background-color: #f3f4f6;
-    /* Light gray background for the container */
-    border-radius: 8px;
-    padding: 4px;
+  display: flex;
+  background-color: #f3f4f6;
+  /* Light gray background for the container */
+  border-radius: 8px;
+  padding: 4px;
 }
 
 .viewToggle button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    border: none;
-    background-color: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #4b5563;
-    /* Medium gray text */
-    transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background-color: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #4b5563;
+  /* Medium gray text */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .viewToggle button:hover {
-    background-color: #e5e7eb;
+  background-color: #e5e7eb;
 }
 
 /* Active state for the toggle button */
 .viewToggle button.active {
-    background-color: #ffffff;
-    color: #111827;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  /* 테이블과의 상단 간격 */
 }

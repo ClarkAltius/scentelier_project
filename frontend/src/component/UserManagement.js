@@ -253,7 +253,7 @@ function UserManagement() {
     // === RENDER FUNCTIONS ===
 
     const renderPagination = (currentPage, totalPages, onPageChange) => {
-        if (totalPages <= 1) return null;
+
         return (
             <Pagination className={styles.paginationContainer}>
                 <Pagination.Prev onClick={() => onPageChange(Math.max(currentPage - 1, 0))} disabled={currentPage === 0} />

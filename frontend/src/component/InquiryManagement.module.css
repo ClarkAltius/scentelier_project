@@ -214,12 +214,12 @@
     }
 }
 
-/* Pagination styles */
 .paginationContainer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    /* 테이블과의 상단 간격 */
 }
 
 .pageInfo {

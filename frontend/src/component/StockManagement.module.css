@@ -393,3 +393,11 @@
     font-size: 1.1rem;
     background-color: #f8f9fa;
 }
+
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    /* 테이블과의 상단 간격 */
+}

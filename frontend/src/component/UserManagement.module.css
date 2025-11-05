@@ -117,3 +117,11 @@
     transform: translateY(-50%);
     opacity: 0.15;
 }
+
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    /* 테이블과의 상단 간격 */
+}
