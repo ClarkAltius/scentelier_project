@@ -10,8 +10,8 @@ public class ProductPerformanceDto {
     private String name;
     private String category;
     private String season;
-    private long unitsSold;
-    private long revenue;
-    private double avgRating;
-    private double rePurchaseRate; // As discussed, value from 0.0 to 1.0
+    private Long unitsSold;
+    private Long revenue;
+    private Double avgRating;
+    private Double rePurchaseRate;
 }

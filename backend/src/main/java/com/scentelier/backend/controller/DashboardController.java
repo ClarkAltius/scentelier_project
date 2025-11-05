@@ -1,10 +1,10 @@
 package com.scentelier.backend.controller;
 
 import com.scentelier.backend.dto.*;
+import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
 import com.scentelier.backend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

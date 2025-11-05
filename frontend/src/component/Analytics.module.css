@@ -92,15 +92,26 @@ color: #6b7280;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s;
     color: #374151;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .fullWidth {
     grid-column: 1 / -1;
 }
 
+
 .chartWrapper {
-    height: 350px;
+    flex: 1;
+    /* Take up ALL remaining vertical space automatically */
     width: 100%;
+    /* Be responsive, DO NOT use fixed 600px */
+    position: relative;
+    /* Vital anchor point */
+    min-height: 0;
+    /* Allows flex child to shrink properly */
 }
 
 .tableContainer {

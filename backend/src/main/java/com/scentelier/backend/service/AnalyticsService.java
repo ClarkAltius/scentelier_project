@@ -1,11 +1,13 @@
 package com.scentelier.backend.service;
 
-import com.scentelier.backend.dto.MostUsedIngredientDto;
+import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
 import com.scentelier.backend.dto.analytics.*;
 import com.scentelier.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import com.scentelier.backend.dto.analytics.CategorySalesDto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import com.scentelier.backend.dto.analytics.DailyAovDto;
+import java.util.Collections;
+import com.scentelier.backend.repository.CustomPerfumeIngredientRepository;
+import com.scentelier.backend.dto.analytics.CustomerBreakdownDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 @RequiredArgsConstructor
@@ -23,111 +33,104 @@ public class AnalyticsService {
     // private final ProductRepository productRepository;
     // ...etc
 
+
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
-
+    private final CustomPerfumeIngredientRepository customPerfumeIngredientRepository;
     private final Random random = new Random();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
+    private static final Logger logger = LoggerFactory.getLogger(AnalyticsService.class);
     // --- MOCK DATA IMPLEMENTATIONS ---
     // We are keeping the mock data logic here in the service for now.
 
     public List<DailySalesDto> getSalesOverTime(LocalDate startDate, LocalDate endDate, String productType) {
-        List<DailySalesDto> data = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            long sales = random.nextInt(50000, 450000);
-            if ("finished".equals(productType)) sales *= 0.7;
-            if ("custom".equals(productType)) sales *= 0.3;
-            data.add(new DailySalesDto(date.format(DATE_FORMATTER), (double) sales));
-        }
-        return data;
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        return orderProductRepository.findDailySales(startDateTime, endDateTime, productType);
     }
 
     public List<DailyAovDto> getAovOverTime(LocalDate startDate, LocalDate endDate) {
-        List<DailyAovDto> data = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            double aov = random.nextInt(65000, 110000);
-            data.add(new DailyAovDto(date.format(DATE_FORMATTER), aov));
-        }
-        return data;
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        return orderRepository.findDailyAov(startDateTime, endDateTime);
     }
 
     public List<CustomerBreakdownDto> getCustomerBreakdown(LocalDate startDate, LocalDate endDate) {
-        List<CustomerBreakdownDto> data = new ArrayList<>();
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            data.add(new CustomerBreakdownDto(
-                    date.format(DATE_FORMATTER),
-                    random.nextInt(5, 30),
-                    random.nextInt(20, 60)
-            ));
-        }
-        return data;
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        List<Object[]> results = orderRepository.findCustomerBreakdown(startDateTime, endDateTime);
+
+        // Manual mapping from Object[] to DTO
+        return results.stream()
+                .map(row -> new CustomerBreakdownDto(
+                        (String) row[0],                // date string
+                        ((Number) row[1]).longValue(),  // new customers count
+                        ((Number) row[2]).longValue()   // returning customers count
+                ))
+                .collect(Collectors.toList());
     }
 
     public List<CategorySalesDto> getSalesByCategory(LocalDate startDate, LocalDate endDate, String productType) {
-        String[] categories = {"Floral", "Woody", "Citrus", "Oriental", "Fruity", "Spicy"};
-        List<CategorySalesDto> data = new ArrayList<>();
-        for (String cat : categories) {
-            long revenue = random.nextInt(1000000, 5000000);
-            data.add(new CategorySalesDto(cat, revenue));
+        // 커스텀 향수 조회중이라면 빈 리스트 반환.
+        if ("custom".equals(productType)) {
+            return Collections.emptyList();
         }
-        return data;
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        return orderProductRepository.findSalesByCategory(startDateTime, endDateTime);
     }
 
     public List<MostUsedIngredientDto> getPopularIngredients(LocalDate startDate, LocalDate endDate) {
-        String[] ingredients = {"Rose", "Sandalwood", "Bergamot", "Jasmine", "Vanilla", "Patchouli", "Oud", "Vetiver"};
-        List<MostUsedIngredientDto> data = new ArrayList<>();
-
-        // --- START OF FIX ---
-        int id = 1; // Use int for Integer
-        for (String name : ingredients) {
-            // Create a BigDecimal from the random number
-            BigDecimal usage = new BigDecimal(random.nextInt(50, 500));
-            // Pass the correct types (int, String, BigDecimal)
-            data.add(new MostUsedIngredientDto(id++, name, usage));
-        }
-
-        // Use BigDecimal.compareTo for sorting
-        return data.stream()
-                .sorted((a, b) -> b.getUsage().compareTo(a.getUsage())) // b.compareTo(a) for descending
-                .collect(Collectors.toList());
-        // --- END OF FIX ---
+        Pageable topTen = PageRequest.of(0, 10);
+        return customPerfumeIngredientRepository.findMostUsedIngredients(topTen);
     }
 
     public List<ProductPerformanceDto> getProductPerformance(LocalDate startDate, LocalDate endDate, String productType, List<String> categories) {
-        String[] names = {"Midnight Bloom", "Forest Whisper", "Sunrise Sparkle", "Amber Evening", "Coastal Drive", "Spiced Noir"};
-        String[] cats = {"Floral", "Woody", "Citrus", "Oriental", "Aromatic", "Spicy"};
-        String[] seasons = {"SPRING", "AUTUMN", "SUMMER", "WINTER", "ALL", "SPRING"};
 
-        List<ProductPerformanceDto> data = new ArrayList<>();
-        for (int i = 0; i < 15; i++) {
-            data.add(new ProductPerformanceDto(
-                    (long) i + 1,
-                    names[i % names.length] + (i > 5 ? " II" : ""),
-                    cats[i % cats.length],
-                    seasons[i % seasons.length],
-                    random.nextInt(50, 300),
-                    random.nextInt(3000000, 15000000),
-                    3.0 + (random.nextDouble() * 2.0), // 3.0 to 5.0
-                    random.nextDouble() * 0.25 // 0 to 25%
-            ));
+        if ("custom".equals(productType)) {
+            return Collections.emptyList();
         }
-        return data;
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        List<String> categoryFilter = (categories != null && !categories.isEmpty()) ? categories : null;
+
+        List<Object[]> results = orderProductRepository.findProductPerformanceNative(startDateTime, endDateTime, categoryFilter);
+
+        logger.info("--- Product Performance Query Results ---");
+        return results.stream()
+                .map(row -> {
+                    // Log the raw data from the SQL query
+                    logger.info("Raw Row: [ID: {}, Name: {}, Cat: {}, Season: {}, Units: {}, Revenue: {}, AvgRating: {}, RepurchaseRate: {}]",
+                            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]);
+
+                    return new ProductPerformanceDto(
+                            ((Number) row[0]).longValue(),  // id (Long)
+                            (String) row[1],                // name (String)
+                            (String) row[2],                // category (String)
+                            (String) row[3],                // season (String)
+                            ((BigDecimal) row[4]).longValue(), // unitsSold (long)
+                            ((BigDecimal) row[5]).longValue(), // revenue (long)
+                            ((Number) row[6]).doubleValue(), // avgRating (double)
+                            ((Number) row[7]).doubleValue()  // rePurchaseRate (double)
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public List<TopCustomerDto> getTopCustomers(LocalDate startDate, LocalDate endDate) {
-        String[] domains = {"gmail.com", "naver.com", "example.com", "kakao.com"};
-        List<TopCustomerDto> data = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            data.add(new TopCustomerDto(
-                    (long) 100 + i,
-                    "user" + random.nextInt(100, 999) + "@" + domains[i % domains.length],
-                    random.nextInt(3, 25),
-                    random.nextInt(200000, 2500000)
-            ));
-        }
-        return data.stream()
-                .sorted((a, b) -> Long.compare(b.getTotalSpent(), a.getTotalSpent()))
-                .collect(Collectors.toList());
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+
+        // End of the day (e.g., 2025-11-05 -> 2025-11-05T23:59:59)
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        Pageable topTen = PageRequest.of(0, 10);
+
+        return orderRepository.findTopCustomers(startDateTime, endDateTime, topTen);
     }
 }

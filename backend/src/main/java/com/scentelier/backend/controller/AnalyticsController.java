@@ -1,6 +1,6 @@
 package com.scentelier.backend.controller;
 
-import com.scentelier.backend.dto.MostUsedIngredientDto;
+import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
 import com.scentelier.backend.dto.analytics.*;
 import com.scentelier.backend.service.AnalyticsService;
 import lombok.RequiredArgsConstructor;

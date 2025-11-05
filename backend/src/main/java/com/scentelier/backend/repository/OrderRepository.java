@@ -1,6 +1,8 @@
 package com.scentelier.backend.repository;
 import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.dto.analytics.DailySalesDto;
+import com.scentelier.backend.dto.analytics.DailyAovDto;
+import com.scentelier.backend.dto.analytics.TopCustomerDto;
 import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
@@ -12,6 +14,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -87,5 +90,52 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     List<Object[]> findMonthlySales();
     Page<Orders> findByUsers_IdOrderByOrderDateDesc(Long userId, Pageable pageable);
 
+    @Query("SELECT new com.scentelier.backend.dto.analytics.TopCustomerDto(" +
+            "   u.id, " +
+            "   u.email, " +
+            "   COUNT(o.id), " +
+            "   CAST(COALESCE(SUM(o.totalPrice), 0) AS long)" +
+            ") " +
+            "FROM Orders o " +
+            "JOIN o.users u " +
+            "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
+            "  AND o.users IS NOT NULL " +
+            "GROUP BY u.id, u.email " +
+            "ORDER BY SUM(o.totalPrice) DESC")
+    List<TopCustomerDto> findTopCustomers(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            Pageable pageable
+    );
 
+    // 상세 통계 페이지 평균 주문액 표 쿼리
+    @Query("SELECT new com.scentelier.backend.dto.analytics.DailyAovDto(" +
+            "   str(DATE(o.orderDate)), " +
+            "   COALESCE(AVG(o.totalPrice), 0.0) " +
+            ") " +
+            "FROM Orders o " +
+            "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
+            "  AND o.status <> 'CANCELLED' " +
+            "GROUP BY str(DATE(o.orderDate)) " +
+            "ORDER BY str(DATE(o.orderDate)) ASC")
+    List<DailyAovDto> findDailyAov(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+    // 상세 통계 페이지 고객 재주문율 쿼리
+    @Query(value = "SELECT " +
+            "   DATE_FORMAT(o.order_date, '%Y-%m-%d') as day, " +
+            "   COUNT(DISTINCT CASE WHEN DATE(o.order_date) = (SELECT MIN(DATE(o2.order_date)) FROM orders o2 WHERE o2.user_id = o.user_id AND o2.status != 'CANCELLED') THEN o.user_id ELSE NULL END) as new_cust, " +
+            "   COUNT(DISTINCT CASE WHEN DATE(o.order_date) > (SELECT MIN(DATE(o3.order_date)) FROM orders o3 WHERE o3.user_id = o.user_id AND o3.status != 'CANCELLED') THEN o.user_id ELSE NULL END) as ret_cust " +
+            "FROM orders o " +
+            "WHERE o.order_date BETWEEN :startDate AND :endDate " +
+            "  AND o.status != 'CANCELLED' " +
+            "GROUP BY day " +
+            "ORDER BY day ASC",
+            nativeQuery = true)
+    List<Object[]> findCustomerBreakdown(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }

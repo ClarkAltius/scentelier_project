@@ -35,6 +35,17 @@
     margin: 0;
 }
 
+.chartWrapper {
+    flex: 1;
+    /* Take up ALL remaining vertical space automatically */
+    width: 100%;
+    /* Be responsive, DO NOT use fixed 600px */
+    position: relative;
+    /* Vital anchor point */
+    min-height: 0;
+    /* Allows flex child to shrink properly */
+}
+
 .cardIcon {
     color: #6b7280;
     /* Medium gray for icons */

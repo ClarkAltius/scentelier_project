@@ -1,15 +1,13 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.dto.*;
+import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
 import com.scentelier.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.scentelier.backend.entity.Ingredient;
-import com.scentelier.backend.entity.Products;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import com.scentelier.backend.constant.InquiryStatus;
 import com.scentelier.backend.constant.OrderStatus;

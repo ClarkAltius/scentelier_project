@@ -132,7 +132,7 @@ function Analytics() {
 
     // --- RENDER LOGIC ---
     if (loading) {
-        return <div className={styles.loadingOverlay}>Loading analytics...</div>;
+        return <div className={styles.loadingOverlay}>상세 통계 로딩중...</div>;
     }
 
     if (error) {
@@ -140,7 +140,7 @@ function Analytics() {
     }
 
     if (!analyticsData) {
-        return <div className={styles.loadingOverlay}>No analytics data found.</div>;
+        return <div className={styles.loadingOverlay}>통계 정보 없음.</div>;
     }
 
     // --- JSX ---
@@ -150,42 +150,42 @@ function Analytics() {
             <div className={styles.filterBar}>
                 <div className={styles.filterGroup}>
                     <label htmlFor="date-range-select">
-                        <Calendar size={12} /> Date Range
+                        <Calendar size={12} /> 기간 설정
                     </label>
                     <select
                         id="date-range-select"
                         value={dateRange}
                         onChange={(e) => setDateRange(e.target.value)}
                     >
-                        <option value="last_30_days">Last 30 Days</option>
-                        <option value="last_90_days">Last 90 Days</option>
-                        <option value="this_year">This Year</option>
+                        <option value="last_30_days">최근 30일</option>
+                        <option value="last_90_days">최근 90일</option>
+                        <option value="this_year">최근 1년</option>
                     </select>
                 </div>
 
                 <div className={styles.filterGroup}>
                     <label htmlFor="product-type-select">
-                        <Filter size={12} /> Product Type
+                        <Filter size={12} /> 상품 타입
                     </label>
                     <select
                         id="product-type-select"
                         value={productType}
                         onChange={(e) => setProductType(e.target.value)}
                     >
-                        <option value="all">All Products</option>
-                        <option value="finished">Finished Products</option>
-                        <option value="custom">Custom Perfumes</option>
+                        <option value="all">모든 상품</option>
+                        <option value="finished">완제품</option>
+                        <option value="custom">커스텀 향수</option>
                     </select>
                 </div>
 
                 {/* This is a placeholder. A real implementation would use a multi-select dropdown library */}
-                <div className={styles.filterGroup}>
+                {/* <div className={styles.filterGroup}>
                     <label>Categories</label>
                     <button className={styles.filterButton} onClick={() => alert('Category filter modal would open here.')}>
                         <SlidersHorizontal size={14} />
                         Filter Categories ({selectedCategories.length} selected)
                     </button>
-                </div>
+                </div> */}
             </div>
 
             {/* Main Analytics Grid */}
@@ -193,9 +193,9 @@ function Analytics() {
 
                 {/* Sales Over Time */}
                 <div className={styles.analyticsCard}>
-                    <h3><DollarSign size={18} /> Sales Over Time</h3>
+                    <h3><DollarSign size={18} /> 매출 추이</h3>
                     <div className={styles.chartWrapper}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={analyticsData.salesOverTime}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                                 <XAxis dataKey="date" fontSize={12} />
@@ -203,7 +203,7 @@ function Analytics() {
                                     tickFormatter={(value) => `₩${(value / 10000).toFixed(0)}만`}
                                     fontSize={12}
                                 />
-                                <Tooltip formatter={(value) => [`₩${value.toLocaleString()}`, "Sales"]} />
+                                <Tooltip formatter={(value) => [`₩${value.toLocaleString()}`, "매출"]} />
                                 <Legend />
                                 <Line type="monotone" dataKey="sales" stroke="#3b82f6" strokeWidth={2} dot={false} />
                             </LineChart>
@@ -213,9 +213,9 @@ function Analytics() {
 
                 {/* AOV Over Time */}
                 <div className={styles.analyticsCard}>
-                    <h3><ShoppingCart size={18} /> Average Order Value (AOV)</h3>
+                    <h3><ShoppingCart size={18} /> 평균 주문 금액(AOV)</h3>
                     <div className={styles.chartWrapper}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={analyticsData.aovOverTime}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                                 <XAxis dataKey="date" fontSize={12} />
@@ -233,60 +233,80 @@ function Analytics() {
 
                 {/* Customer Breakdown */}
                 <div className={styles.analyticsCard}>
-                    <h3><Users size={18} /> New vs. Returning Customers</h3>
+                    <h3><Users size={18} /> 고객 신규 구매 vs. 고객 재구매</h3>
                     <div className={styles.chartWrapper}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={analyticsData.customerBreakdown}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                                 <XAxis dataKey="date" fontSize={12} />
                                 <YAxis fontSize={12} />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="newCustomers" stackId="a" fill="#8b5cf6" name="New Customers" />
-                                <Bar dataKey="returningCustomers" stackId="a" fill="#ec4899" name="Returning Customers" />
+                                <Bar dataKey="newCustomers" stackId="a" fill="#8b5cf6" name="신규 고객" />
+                                <Bar dataKey="returningCustomers" stackId="a" fill="#ec4899" name="재구매 고객" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 {/* Sales by Category Pie Chart */}
-                <div className={styles.analyticsCard}>
-                    <h3><PieChartIcon size={18} /> Sales by Category</h3>
-                    <div className={styles.chartWrapper}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={analyticsData.salesByCategory}
-                                    dataKey="revenue"
-                                    nameKey="category"
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={70}
-                                    outerRadius={110}
-                                    paddingAngle={3}
-                                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                                >
-                                    {analyticsData.salesByCategory.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip formatter={(value) => `₩${value.toLocaleString()}`} />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
+                {/* If 'custom' is selected, show Popular Ingredients here. Otherwise, show Sales by Category. */}
+                {productType === 'custom' ? (
+                    <div className={styles.analyticsCard}>
+                        <h3><Beaker size={18} /> 원액 인기순</h3>
+                        <div className={styles.chartWrapper}>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={analyticsData.popularIngredients} layout="vertical" margin={{ left: 20 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                    <XAxis type="number" fontSize={12} />
+                                    <YAxis type="category" dataKey="name" width={100} fontSize={12} minWidth={0} />
+                                    <Tooltip formatter={(value) => [value, "Usage Count"]} />
+                                    <Legend />
+                                    <Bar dataKey="usage" fill="#f59e0b" name="사용 횟수" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className={styles.analyticsCard}>
+                        <h3><PieChartIcon size={18} /> 카테고리 별 판매 비중</h3>
+                        <div className={styles.chartWrapper}>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <PieChart>
+                                    <Pie
+                                        data={analyticsData.salesByCategory}
+                                        dataKey="revenue"
+                                        nameKey="category"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={70}
+                                        outerRadius={110}
+                                        paddingAngle={3}
+                                        label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                    >
+                                        {analyticsData.salesByCategory.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `₩${value.toLocaleString()}`} />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                )}
+
 
                 {/* Popular Ingredients (Only shows if 'custom' or 'all' is selected) */}
-                {(productType === 'all' || productType === 'custom') && (
+                {(productType === 'all') && (
                     <div className={`${styles.analyticsCard} ${styles.fullWidth}`}>
-                        <h3><Beaker size={18} /> Popular Ingredients (Custom Perfumes)</h3>
+                        <h3><Beaker size={18} /> 원액 인기 (커스텀 향수)</h3>
                         <div className={styles.chartWrapper}>
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={analyticsData.popularIngredients} layout="vertical">
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                                     <XAxis type="number" fontSize={12} />
-                                    <YAxis type="category" dataKey="name" width={100} fontSize={12} />
+                                    <YAxis type="category" dataKey="name" width={100} fontSize={12} minWidth={0} />
                                     <Tooltip formatter={(value) => [value, "Usage Count"]} />
                                     <Legend />
                                     <Bar dataKey="usage" fill="#f59e0b" name="Usage Count" />
@@ -297,50 +317,51 @@ function Analytics() {
                 )}
 
                 {/* Product Performance Table */}
-                <div className={`${styles.analyticsCard} ${styles.fullWidth}`}>
-                    <h3><Package size={18} /> Product Performance</h3>
-                    <div className={styles.tableContainer}>
-                        <table className={styles.dataTable}>
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Season</th>
-                                    <th>Units Sold</th>
-                                    <th>Total Revenue</th>
-                                    <th>Avg. Rating</th>
-                                    <th>Re-purchase Rate</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {analyticsData.productPerformance.map((product) => (
-                                    <tr key={product.id}>
-                                        <td>{product.name}</td>
-                                        <td>{product.category}</td>
-                                        <td>{product.season}</td>
-                                        <td>{product.unitsSold}</td>
-                                        <td>₩{product.revenue.toLocaleString()}</td>
-                                        <td className={styles.ratingCell}>
-                                            {product.avgRating.toFixed(1)} <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                                        </td>
-                                        <td>{(product.rePurchaseRate * 100).toFixed(1)}%</td>
+                {(productType != 'custom') && (
+                    <div className={`${styles.analyticsCard} ${styles.fullWidth}`}>
+                        <h3><Package size={18} /> 제품 성적</h3>
+                        <div className={styles.tableContainer}>
+                            <table className={styles.dataTable}>
+                                <thead>
+                                    <tr>
+                                        <th>완제품명</th>
+                                        <th>카테고리</th>
+                                        <th>계절</th>
+                                        <th>판매수량</th>
+                                        <th>총 매출</th>
+                                        <th>평균 평점</th>
+                                        <th>재구매율</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {analyticsData.productPerformance.map((product) => (
+                                        <tr key={product.id}>
+                                            <td>{product.name}</td>
+                                            <td>{product.category}</td>
+                                            <td>{product.season}</td>
+                                            <td>{product.unitsSold}</td>
+                                            <td>₩{product.revenue.toLocaleString()}</td>
+                                            <td className={styles.ratingCell}>
+                                                {product.avgRating.toFixed(1)} <Star size={14} fill="#f59e0b" color="#f59e0b" />
+                                            </td>
+                                            <td>{(product.rePurchaseRate * 100).toFixed(1)}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-
+                )}
                 {/* Top Customers Table */}
                 <div className={`${styles.analyticsCard} ${styles.fullWidth}`}>
-                    <h3><Users size={18} /> Top Customers</h3>
+                    <h3><Users size={18} /> 고객 구매량 순</h3>
                     <div className={styles.tableContainer}>
                         <table className={styles.dataTable}>
                             <thead>
                                 <tr>
-                                    <th>User Email</th>
-                                    <th>Total Orders</th>
-                                    <th>Total Spent</th>
+                                    <th>사용자 이메일</th>
+                                    <th>총 주문</th>
+                                    <th>총 매출</th>
                                 </tr>
                             </thead>
                             <tbody>

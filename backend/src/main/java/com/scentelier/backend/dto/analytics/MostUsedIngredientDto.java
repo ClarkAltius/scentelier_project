@@ -1,4 +1,4 @@
-package com.scentelier.backend.dto;
+package com.scentelier.backend.dto.analytics;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
