@@ -112,11 +112,11 @@ function ReviewManagement() {
             const response = await axios.patch(url, payload, { withCredentials: true });
 
             const updatedReview = response.data;
-            // de----bugggg start ===========================
-            console.log("Review sent to server:", review);
-            console.log("Payload sent:", payload);
-            console.log("Response from server (updatedReview):", updatedReview);
-            // de----bugggg end===============================
+            // // de----bugggg start ===========================
+            // console.log("Review sent to server:", review);
+            // console.log("Payload sent:", payload);
+            // console.log("Response from server (updatedReview):", updatedReview);
+            // // de----bugggg end===============================
             setReviews(prev => prev.map(r => r.reviewId === updatedReview.reviewId ? updatedReview : r));
             alert(`리뷰가 ${action}되었습니다.`);
         } catch (err) {

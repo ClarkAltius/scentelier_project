@@ -8,12 +8,18 @@ import com.scentelier.backend.repository.ProductRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.scentelier.backend.dto.ProductStockDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.NoSuchElementException;
 import jakarta.transaction.Transactional;
@@ -176,7 +182,7 @@ public class ProductService {
         Products updateProduct = productRepository.save(product);
 
         // DTO 반환
-        return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock(), updateProduct.getImageUrl());
+        return new ProductStockDto(updateProduct.getId(), updateProduct.getName(), updateProduct.getStock());
     }
 
     public Page<Products> findAllSelling(Pageable pageable) {
@@ -230,6 +236,74 @@ public class ProductService {
             p.setDeletedAt(null);
         }
         return productRepository.save(p);
+    }
+    @Transactional
+    public Products update(Long id, Products req) {
+        Products p = productRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));
+
+        // name
+        if (req.getName() != null && !req.getName().isBlank()) {
+            p.setName(req.getName());
+        }
+        // category
+        if (req.getCategory() != null && !req.getCategory().isBlank()) {
+            p.setCategory(req.getCategory());
+        }
+        // description
+        if (req.getDescription() != null) {
+            p.setDescription(req.getDescription());
+        }
+        // price
+        if (req.getPrice() != null) {
+            if (req.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("가격은 0보다 큰 값이어야 합니다.");
+            }
+            p.setPrice(req.getPrice());
+        }
+        // stock (0도 유효값이므로 무조건 반영)
+        p.setStock(req.getStock());
+
+        // imageUrl
+        if (req.getImageUrl() != null && !req.getImageUrl().isBlank()) {
+            p.setImageUrl(req.getImageUrl());
+        }
+        // season (Enum) — null이면 유지
+        if (req.getSeason() != null) {
+            p.setSeason(req.getSeason());
+        }
+        // keyword — null/빈문자면 유지
+        if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
+            p.setKeyword(req.getKeyword());
+        }
+
+        // isDeleted / createdAt / deletedAt은 유지
+        return productRepository.save(p);
+    }
+
+    // 평균 별점 상위 5개
+    public List<Map<String, Object>> getTopRatedProducts() {
+        Pageable limit = PageRequest.of(0, 5);
+        List<Object[]> results = reviewRepository.findTopRatedProducts(limit);
+
+        return results.stream().map(obj -> {
+            Long productId = (Long) obj[0];
+            Double avgRating = (Double) obj[1];
+            Long reviewCount = (Long) obj[2];
+
+            Products product = productRepository.findById(productId).orElse(null);
+            if (product == null) return null;
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", product.getId());
+            map.put("name", product.getName());
+            map.put("price", product.getPrice());
+            map.put("imageUrl", product.getImageUrl());
+            map.put("keyword", product.getKeyword());
+            map.put("avgRating", Math.round(avgRating * 10) / 10.0);
+            map.put("reviewCount", reviewCount);
+            return map;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
 }

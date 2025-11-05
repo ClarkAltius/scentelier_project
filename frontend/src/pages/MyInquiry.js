@@ -14,7 +14,12 @@ function MyInquiry() {
 
 
     const { user } = useAuth();
-
+    const TYPE_LABELS = {
+        PRODUCT: "상품",
+        DELIVERY: "배달",
+        PAYMENT: "결제",
+        ETC: "기타"
+    };
 
     useEffect(() => {
         if (!user) {
@@ -26,15 +31,41 @@ function MyInquiry() {
 
         (async () => {
             try {
-               // console.log(user);
-                const url = `${API_BASE_URL}/api/inquiries/my`;
-                // const params = { params: { userId: user.id, role: user.role } };
-                const res = await axios.get(url, { withCredentials: true });
-                //console.log("응답:", res.data);
 
+                const url = `${API_BASE_URL}/api/inquiries/my`;
+                const res = await axios.get(url, { withCredentials: true });
                 const data = res.data?.data ?? res.data ?? [];
-                //console.log(res);
-                setInquiries(data);
+                console.log("inquiry data:", data);
+                // setInquiries(data);
+                const inquiriesWithProducts = await Promise.all(
+                    data.map(async (inquiry) => {
+                        if (inquiry.productId) {
+                            try {
+                                const productRes = await axios.get(
+                                    `${API_BASE_URL}/api/products/${inquiry.productId}`
+                                );
+                                return {
+                                    ...inquiry,
+                                    productName:
+                                        productRes.data?.name || "상품명 없음",
+                                };
+                            } catch (err) {
+                                console.error(
+                                    "상품 정보를 불러오지 못했습니다:",
+                                    err
+                                );
+                                return {
+                                    ...inquiry,
+                                    productName: "상품명 불러오기 실패",
+                                };
+                            }
+                        } else {
+                            return inquiry;
+                        }
+                    })
+                );
+
+                setInquiries(inquiriesWithProducts);
             } catch (e) {
                 console.error(e);
                 setError(e.response?.data?.message || "문의사항 목록을 불러오는 데 실패하였습니다.");
@@ -71,8 +102,18 @@ function MyInquiry() {
                         <p>
                             <strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}
                         </p>
+                        {inquiry.type && (
+                            <p>
+                                <strong>문의 유형 :</strong> {TYPE_LABELS[inquiry.type] || inquiry.type}
+                            </p>
+                        )}
+                        {inquiry.productName && (
+                            <p>
+                                <strong>상품명 :</strong> {inquiry.productName}
+                            </p>
+                        )}
                         <p>
-                            <strong>상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
+                            <strong>답변 상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
                         </p>
                     </div>
                 ))

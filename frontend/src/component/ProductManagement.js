@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from './ProductManagement.module.css';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
 import { useNavigate } from 'react-router-dom';
+import ProductEditModal from './ProductEditModal';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
+
 
 function ProductManagement({ setActiveView }) {
   const [products, setProducts] = useState([]);
@@ -21,7 +23,10 @@ function ProductManagement({ setActiveView }) {
   const [detailLoading, setDetailLoading] = useState(false);
 
   const [searchText, setSearchText] = useState(''); // 입력값
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('');    
+  
+  const [editing, setEditing] = useState(null);   // 선택된 상품
+  const [showEdit, setShowEdit] = useState(false);
 
   const isAllSelected = products.length > 0 && selectedIds.length === products.length;
 
@@ -37,9 +42,10 @@ function ProductManagement({ setActiveView }) {
   // 상태 배지
   const renderStatusBadge = (p) => {
     const status = p.isDeleted ? 'STOPPED' : (p.status ?? 'SELLING');
+    if (p.stock === 0) return <span className={`${styles.badge} ${styles.badgeStopped}`}>품절</span>;
     if (status === 'SELLING') return <span className={`${styles.badge} ${styles.badgeSelling}`}>판매중</span>;
     if (status === 'STOPPED') return <span className={`${styles.badge} ${styles.badgeStopped}`}>판매중지</span>;
-    if (status === 'PENDING') return <span className={`${styles.badge} ${styles.badgePending}`}>주문중</span>;
+   if (status === 'PENDING') return <span className={`${styles.badge} ${styles.badgePending}`}>주문중</span>;
     return <span>알수없음</span>;
   };
 
@@ -54,7 +60,6 @@ function ProductManagement({ setActiveView }) {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
           params: { page, size: 10, q: query || undefined, keyword: query || undefined },
-          params: { page, size: 10 },
           signal: controller.signal,
         });
 
@@ -71,7 +76,7 @@ function ProductManagement({ setActiveView }) {
           const isDelRaw = p.isDeleted ?? p.is_deleted ?? p.isdeleted ?? 0;
           const isDeleted = isDelRaw === true || Number(isDelRaw) === 1;
           const base = p.status ?? (p.selling === true ? 'SELLING' : (p.selling === false ? 'STOPPED' : 'SELLING'));
-          const status = isDeleted ? 'STOPPED' : base;
+          const status = (isDeleted || p.stock === 0) ? 'STOPPED' : base;
           return { ...p, isDeleted, status };
         });
 
@@ -96,7 +101,27 @@ function ProductManagement({ setActiveView }) {
       ignore = true;
       controller.abort();
     };
-  }, [page], [query]);
+  }, [page, query]);
+
+      // 수정 버튼 클릭
+    const handleEdit = (product) => {
+      setEditing(product);
+      setShowEdit(true);
+    };
+    // 수정 모달 닫기
+    const handleEditClose = () => {
+      setShowEdit(false);
+      setEditing(null);
+    };
+
+    // 수정 저장 후 리스트 반영
+    const handleEditSaved = (updated) => {
+    const uid = updated.id ?? updated.productId; // 어느 쪽이든 대응
+    setProducts(prev =>
+      prev.map(p => (p.id === uid ? { ...p, ...updated, id: uid } : p))
+    );
+    handleEditClose();
+  };
 
   // 선택 토글
   const handleSelect = (id) => {
@@ -112,6 +137,11 @@ function ProductManagement({ setActiveView }) {
       alert('상품 ID가 없어 상태를 변경할 수 없습니다.');
       return;
     }
+
+   if (item.stock === 0 && (item.status === 'STOPPED' || item.isDeleted)) {
+   alert('재고가 0인 상품은 판매를 시작할 수 없습니다.');
+   return;
+ }
     const next =
       (item.isDeleted === true || item.isDeleted === 1 || item.status === 'STOPPED')
         ? 'SELLING'
@@ -144,31 +174,24 @@ function ProductManagement({ setActiveView }) {
   };
   // 상세 열기/닫기 함수 추가
   const openDetail = async (id) => {
-    setShowDetail(true);
-    setDetailLoading(true);
-    try {
-      // 백엔드 상세 엔드포인트(예: GET /api/admin/products/{id})
-      const res = await axios.get(`${API_BASE_URL}/api/admin/products/${encodeURIComponent(id)}`, { withCredentials: true });
-      setDetail(res.data ?? null);
-    } catch (e) {
-      // 실패하면 목록의 데이터라도 보여주기
-      const fallback = products.find(p => p.id === id) ?? null;
-      setDetail(fallback);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
+  setShowDetail(true);
+  setDetailLoading(true);
+  try {
+    // 백엔드 상세 엔드포인트(예: GET /api/admin/products/{id})
+    const res = await axios.get(`${API_BASE_URL}/api/admin/products/${encodeURIComponent(id)}`, { withCredentials: true });
+    setDetail(res.data ?? null);
+  } catch (e) {
+    // 실패하면 목록의 데이터라도 보여주기
+    const fallback = products.find(p => p.id === id) ?? null;
+    setDetail(fallback);
+  } finally {
+    setDetailLoading(false);
+  }
+};
   const closeDetail = () => { setShowDetail(false); setDetail(null); };
-
-
-
 
   // CRUD
   const handleAddNew = () => setActiveView('productInsert');
-
-  const handleEdit = (productId) => {
-    console.log(`TODO: Open 'Edit' modal for product ${productId}`);
-  };
 
   const handleDelete = async (productId) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
@@ -231,6 +254,30 @@ function ProductManagement({ setActiveView }) {
     }
   };
 
+  // 검색어로 필터된 목록
+  const visibleProducts = useMemo(() => {
+   const term = (query || '').trim().toLowerCase();
+   if (!term) return products;
+   return products.filter((p) => { /* 기존 필터 로직 그대로 */ 
+     const name = String(p.name ?? '').toLowerCase();
+     const category = String(p.category ?? '').toLowerCase();
+     const idStr = String(p.id ?? '');
+     const status = String(p.status ?? '').toLowerCase();
+     const statusKo =
+       p.status === 'SELLING' ? '판매중' :
+       p.status === 'STOPPED' ? '판매중지' :
+       p.status === 'PENDING' ? '주문중' : '';
+     return (
+       name.includes(term) ||
+       category.includes(term) ||
+       idStr.includes(term) ||
+       status.includes(term) ||
+       statusKo.includes(term)
+     );
+   });
+ }, [products, query]);
+
+
   // 테이블 렌더
   const renderTable = () => {
     if (isLoading) return <div className={styles.loading}>Loading products...</div>;
@@ -264,9 +311,16 @@ function ProductManagement({ setActiveView }) {
                 <td colSpan={8} className={styles.emptyCell}>
                   상품이 없습니다. '신규 상품 추가' 버튼을 눌러 상품을 등록해주세요.
                 </td>
-              </tr>
-            ) : (
-              products.map((product) => {
+                    </tr>
+                  ) : visibleProducts.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className={styles.emptyCell}>
+                        검색 결과가 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    visibleProducts.map((product) => {
+            
                 const isStoppedRow = product.isDeleted === true || product.isDeleted === 1 || product.status === 'STOPPED';
                 return (
                   <tr
@@ -295,6 +349,8 @@ function ProductManagement({ setActiveView }) {
                         }
                         alt={product.name || '상품 이미지'}
                         className={styles.productThumbnail}
+                        loading="lazy"  
+                        decoding="async"  
                       />
                     </td>
                     <td>{product.name}</td>
@@ -308,35 +364,25 @@ function ProductManagement({ setActiveView }) {
                     <td>{renderStatusBadge(product)}</td>
                     <td>
                       <div className={styles.actionButtons}>
-                        {/* <button
-                          className={styles.toggleStatusButton}
-                          disabled={product.status === 'PENDING'}
-                          title={
-                            product.status === 'PENDING'
-                              ? '주문중 상태에서는 판매 상태를 변경할 수 없습니다.'
-                              : product.status === 'SELLING'
-                              ? '판매중지'
-                              : '판매시작'
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleStatus(product); // 반드시 객체 통째로
-                          }}
-                        >
-                          {product.status === 'SELLING' ? '판매중지' : '판매시작'}
-                        </button> */}
 
-                        <td>
-                          <div className={styles.actionButtons}>
-                            {/* 상세 */}
-                            <button
-                              className={styles.viewButton}
-                              onClick={(e) => { e.stopPropagation(); openDetail(product.id); }}
-                              title="상세보기"
-                            >
-                              <Eye size={16} />
-                              <span style={{ marginLeft: 4 }}>상세</span>
-                            </button>
+                         {/* 수정 */}
+                        <button
+                          className={`${styles.actionButton} ${styles.editButton}`}
+                          onClick={(e) => { e.stopPropagation(); handleEdit(product); }}
+                          aria-label={`${product.name} 수정`}
+                          title="수정"
+                        >
+                          <Edit size={16} />
+                        </button>
+        
+                        <button
+                            className={styles.viewButton}
+                            onClick={(e) => { e.stopPropagation(); openDetail(product.id); }}
+                            title="상세보기"
+                          >
+                            <Eye size={16} />
+                            <span style={{ marginLeft: 4 }}>상세</span>
+                          </button>
 
                             {/* 토글 (판매중지/판매시작) */}
                             <button
@@ -355,8 +401,7 @@ function ProductManagement({ setActiveView }) {
                               }}
                             >
                               {product.status === 'SELLING' ? '판매중지' : '판매시작'}
-                            </button>
-
+                              </button>
                             {/* 삭제 */}
                             <button
                               className={`${styles.actionButton} ${styles.deleteButton}`}
@@ -367,9 +412,6 @@ function ProductManagement({ setActiveView }) {
                             </button>
                           </div>
                         </td>
-
-                      </div>
-                    </td>
                   </tr>
                 );
               })
@@ -424,7 +466,6 @@ function ProductManagement({ setActiveView }) {
           <span style={{ marginRight: 6 }}>선택 삭제</span>
         </button>
       </div>
-
       {renderTable()}
 
       {/* 상세 모달: 테이블 아래, 컴포넌트 하단에 위치 */}
@@ -448,56 +489,95 @@ function ProductManagement({ setActiveView }) {
               <button className={styles.toggleStatusButton} onClick={closeDetail}>닫기</button>
             </div>
 
-            {detailLoading ? (
-              <div className={styles.loading}>불러오는 중...</div>
-            ) : !detail ? (
-              <div className={styles.error}>상세 정보를 불러오지 못했습니다.</div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16 }}>
-                <div>
-                  <img
-                    src={
-                      detail.imageUrl
-                        ? `${API_BASE_URL}/uploads/products/${detail.imageUrl}`
-                        : `${API_BASE_URL}/uploads/products/placeholder.jpg`
-                    }
-                    alt={detail.name ?? '상품 이미지'}
-                    style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 6, border: '1px solid #eee' }}
-                  />
-                </div>
-                <div style={{ lineHeight: 1.8 }}>
-                  <div><strong>ID</strong> : {detail.id}</div>
-                  <div><strong>상품명</strong> : {detail.name}</div>
-                  <div><strong>카테고리</strong> : {detail.category ?? '-'}</div>
-                  <div><strong>가격</strong> : {Number(detail.price)?.toLocaleString('ko-KR')}원</div>
-                  <div><strong>재고</strong> : {detail.stock ?? 0}</div>
-                  <div><strong>상태</strong> : {detail.isDeleted || detail.status === 'STOPPED' ? '판매중지' : (detail.status === 'PENDING' ? '주문중' : '판매중')}</div>
-                  {detail.description && (
-                    <div style={{ marginTop: 8 }}>
-                      <strong>설명</strong><br />
-                      <div style={{ whiteSpace: 'pre-wrap', color: '#555' }}>{detail.description}</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                className={styles.toggleStatusButton}
-                onClick={() => { closeDetail(); handleToggleStatus(detail); }}
-                disabled={detail?.status === 'PENDING'}
-                title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
-              >
-                {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
-              </button>
-              <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
-                <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
-              </button>
-            </div>
-          </div>
+{detailLoading ? (
+  <div className={styles.loading}>불러오는 중...</div>
+) : !detail ? (
+  <div className={styles.error}>상세 정보를 불러오지 못했습니다.</div>
+) : (
+  <>
+    <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 16 }}>
+      <div>
+        <img
+          src={
+            detail.imageUrl
+              ? `${API_BASE_URL}/uploads/products/${detail.imageUrl}`
+              : `${API_BASE_URL}/uploads/products/placeholder.jpg`
+          }
+          alt={detail.name ?? '상품 이미지'}
+          style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 6, border: '1px solid #eee' }}
+        />
+      </div>
+      <div style={{ lineHeight: 1.8 }}>
+        <div><strong>ID</strong> : {detail.id}</div>
+        <div><strong>상품명</strong> : {detail.name}</div>
+        <div><strong>카테고리</strong> : {detail.category ?? '-'}</div>
+        <div><strong>가격</strong> : {Number(detail.price)?.toLocaleString('ko-KR')}원</div>
+        <div><strong>재고</strong> : {detail.stock ?? 0}</div>
+        <div>
+          <strong>상태</strong> : {detail.stock === 0 || detail.isDeleted || detail.status === 'STOPPED'
+            ? '판매중지'
+            : (detail.status === 'PENDING' ? '주문중' : '판매중')}
         </div>
-      )}
+        {detail.description && (
+          <div style={{ marginTop: 8 }}>
+            <strong>설명</strong><br />
+            <div style={{ whiteSpace: 'pre-wrap', color: '#555' }}>{detail.description}</div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* 하단 버튼 */}
+    <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+      <button
+        className={styles.editButton}
+        onClick={() => { closeDetail(); handleEdit(detail); }}
+      >
+        <Edit size={16} style={{ verticalAlign: 'text-bottom' }} /> 수정
+      </button>
+      {/* <button
+        className={styles.toggleStatusButton}
+        onClick={() => { closeDetail(); handleToggleStatus(detail); }}
+        disabled={detail?.status === 'PENDING'}
+        title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
+      >
+        {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
+      </button> */}
+      {/* <button
+        className={styles.deleteButton}
+        onClick={() => { closeDetail(); handleDelete(detail.id); }}
+      >
+        <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
+      </button> */}
+    </div>
+  </>
+)}
+<div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        {/* 수정 버튼 */}
+        <button
+          className={styles.editButton}
+          onClick={() => {
+            closeDetail();
+            handleEdit(detail); // detail 상품을 수정 모달로 넘기기
+          }}
+        >
+          <Edit size={16} style={{ verticalAlign: 'text-bottom' }} /> 수정
+        </button>
+        <button
+          className={styles.toggleStatusButton}
+          onClick={() => { closeDetail(); handleToggleStatus(detail); }}
+          disabled={detail?.status === 'PENDING'}
+          title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
+        >
+          {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
+        </button>
+        <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
+          <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {!isLoading && !error && totalPages > 0 && (
         <div className={styles.pagination}>
@@ -512,8 +592,17 @@ function ProductManagement({ setActiveView }) {
           </button>
         </div>
       )}
+      {/* 수정 모달 */}
+      {showEdit && editing && (
+        <ProductEditModal
+          show={showEdit}
+          product={editing}
+          onClose={handleEditClose}
+          onSaved={handleEditSaved}
+        />
+      )}
     </div>
-  );
+  )
 }
 
 export default ProductManagement;

@@ -12,4 +12,7 @@ public class MostUsedIngredientDto {
     private Integer id; // Ingredient ID
     private String name;
     private BigDecimal usage; // "units used"
+
+    public MostUsedIngredientDto(long l, String name, long l1) {
+    }
 }

@@ -1,0 +1,161 @@
+.analyticsPage {
+    padding: 1.5rem;
+    background-color: #f9fafb;
+    /* Light gray background /
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+color: #374151;
+/ Darker gray text */
+}
+
+
+.analyticsCard h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #111827;
+}
+
+.filterBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filterGroup label {
+    font-size: 0.75rem;
+    /* 12px /
+font-weight: 500;
+color: #6b7280;
+/ Medium gray */
+}
+
+
+.filterGroup select,
+.filterButton {
+    padding: 0.6rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.2s;
+}
+
+.filterButton {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filterGroup select:focus,
+.filterButton:hover {
+    border-color: #3b82f6;
+    /* Blue border on hover/focus */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+.analyticsGrid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+}
+
+/* On larger screens, use a 2-column grid */
+@media (min-width: 1024px) {
+    .analyticsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.analyticsCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s;
+    color: #374151;
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.chartWrapper {
+    height: 350px;
+    width: 100%;
+}
+
+.tableContainer {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    /* 14px */
+}
+
+.dataTable th,
+.dataTable td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    /* Light gray border */
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dataTable th {
+    background-color: #f9fafb;
+    /* Very light gray header */
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.dataTable tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.ratingCell {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #f59e0b;
+    /* Amber/gold for star */
+}
+
+.loadingOverlay,
+.errorOverlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.errorOverlay {
+    color: #ef4444;
+    /* Red for error */
+}

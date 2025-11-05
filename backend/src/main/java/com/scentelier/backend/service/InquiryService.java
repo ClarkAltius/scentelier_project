@@ -105,6 +105,15 @@ public class InquiryService {
         //3. Dto에 답변 받은 inquiry 를 매핑. 생각보다 복잡하네...
 
         InquiryDto inquiryDto = new InquiryDto(inquiry);
+
+        // 상품 이름 매핑
+        if (inquiry.getProduct() != null) {
+            inquiryDto.setProductName(inquiry.getProduct().getName());
+        } else {
+            inquiryDto.setProductName(null);
+        }
+
+
         List<InquiryAnswers> answers = inquiryAnswerRepository.findByInquiryId(inquiryId);
 
         List<InquiryAnswerResponseDto> answerDtos = answers.stream()

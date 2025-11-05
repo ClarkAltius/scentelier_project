@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 //페이징 임포트
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -131,4 +132,51 @@ public class ProductController {
             return ResponseEntity.internalServerError().body("복구 중 오류: " + e.getMessage());
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Products payload) {
+        try {
+            Products saved = productService.update(id, payload);
+            return ResponseEntity.ok(saved);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("상품을 찾을 수 없습니다. id=" + id);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("수정 중 오류: " + e.getMessage());
+        }
+    }
+    @PostMapping(value="/{id}/update", consumes="application/json", produces="application/json")
+    public ResponseEntity<Products> updateByPost(@PathVariable Long id, @RequestBody Products payload) {
+        return ResponseEntity.ok(productService.update(id, payload));
+    }
+
+    @PostMapping("/{id}/image")
+    public ResponseEntity<?> uploadProductImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
+        try {
+            // 파일명 생성
+            String imageFileName = "product_" + System.currentTimeMillis() + ".jpg";
+
+            // 저장 경로 조합
+            String pathName = productImageLocation.endsWith("\\") || productImageLocation.endsWith("/")
+                    ? productImageLocation : productImageLocation + File.separator;
+
+            File dir = new File(pathName + "products");
+            if (!dir.exists()) dir.mkdirs();
+
+            File dest = new File(dir, imageFileName);
+            image.transferTo(dest);
+
+            // 파일명만 응답 (프런트가 PUT 업데이트에 사용)
+            return ResponseEntity.ok(Map.of("filename", imageFileName));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", "이미지 업로드 실패", "error", e.getMessage()));
+        }
+    }
+
+    // 평균 별점 상위 5개
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<Map<String, Object>>> getTopRatedProducts() {
+        List<Map<String, Object>> result = productService.getTopRatedProducts();
+        return ResponseEntity.ok(result);
+    }
+
 }

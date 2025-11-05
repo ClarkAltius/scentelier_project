@@ -67,6 +67,7 @@ public class AdminController {
         return ResponseEntity.ok(stockData);
     }
 
+
     @GetMapping("/ingredients/stock")
     public ResponseEntity<Page<IngredientStockDto>> getIngredientStock(
             Pageable pageable,

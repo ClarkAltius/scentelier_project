@@ -12,7 +12,8 @@ function Home() {
     const [best, setBest] = useState([]);
     const navigate = useNavigate();
     const { user } = useAuth();
-
+    const [topRated, setTopRated] = useState([]);
+    const scrollRef = useRef(null);
 
     //썸네일 목록 - 3번 반복해 무한 루프 효과
     const thumbnails = [
@@ -93,8 +94,23 @@ function Home() {
             container.removeEventListener('wheel', onWheel);
         };
 
+    }, []);
 
+    useEffect(() => {
+        axios.get(`${API_BASE_URL}/product/top-rated`)
+            .then((res) => setTopRated(res.data))
+            .catch(err => console.error("별점 상위 상품 조회 실패:", err));
 
+        const container = scrollRef.current;
+        if (!container) return;
+        let scrollInterval = setInterval(() => {
+            if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+            container.scrollLeft = 0;
+            } else {
+            container.scrollLeft += 2;
+            }
+        }, 20);
+        return () => clearInterval(scrollInterval);
     }, []);
 
     const formatPrice = (price) => price.toLocaleString("ko-KR");
@@ -387,6 +403,52 @@ function Home() {
                         </Card.Body>
                     </Card>)
                 )}
+            </div>
+            {/** 별점 기준 상위 5개 */}
+            <div ref={scrollRef} style={{ textAlign: 'center', margin: '100px 0 30px 0', fontSize: '50px', fontFamily: "'Gowun Batang', serif", color: '#808080ff' }}>
+                _Top Rated Perfumes
+                <span style={{ fontSize: '20px' }}>__ Scentelier의 평점 높은 향수를 만나보세요.</span>
+            </div>
+
+            <div
+            style={{
+                display: 'flex',
+                overflowX: 'auto',
+                gap: '20px',
+                padding: '20px',
+                scrollBehavior: 'smooth',
+                scrollbarWidth: 'none',
+            }}
+            onWheel={(e) => e.preventDefault()}
+            >
+            {topRated.map((item) => (
+                <Card
+                key={item.id}
+                onClick={() => navigate(`/product/detail/${item.id}`)}
+                style={{ flex: '0 0 auto', width: '20rem', cursor: 'pointer' }}
+                >
+                <Card.Img
+                    variant="top"
+                    src={`${API_BASE_URL}/uploads/products/${item.imageUrl}`}
+                    style={{
+                    width: '100%',
+                    height: '250px',
+                    objectFit: 'cover',
+                    borderRadius: '4px 4px 0 0',
+                    }}
+                />
+                <Card.Body>
+                    <Card.Title style={{ textAlign: 'center' }}>{item.name}</Card.Title>
+                    <div style={{ textAlign: 'center', color: '#808080' }}>
+                    ⭐ {item.avgRating} ({item.reviewCount})
+                    <br />
+                    <span style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
+                        {formatPrice(item.price)}원
+                    </span>
+                    </div>
+                </Card.Body>
+                </Card>
+            ))}
             </div>
             {/* -----------------------------리스트 ---------------------------- */}
 
