@@ -1,13 +1,18 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
-import com.scentelier.backend.dto.analytics.*;
+import com.scentelier.backend.dto.analytics.CategorySalesDto;
+import com.scentelier.backend.dto.analytics.DailyAovDto;
+import com.scentelier.backend.dto.analytics.CustomerBreakdownDto;
+import com.scentelier.backend.dto.analytics.DailySalesDto;
+import com.scentelier.backend.dto.analytics.ProductPerformanceDto;
+import com.scentelier.backend.dto.analytics.TopCustomerDto;
+
 import com.scentelier.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.scentelier.backend.dto.analytics.CategorySalesDto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,10 +21,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
-import com.scentelier.backend.dto.analytics.DailyAovDto;
 import java.util.Collections;
 import com.scentelier.backend.repository.CustomPerfumeIngredientRepository;
-import com.scentelier.backend.dto.analytics.CustomerBreakdownDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

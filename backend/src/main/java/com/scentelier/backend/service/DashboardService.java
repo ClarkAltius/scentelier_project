@@ -1,20 +1,20 @@
 package com.scentelier.backend.service;
 
+import com.scentelier.backend.constant.InquiryStatus;
+import com.scentelier.backend.constant.OrderStatus;
 import com.scentelier.backend.dto.*;
 import com.scentelier.backend.dto.analytics.MostUsedIngredientDto;
 import com.scentelier.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import com.scentelier.backend.constant.InquiryStatus;
-import com.scentelier.backend.constant.OrderStatus;
-import org.springframework.data.domain.PageRequest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
