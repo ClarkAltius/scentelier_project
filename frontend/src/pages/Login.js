@@ -62,74 +62,115 @@ function Login() {
     }
 
     return (
-        <Container className="d-flex justify-content-center align-items-center" style={{ height: '70vh' }}>
+        <Container
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "100vh" }}
+        >
             <Row className="w-100 justify-content-center">
-                <Col md={6}>
-                    <Card>
-                        <Card.Body>
-                            <h2 style={{
-                                fontSize: "54px",
-                                fontFamily: "'Gowun Batang', serif",
-                                color: "#67AB9F",
-                            }} className="text-center mb-4">Login</h2>
+                <Col md={6} lg={4}>
+                    <Card
+                        className="shadow-sm border-1"
+                        style={{
+                            width: "700px",
+                            paddingTop: "50px",   // ✅ 카드 상단 여백
+                            paddingBottom: "70px" // ✅ 카드 하단 여백
+                        }}
+                    >
+                        <Card.Body className="d-flex flex-column justify-content-between">
+                            <h2
+                                style={{
+                                    fontSize: "48px",
+                                    fontFamily: "'Gowun Batang', serif",
+                                    color: "#67AB9F",
+                                }}
+                                className="text-center mb-4"
+                            >
+                                Login
+                            </h2>
 
                             {errors && <Alert variant="danger">{errors}</Alert>}
 
-                            <Form onSubmit={LoginAction}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>이메일</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="이메일을 입력해 주세요."
-                                        value={email}
-                                        onChange={(event) => setEmail(event.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
+                            <Form
+                                onSubmit={LoginAction}
+                                className="flex-grow-1 d-flex flex-column justify-content-between"
+                            >
+                                <div>
+                                    <Form.Group className="mx-5 mb-4">
+                                        <Form.Label>E-Mail</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="이메일을 입력해 주세요."
+                                            value={email}
+                                            onChange={(event) => setEmail(event.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>비밀 번호</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="비밀 번호를 입력해 주세요."
-                                        value={password}
-                                        onChange={(event) => setPassword(event.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
+                                    <Form.Group className="mx-5 mb-4">
+                                        <Form.Label>Password</Form.Label>
+                                        <Form.Control
+                                            type="password"
+                                            placeholder="비밀 번호를 입력해 주세요."
+                                            value={password}
+                                            onChange={(event) => setPassword(event.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                </div>
 
-                                <Row className="g-2">
-                                    <Col xs={8}>
-                                        <Button variant="outline-success" type="submit" className="w-100" size="lg"
-                                            style={{ minWidth: 220, borderRadius: 0, fontWeight: 600 }}>
-                                            로그인
-                                        </Button>
-                                    </Col>
-                                    <Col xs={4}>
-                                        <Link to={`/signup`} variant="outline-dark" size="100" style={{ minWidth: 100, borderRadius: 0, fontWeight: 600 }} className="btn btn-outline-secondary w-100">
-                                            회원 가입
+                                {/* 버튼 그룹 */}
+                                <div
+                                    className="d-flex justify-content-center align-items-center mt-5"
+                                    style={{ gap: "10px" }}
+                                >
+                                    <button
+                                        type="submit"
+                                        size="lg"
+                                        style={{
+                                            backgroundColor: "white",
+                                            border: "2px solid #67AB9F",
+                                            color: "#67AB9F",
+                                            borderRadius: 10,
+                                            fontWeight: 600,
+                                            width: "200px",
+                                            height: "58px",
+                                        }}
+                                    >
+                                        로그인
+                                    </button>
 
-                                        </Link>
+                                    <Link
+                                        to="/signup"
+                                        className="btn btn-outline-secondary"
+                                        style={{
+                                            border: "2px solid #adadadff",
+                                            color: "#adadadff",
+                                            borderRadius: 10,
+                                            fontWeight: 600,
+                                            width: "150px",
+                                            height: "58px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        회원 가입
+                                    </Link>
+                                </div>
 
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <div className="form-end">
-                                            <Link to="/findpass" className="inline-link">
-
-                                                비밀번호를 잊으셨나요?
-
-                                            </Link>
-                                        </div>
-                                    </Col>
-                                </Row>
+                                {/* 비밀번호 찾기 링크 */}
+                                <div className="text-end mt-3 me-5">
+                                    <Link to="/findpass" className="text-muted small">
+                                        비밀번호를 잊으셨나요?
+                                    </Link>
+                                </div>
                             </Form>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
         </Container>
+
     );
 }
 
