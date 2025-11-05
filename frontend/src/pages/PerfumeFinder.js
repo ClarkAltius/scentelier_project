@@ -20,7 +20,6 @@ function PerfumeTest() {
         const url2 = `${API_BASE_URL}/product/list`;
         axios.get(url2)
             .then((response) => {
-                console.log("💡 받아온 상품 데이터:", response.data);
                 setProduct(response.data);
             })
             .catch(error => {
@@ -31,7 +30,6 @@ function PerfumeTest() {
     // ✅ 상품이 로드되면 대기 중이던 타입으로 필터링
     useEffect(() => {
         if (product.length > 0 && pendingType) {
-            console.log("⏳ 상품 로드 완료 → 대기 중 타입 적용:", pendingType);
             handleButtonClick(pendingType);
             setPendingType(null); // 적용 후 초기화
         }
@@ -42,13 +40,11 @@ function PerfumeTest() {
         const handleMessage = (event) => {
             if (event.data?.type === "TEST_RESULT") {
                 const resultType = event.data.payload;
-                console.log("🧾 테스트 결과 수신:", resultType);
 
                 // 상품이 이미 있으면 즉시 필터링, 아니면 pending
                 if (product.length > 0) {
                     handleButtonClick(resultType);
                 } else {
-                    console.log("⏳ 상품 아직 로드 안됨 → pendingType에 저장");
                     setPendingType(resultType);
                 }
             }
@@ -60,11 +56,9 @@ function PerfumeTest() {
     // 버튼 클릭 or 테스트 결과 적용 시 필터링
     const handleButtonClick = (type) => {
         setSelectedType(type);
-        console.log("👉 선택된 타입:", type);
         const filtered = product?.filter((item) =>
             (item.category || item.categoryName || "").toLowerCase() === type.toLowerCase()
         );
-        console.log("🎯 필터된 상품:", filtered);
         setFilteredProducts(filtered);
     };
 
