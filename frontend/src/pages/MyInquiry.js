@@ -11,8 +11,6 @@ function MyInquiry() {
     const [loading, setLoading] = useState(true);
     const [checkedLogin, setCheckedLogin] = useState(false);
     const navigate = useNavigate();
-
-
     const { user } = useAuth();
 
 
@@ -26,7 +24,7 @@ function MyInquiry() {
 
         (async () => {
             try {
-               // console.log(user);
+                // console.log(user);
                 const url = `${API_BASE_URL}/api/inquiries/my`;
                 // const params = { params: { userId: user.id, role: user.role } };
                 const res = await axios.get(url, { withCredentials: true });
@@ -74,6 +72,11 @@ function MyInquiry() {
                         <p>
                             <strong>상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
                         </p>
+                        {inquiry.productName && (
+                            <p>
+                                <strong>상품명:</strong> {inquiry.productName}
+                            </p>
+                        )}
                     </div>
                 ))
             )}
