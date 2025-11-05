@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 //페이징 임포트
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
