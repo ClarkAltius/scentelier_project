@@ -1,5 +1,6 @@
 package com.scentelier.backend.repository;
 import com.scentelier.backend.constant.OrderStatus;
+import com.scentelier.backend.dto.analytics.DailySalesDto;
 import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.entity.Products;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
@@ -84,4 +86,6 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "ORDER BY month ASC")
     List<Object[]> findMonthlySales();
     Page<Orders> findByUsers_IdOrderByOrderDateDesc(Long userId, Pageable pageable);
+
+
 }

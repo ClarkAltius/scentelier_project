@@ -199,7 +199,40 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Third Row: Operational Insights */}
+            {/* Third Row: Top Performers */}
+            <div className={styles.mainGrid}>
+                <div className={`${styles.card} ${styles.listCard}`}>
+                    <div className={styles.cardHeader}>
+                        <Star size={20} className={`${styles.cardIcon} ${styles.starIcon}`} />
+                        <h3>베스트셀러 (완제품)</h3>
+                    </div>
+                    <ul className={styles.itemList}>
+                        {bestSellers.map(item => (
+                            <li key={item.id}>
+                                <span className={styles.itemName}>{item.name}</span>
+                                <span className={styles.itemSales}>{item.sales.toLocaleString()} sold</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className={`${styles.card} ${styles.listCard}`}>
+                    <div className={styles.cardHeader}>
+                        <Beaker size={20} className={`${styles.cardIcon} ${styles.beakerIcon}`} />
+                        <h3>인기 원료 (커스텀)</h3>
+                    </div>
+                    <ul className={styles.itemList}>
+                        {mostUsedIngredients.map(item => (
+                            <li key={item.id}>
+                                <span className={styles.itemName}>{item.name}</span>
+                                <span className={styles.itemSales}>{item.usage.toLocaleString()} units used</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+
+
+            {/* Fourth Row: Operational Insights */}
             <div className={styles.operationalGrid}>
                 {/* Actionable Items */}
                 <div className={styles.card}>
@@ -231,38 +264,6 @@ function Dashboard() {
                                 <span className={item.type === 'Product' ? styles.productTag : styles.ingredientTag}>
                                     {item.type}
                                 </span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-
-            {/* Fourth Row: Top Performers */}
-            <div className={styles.mainGrid}>
-                <div className={`${styles.card} ${styles.listCard}`}>
-                    <div className={styles.cardHeader}>
-                        <Star size={20} className={`${styles.cardIcon} ${styles.starIcon}`} />
-                        <h3>베스트셀러 (완제품)</h3>
-                    </div>
-                    <ul className={styles.itemList}>
-                        {bestSellers.map(item => (
-                            <li key={item.id}>
-                                <span className={styles.itemName}>{item.name}</span>
-                                <span className={styles.itemSales}>{item.sales.toLocaleString()} sold</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className={`${styles.card} ${styles.listCard}`}>
-                    <div className={styles.cardHeader}>
-                        <Beaker size={20} className={`${styles.cardIcon} ${styles.beakerIcon}`} />
-                        <h3>인기 원료 (커스텀)</h3>
-                    </div>
-                    <ul className={styles.itemList}>
-                        {mostUsedIngredients.map(item => (
-                            <li key={item.id}>
-                                <span className={styles.itemName}>{item.name}</span>
-                                <span className={styles.itemSales}>{item.usage.toLocaleString()} units used</span>
                             </li>
                         ))}
                     </ul>
