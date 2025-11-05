@@ -86,8 +86,15 @@ public class InquiryController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             List<Inquiry> inquiries = inquiryService.getMyInquiries(loggedInUser.getId());
+
+            // Inquiry → InquiryDto 변환 (productName 포함)
+            List<InquiryDto> inquiryDtos = inquiries.stream()
+                    .map(InquiryDto::new)
+                    .toList();
+
             response.put("success", true);
-            response.put("data", inquiries);
+            //response.put("data", inquiries);
+            response.put("data", inquiryDtos);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

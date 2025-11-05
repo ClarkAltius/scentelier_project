@@ -27,6 +27,8 @@ const Inquiry = () => {
   const [loading, setLoading] = useState(true);
   const [isProductSelected, setIsProductSelected] = useState(false);
 
+
+  
   useEffect(() => {
     if (!user) {
       alert("로그인이 필요합니다.");

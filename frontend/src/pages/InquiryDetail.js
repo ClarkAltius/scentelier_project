@@ -15,6 +15,14 @@ function InquiryDetail() {
 
     const { user } = useAuth();
 
+
+    const TYPE_LABELS = {
+        PRODUCT: "상품",
+        DELIVERY: "배달",
+        PAYMENT: "결제",
+        ETC: "기타"
+    };
+
     useEffect(() => {
         if (!user) {
             alert("로그인이 필요합니다.");
@@ -67,12 +75,20 @@ function InquiryDetail() {
         <div style={{ padding: "20px" }}>
             <h2>{inquiry.title}</h2>
             <p><strong>작성일자 :</strong> {new Date(inquiry.createdAt).toLocaleString()}</p>
+            {inquiry.type && (
+                <p>
+                    <strong>문의 유형 :</strong> {TYPE_LABELS[inquiry.type] || inquiry.type}
+                </p>
+            )}
+
+
             {inquiry.productName && (
                 <p><strong>문의 상품명 :</strong> {inquiry.productName}</p>
             )}
+            <p><strong>답변 상태 :</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}</p>
             <p><strong>내용</strong></p>
             <p>{inquiry.content}</p>
-            <p><strong>상태 :</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}</p>
+            
 
             <div style={{ marginTop: "20px" }}>
                 <Link to="/myinquiry" className="btn btn-outline-secondary me-2">
