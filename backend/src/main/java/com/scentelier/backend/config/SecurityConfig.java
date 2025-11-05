@@ -4,12 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scentelier.backend.dto.UserResponseDto;
 import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,7 +33,8 @@ import java.util.Optional;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    @Autowired
+    private UserRepository userRepository;
     //로그인 과정에서 사용할 bean 정의
     //return 되는 것은 PasswordEncoder 인스턴스
 
@@ -50,7 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/reset-password", "/user/change-password").permitAll()
                                 .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**","/api/perfume/**", "/api/customPerfume/**", "/reviews/**", "/product/top-rated").permitAll()
                                 .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
-                        
+
                                 // 관리자 전용 엔드포인트
                                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                                 .anyRequest().authenticated()
@@ -77,6 +83,9 @@ public class SecurityConfig {
                             if(userOptional.isPresent()){
                                 Users user = userOptional.get();
 
+                                // Spring Security에 권한 부여 (Enum → ROLE_문자열)
+                                String authority = "ROLE_" + user.getRole().name();
+
                                 UserResponseDto dto = new UserResponseDto(
                                         user.getId(),
                                         user.getEmail(),
@@ -98,8 +107,17 @@ public class SecurityConfig {
                                 .failureHandler((request, response, exception) -> {
                                     // Basic failure response for API testing
                                     response.setCharacterEncoding("UTF-8");
+                                    response.setContentType("application/json");
                                     response.setStatus(401); // Unauthorized
-                                    response.getWriter().write("{\"message\": \"로그인 실패: " + exception.getMessage() + "\"}");
+
+                                    String errorMessage = "이메일 또는 비밀번호를 확인해 주세요.";
+
+                                    // 탈퇴 회원 체크
+                                    if (exception instanceof org.springframework.security.authentication.DisabledException) {
+                                        errorMessage = "탈퇴된 아이디입니다.";
+                                    }
+
+                                    response.getWriter().write("{\"message\": \"" + errorMessage + "\"}");
                                     response.getWriter().flush();
                                 })
 
@@ -111,8 +129,31 @@ public class SecurityConfig {
                         // (SPA/API 클라이언트(React)에 적합한 방식)
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 );
+        http.authenticationProvider(authenticationProvider());
         return http.build();
     }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(username -> {
+            Users user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
+            String authority = "ROLE_" + user.getRole().name();
+            return new org.springframework.security.core.userdetails.User(
+                    user.getEmail(),
+                    user.getPassword(),
+                    !user.isDeleted(),
+                    true, true, true,
+                    AuthorityUtils.createAuthorityList(authority)
+            );
+        });
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+
+
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
