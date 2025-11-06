@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, Container, Row, Form, Col, Button, Alert } from "react-bootstrap";
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
+import './Signup.css'; // 새로 만든 CSS 파일 import
 
 function App() {
 
@@ -98,162 +99,146 @@ function App() {
 
 
     return (
-        <Container className="d-flex justify-content-center align-items-center" style={{ height: '70vh' }}>
-            <Row className="w-100 justify-content-center">
-                <Col md={6}>
-                    <Card>
-                        <Card.Body>
-                            <h2 className="text-center mb-4">회원 가입</h2>
+        // Container, Row, Col 대신 CSS로 중앙 정렬되는 div 사용
+        <div className="signup-page">
+            <Card className="signup-card">
+                <Card.Body>
+                    <h2 className="text-center mb-4"
+                        style={{ fontFamily: "'Gowun Batang', serif", }}
+                    >Sign Up</h2>
 
+                    {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
-                            {errors.general && <Alert variant="danger">{errors.general}</Alert>}
+                    <Form onSubmit={SignupAction}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>이름</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="이름을 입력해 주세요."
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                isInvalid={!!errors.username}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.username}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
+                        <Form.Group className="mb-3">
+                            <Form.Label>전화번호</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder='전화번호에 "-"을 넣어 입력해 주세요.'
+                                value={phone}
+                                onChange={(event) => {
+                                    const val = event.target.value;
+                                    setPhone(val);
 
+                                    if (!PHONE_REGEX.test(val)) { // PHONE_REGEX는 정의되어 있다고 가정
+                                        setErrors((prev) => ({ ...prev, phone: "전화번호 형식이 올바르지 않습니다." }));
+                                    } else {
+                                        setErrors((prev) => ({ ...prev, phone: "" }));
+                                    }
+                                }}
+                                isInvalid={!!errors.phone}
+                            />
+                            <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
+                        </Form.Group>
 
-                            <Form onSubmit={SignupAction}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>이름</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="이름을 입력해 주세요."
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        isInvalid={!!errors.username}
-                                    />
+                        <Form.Group className="mb-3">
+                            <Form.Label>이메일</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="이메일을 입력해 주세요."
+                                value={email}
+                                onChange={async (event) => {
+                                    const val = event.target.value;
+                                    setEmail(val);
+                                    if (!val.includes("@")) {
+                                        setErrors((prev) => ({ ...prev, email: "올바른 이메일 형식이 아닙니다." }));
+                                    } else {
+                                        await checkEmailDuplication(val); // 이 함수는 정의되어 있다고 가정
+                                    }
+                                }}
+                                required
+                                isInvalid={!!errors.email}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.username}
-                                    </Form.Control.Feedback>
+                        <Form.Group className="mb-3">
+                            <Form.Label>비밀 번호</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="비밀 번호를 입력해 주세요."
+                                value={password}
+                                onChange={(event) => {
+                                    const val = event.target.value;
+                                    setPassword(val);
 
-                                </Form.Group>
+                                    if (!PASSWORD_REGEX.test(val)) { // PASSWORD_REGEX는 정의되어 있다고 가정
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            password: "첫 글자가 대문자이고 8자 이상이어야 합니다."
+                                        }));
+                                    } else {
+                                        setErrors((prev) => ({ ...prev, password: "" }));
+                                    }
+                                }}
+                                required
+                                isInvalid={!!errors.password}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>전화번호</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder='전화번호에 "-"을 넣어 입력해 주세요.'
-                                        value={phone}
-                                        // onChange={(e) => setPhone(e.target.value)}
-                                        onChange={(event) => {
-                                            const val = event.target.value;
-                                            setPhone(val);
+                        <Form.Group className="mb-3">
+                            <Form.Label>비밀번호 확인</Form.Label>
+                            <Form.Control
+                                type="password"
+                                placeholder="비밀번호를 다시 입력해 주세요."
+                                value={confirmPassword}
+                                onChange={(event) => {
+                                    const val = event.target.value;
+                                    setConfirmPassword(val);
 
-                                            if (!PHONE_REGEX.test(val)) {
-                                                setErrors((prev) => ({ ...prev, phone: "전화번호 형식이 올바르지 않습니다." }));
-                                            } else {
-                                                setErrors((prev) => ({ ...prev, phone: "" }));
-                                            }
-                                        }}
-                                        isInvalid={!!errors.phone}
-                                    />
-                                    <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
-                                </Form.Group>
+                                    if (val !== password) {
+                                        setErrors((prev) => ({ ...prev, confirmPassword: "비밀번호가 일치하지 않습니다." }));
+                                    } else {
+                                        setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                                    }
+                                }}
+                                required
+                                isInvalid={!!errors.confirmPassword}
+                            />
+                            <Form.Control.Feedback type="invalid">{errors.confirmPassword}</Form.Control.Feedback>
+                        </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>이메일</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="이메일을 입력해 주세요."
-                                        value={email}
-                                        // onChange={(event) => setEmail(event.target.value)}
-                                        onChange={async (event) => {
-                                            const val = event.target.value;
-                                            setEmail(val);
-                                            // 실시간 형식 체크 (간단하게 @ 포함 여부)
-                                            if (!val.includes("@")) {
-                                                setErrors((prev) => ({ ...prev, email: "올바른 이메일 형식이 아닙니다." }));
-                                            } else {
-                                                await checkEmailDuplication(val);
-                                                // setErrors((prev) => ({ ...prev, email: "" }));
-                                            }
-                                        }}
-                                        required
-                                        isInvalid={!!errors.email}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.email}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>주소</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="주소를 입력해 주세요."
+                                value={address}
+                                onChange={(event) => setAddress(event.target.value)}
+                                required
+                                isInvalid={!!errors.address}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.address}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>비밀 번호</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="비밀 번호를 입력해 주세요."
-                                        value={password}
-                                        // onChange={(event) => setPassword(event.target.value)}
-                                        onChange={(event) => {
-                                            const val = event.target.value;
-                                            setPassword(val);
-
-                                            // 실시간 유효성 검사
-                                            if (!PASSWORD_REGEX.test(val)) {
-                                                setErrors((prev) => ({
-                                                    ...prev,
-                                                    password: "첫 글자가 대문자이고 8자 이상이어야 합니다."
-                                                }));
-                                            } else {
-                                                setErrors((prev) => ({ ...prev, password: "" }));
-                                            }
-                                        }}
-                                        required
-                                        isInvalid={!!errors.password}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.password}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-
-                                <Form.Group className="mb-3">
-                                    <Form.Label>비밀번호 확인</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="비밀번호를 다시 입력해 주세요."
-                                        value={confirmPassword}
-                                        onChange={(event) => {
-                                            const val = event.target.value;
-                                            setConfirmPassword(val);
-
-                                            if (val !== password) {
-                                                setErrors((prev) => ({ ...prev, confirmPassword: "비밀번호가 일치하지 않습니다." }));
-                                            } else {
-                                                setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-                                            }
-                                        }}
-                                        required
-                                        isInvalid={!!errors.confirmPassword}
-                                    />
-                                    <Form.Control.Feedback type="invalid">{errors.confirmPassword}</Form.Control.Feedback>
-                                </Form.Group>
-
-
-
-
-                                <Form.Group className="mb-3">
-                                    <Form.Label>주소</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="주소를 입력해 주세요."
-                                        value={address}
-                                        onChange={(event) => setAddress(event.target.value)}
-                                        required
-                                        isInvalid={!!errors.address}
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        {errors.address}
-                                    </Form.Control.Feedback>
-                                </Form.Group>
-
-                                <Button variant="primary" type="submit" className="w-100">
-                                    회원 가입
-                                </Button>
-
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
+                        <Button type="submit" className="w-100 btn-primary-custom">
+                            회원 가입
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+        </div>
     );
 }
 
