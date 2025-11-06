@@ -81,15 +81,17 @@ const MyPage = () => {
     setEditForm((prev) => ({ ...prev, [name]: value }));
 
     // 전화번호 필드일 경우, 실시간 유효성 검사
-    if (value === "" || PHONE_REGEX.test(value)) {
-      setEditError((prev) => ({ ...prev, phone: "" })); // 올바르면 오류 제거
-    } else {
-      setEditError((prev) => ({
-        ...prev,
-        phone: "전화번호 형식이 올바르지 않습니다.\n000-0000-0000 형식으로 입력해 주세요.",
-      }));
-    }
-  };
+    if (name === "phone") {
+  if (value === "" || PHONE_REGEX.test(value)) {
+    setEditError((prev) => ({ ...prev, phone: "" }));
+  } else {
+    setEditError((prev) => ({
+      ...prev,
+      phone: "전화번호 형식이 올바르지 않습니다.\n000-0000-0000 형식으로 입력해 주세요.",
+    }));
+  }
+}
+  }
 
 
 
@@ -138,15 +140,15 @@ const MyPage = () => {
     // 이전 전화번호 형식 에러 초기화
     setEditError({ phone: "", general: "" });
 
-    // 전화번호 형식 검사
-    // if (editForm.phone && !PHONE_REGEX.test(editForm.phone)) {
-    //   setEditError((prev) => ({
-    //     ...prev,
-    //     phone: "전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요.",
-    //     general : "",
-    //   }));
-    //   return;
-    // }
+    //전화번호 형식 검사
+    if (editForm.phone && !PHONE_REGEX.test(editForm.phone)) {
+      setEditError((prev) => ({
+        ...prev,
+        phone: "전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요.",
+        general : "",
+      }));
+      return;
+    }
 
 
     try {
@@ -239,7 +241,16 @@ const MyPage = () => {
     newPassword: "",
   });
 
-  const handleChangePassword = () => setPage("password");
+  // const handleChangePassword = () => setPage("password");
+  const handleChangePassword = () => {
+  // 비밀번호 입력값 초기화
+  setPwForm({
+    currentPassword: "",
+    newPassword: "",
+  });
+  setPwError(""); // 에러 메시지도 초기화
+  setPage("password");
+};
 
   const handlePwChange = (e) => {
     const { name, value } = e.target;
