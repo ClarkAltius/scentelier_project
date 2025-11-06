@@ -1,0 +1,116 @@
+/* Findpass.css */
+
+.findpass-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    /* 페이지 높이 */
+    padding: 40px 20px;
+    background-color: #f7f7f7;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.findpass-card {
+    max-width: 500px;
+    /* 폼 카드 최대 너비 */
+    width: 100%;
+    padding: 30px 35px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+/* 카드 제목 (h2) */
+.findpass-title {
+    color: #555;
+    border-bottom: 3px solid #67ab9f;
+    /* 포인트 컬러 */
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.input-wrapper {
+    margin-bottom: 20px;
+    /* 여백을 조금 더 줌 */
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    /* 라벨과 인풋 사이 여백 */
+    font-weight: 600;
+    color: #808080ff;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* padding이 width에 포함되도록 */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #67ab9f;
+    /* 포커스 시 포인트 컬러 */
+    box-shadow: 0 0 0 0.25rem rgba(103, 171, 159, 0.25);
+    /* 포커스 시 그림자 */
+}
+
+/* input 하단 도움말 텍스트 */
+.input-helper-text {
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* 기본 버튼 (포인트 컬러) */
+.btn-primary-custom {
+    width: 100%;
+    padding: 12px;
+    background-color: #67ab9f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+    background-color: #558c80;
+    /* 호버 시 조금 더 어둡게 */
+}
+
+/* 메시지 공통 */
+.form-message {
+    text-align: center;
+    font-weight: 500;
+    min-height: 1.2em;
+    /* 메시지 영역 높이 고정 (레이아웃 밀림 방지) */
+    margin-bottom: 10px;
+}
+
+/* 에러 메시지 */
+.form-message-error {
+    color: #d9534f;
+    /* 에러 색상 */
+}
+
+/* 성공 메시지 */
+.form-message-success {
+    color: #4CAF50;
+    /* 성공 색상 */
+}
