@@ -12,20 +12,13 @@ function Login() {
     const { login, user } = useAuth(); //콘텍스트에서 정의 한 로그인 기능 사용
     const navigate = useNavigate();
 
-    // 로그인 상태일 경우 마이페이지로 리다이렉트
-    useEffect(() => {
-        if (user) {
-            navigate("/mypage"); // 로그인 상태이면 마이페이지로 리다이렉트
-        }
-    }, [user, navigate]);
-
-
     // 로그인 관련 state 정의
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     // 오류 메시지 관련 state 정의
     const [errors, setErrors] = useState('');
+
 
 
 
@@ -69,6 +62,15 @@ function Login() {
             }
         }
     }
+
+    // 로그인 상태일 경우 마이페이지로 리다이렉트
+    useEffect(() => {
+        if (user && window.location.pathname === "/login") {
+            navigate("/mypage"); // 로그인 상태이면 마이페이지로 리다이렉트
+        }
+    }, [user, navigate]);
+
+
 
     return (
         <div style={{
