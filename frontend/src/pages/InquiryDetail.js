@@ -101,11 +101,11 @@ function InquiryDetail() {
                             {TYPE_LABELS[inquiry.type] || inquiry.type}
                         </p>
                     )}
-                    {/* inquiry.productName이 아닌, state의 productName 사용 */}
-                    {productName && (
+                    {/* inquiry.productName이 아닌, state의 productName 사용하면 상품명 안뜸*/}
+                    {inquiry.productName && (
                         <p>
                             <strong>문의 상품명</strong>
-                            {productName}
+                            {inquiry.productName}
                         </p>
                     )}
                     <p>

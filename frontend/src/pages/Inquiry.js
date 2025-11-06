@@ -113,6 +113,13 @@ const Inquiry = () => {
       isValid = false;
     }
 
+    // --- 상품 선택 필수 조건 추가 ---
+    if (formData.type === "PRODUCT" && (!formData.product || !formData.product.id)) {
+      newErrors.product_id = "상품을 선택해주세요.";
+      isValid = false;
+    }
+
+
     setErrors(newErrors);
     if (!isValid) return;
 
@@ -199,6 +206,7 @@ const Inquiry = () => {
 
           </FormSelect>
           {errors.type && <div style={styles.error}>{errors.type}</div>}
+          {errors.product_id && <div style={styles.error}>{errors.product_id}</div>}
 
 
 
