@@ -62,115 +62,123 @@ function Login() {
     }
 
     return (
-        <Container
-            className="d-flex justify-content-center align-items-center"
-            style={{ height: "100vh" }}
-        >
-            <Row className="w-100 justify-content-center">
-                <Col md={6} lg={4}>
-                    <Card
-                        className="shadow-sm border-1"
-                        style={{
-                            width: "700px",
-                            paddingTop: "50px",   // ✅ 카드 상단 여백
-                            paddingBottom: "70px" // ✅ 카드 하단 여백
-                        }}
-                    >
-                        <Card.Body className="d-flex flex-column justify-content-between">
-                            <h2
-                                style={{
-                                    fontSize: "48px",
-                                    fontFamily: "'Gowun Batang', serif",
-                                    color: "#67AB9F",
-                                }}
-                                className="text-center mb-4"
+        <div style={{
+            backgroundColor: "#f7f7f7",
+            padding: "30px",
+            fontFamily: "Arial, sans-serif",
+            margin: 0,
+            minHeight: "100vh",
+            display: "flex",
+            justifyContent: "center", // 가로 중앙 정렬
+            alignItems: "center", // 세로 중앙 정렬
+        }}>
+            <Container
+                className="d-flex justify-content-center align-items-center"
+                style={{
+                    width: "100%", // 부모 컨테이너가 화면 크기 100%를 차지하도록 설정
+                    maxWidth: "700px", // 최대 너비 설정
+                    backgroundColor: "#fff",
+                    padding: "50px", // 안쪽 여백 조정
+                    borderRadius: "8px",
+                    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+                    display: "flex",
+                    flexDirection: "column", // 항목을 세로로 배치
+                    alignItems: "stretch", // 항목들을 부모의 가로 크기에 맞춰 늘리도록 설정
+                    boxSizing: "border-box", // padding과 border가 포함된 크기 계산
+                }}
+            >
+                <Row className="w-100 justify-content-center">
+                    <Col md={0} lg={10}>
+                        <h2
+                            style={{
+                                fontSize: "48px",
+                                fontFamily: "'Gowun Batang', serif",
+                                color: "#67AB9F",
+                            }}
+                            className="text-center mb-4"
+                        >
+                            Login
+                        </h2>
+                        {errors && <Alert variant="danger">{errors}</Alert>}
+
+                        <Form
+                            onSubmit={LoginAction}
+                            className="flex-grow-1 d-flex flex-column justify-content-between"
+                            style={{ marginTop: "50px" }}
+                        >
+                            <div>
+                                <Form.Group className="mx-5 mb-5">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="이메일을 입력해 주세요."
+                                        value={email}
+                                        onChange={(event) => setEmail(event.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mx-5 mb-2">
+                                    <Form.Control
+                                        type="password"
+                                        placeholder="비밀 번호를 입력해 주세요."
+                                        value={password}
+                                        onChange={(event) => setPassword(event.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+                            </div>
+
+                            {/* 버튼 그룹 */}
+                            <div
+                                className="d-flex justify-content-center align-items-center mt-5"
+                                style={{ gap: "10px" }}
                             >
-                                Login
-                            </h2>
-
-                            {errors && <Alert variant="danger">{errors}</Alert>}
-
-                            <Form
-                                onSubmit={LoginAction}
-                                className="flex-grow-1 d-flex flex-column justify-content-between"
-                            >
-                                <div>
-                                    <Form.Group className="mx-5 mb-4">
-                                        <Form.Label>E-Mail</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="이메일을 입력해 주세요."
-                                            value={email}
-                                            onChange={(event) => setEmail(event.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group className="mx-5 mb-4">
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            placeholder="비밀 번호를 입력해 주세요."
-                                            value={password}
-                                            onChange={(event) => setPassword(event.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
-                                </div>
-
-                                {/* 버튼 그룹 */}
-                                <div
-                                    className="d-flex justify-content-center align-items-center mt-5"
-                                    style={{ gap: "10px" }}
+                                <button
+                                    type="submit"
+                                    size="lg"
+                                    style={{
+                                        backgroundColor: "white",
+                                        border: "2px solid #67AB9F",
+                                        color: "#67AB9F",
+                                        borderRadius: 10,
+                                        fontWeight: 600,
+                                        width: "200px",
+                                        height: "58px",
+                                    }}
                                 >
-                                    <button
-                                        type="submit"
-                                        size="lg"
-                                        style={{
-                                            backgroundColor: "white",
-                                            border: "2px solid #67AB9F",
-                                            color: "#67AB9F",
-                                            borderRadius: 10,
-                                            fontWeight: 600,
-                                            width: "200px",
-                                            height: "58px",
-                                        }}
-                                    >
-                                        로그인
-                                    </button>
+                                    로그인
+                                </button>
 
-                                    <Link
-                                        to="/signup"
-                                        className="btn btn-outline-secondary"
-                                        style={{
-                                            border: "2px solid #adadadff",
-                                            color: "#adadadff",
-                                            borderRadius: 10,
-                                            fontWeight: 600,
-                                            width: "150px",
-                                            height: "58px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        회원 가입
-                                    </Link>
-                                </div>
+                                <Link
+                                    to="/signup"
+                                    className="btn btn-outline-secondary"
+                                    style={{
+                                        border: "2px solid #adadadff",
+                                        color: "#adadadff",
+                                        borderRadius: 10,
+                                        fontWeight: 600,
+                                        width: "150px",
+                                        height: "58px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    회원 가입
+                                </Link>
+                            </div>
 
-                                {/* 비밀번호 찾기 링크 */}
-                                <div className="text-end mt-3 me-5">
-                                    <Link to="/findpass" className="text-muted small">
-                                        비밀번호를 잊으셨나요?
-                                    </Link>
-                                </div>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
-
+                            {/* 비밀번호 찾기 링크 */}
+                            <div className="text-end mt-5 me-5">
+                                <Link to="/findpass" className="text-muted small">
+                                    비밀번호를 잊으셨나요?
+                                </Link>
+                            </div>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container >
+        </div >
     );
 }
 

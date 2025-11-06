@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Form, FormSelect } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../component/AuthContext";
 
@@ -28,7 +28,7 @@ const Inquiry = () => {
   const [isProductSelected, setIsProductSelected] = useState(false);
 
 
-  
+
   useEffect(() => {
     if (!user) {
       alert("로그인이 필요합니다.");
@@ -149,15 +149,11 @@ const Inquiry = () => {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h2 style={styles.heading}>문의하기</h2>
+        <h2 style={styles.heading}>Q & A</h2>
 
-
-
-
-
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           {/*  드롭다운 추가 */}
-          <select
+          <FormSelect
             id="type"
             value={formData.type}
             onChange={handleChange}
@@ -168,11 +164,13 @@ const Inquiry = () => {
             <option value="DELIVERY">배달</option>
             <option value="PAYMENT">결제</option>
             <option value="ETC">기타</option>
-          </select>
+          </FormSelect>
           {errors.type && <div style={styles.error}>{errors.type}</div>}
 
+          <br />
+
           {/*  상품 드롭다운 추가 */}
-          <select
+          <FormSelect
             id="product_id"
             value={formData.product?.id || ""}
             onChange={handleChange}
@@ -199,12 +197,13 @@ const Inquiry = () => {
             <option value="17">Warm Timber</option>
             <option value="18">Wood Whisper</option>
 
-          </select>
+          </FormSelect>
           {errors.type && <div style={styles.error}>{errors.type}</div>}
 
 
+
           <InputGroup
-            label="문의사항 제목"
+            label="제목"
             id="title"
             type="text"
             value={formData.title}
@@ -224,15 +223,13 @@ const Inquiry = () => {
             <button
               type="submit"
               style={styles.submitBtn}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#67AB9F")}
             >
               보내기
             </button>
           </div>
 
           <Col>
-            <Link to="/myinquiry" className="form-end">
+            <Link to="/myinquiry" className="form-end" style={styles.buttonLink}>
 
               <span className="inline-link" href="$">My 문의사항</span>
 
@@ -241,7 +238,7 @@ const Inquiry = () => {
           {successMessage && (
             <div style={styles.successMessage}>{successMessage}</div>
           )}
-        </form>
+        </Form>
       </div>
     </div>
   );
@@ -279,33 +276,46 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     margin: 0,
     minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center", // 가로 중앙 정렬
+    alignItems: "center", // 세로 중앙 정렬
   },
   container: {
-    maxWidth: "500px",
-    margin: "0 auto",
+    width: "100%", // 부모 컨테이너가 화면 크기 100%를 차지하도록 설정
+    maxWidth: "900px", // 최대 너비 설정
     backgroundColor: "#fff",
-    padding: "25px",
+    padding: "50px", // 안쪽 여백 조정
     borderRadius: "8px",
     boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    display: "flex",
+    flexDirection: "column", // 항목을 세로로 배치
+    alignItems: "stretch", // 항목들을 부모의 가로 크기에 맞춰 늘리도록 설정
+    boxSizing: "border-box", // padding과 border가 포함된 크기 계산
   },
   heading: {
     textAlign: "center",
-    marginBottom: "20px",
+    marginBottom: "40px",
+    fontFamily: "'Gowun Batang', serif",
+    fontSize: "40px"
   },
   inputGroup: {
-    marginBottom: "15px",
+    marginBottom: "40px",
+    width: "100%", // 입력 요소가 부모 컨테이너에 맞게 가로로 꽉 차게 설정
   },
   label: {
     display: "block",
     fontWeight: "bold",
-    marginBottom: "5px",
+    marginBottom: "10px",
+    marginTop: "50px"
   },
   input: {
-    width: "100%",
+    width: "80%", // 부모 컨테이너에 맞게 입력창 너비 100%로 설정
     padding: "10px",
     borderRadius: "4px",
     border: "1px solid #ccc",
     fontSize: "16px",
+    marginBottom: "5px", // 입력창과 오류 메시지 사이에 여백 추가
+    boxSizing: "border-box", // padding과 테두리를 포함하여 계산
   },
   error: {
     color: "red",
@@ -314,6 +324,8 @@ const styles = {
   },
   buttonWrapper: {
     textAlign: "center",
+    width: "80%", // 버튼이 부모 컨테이너에 맞게 가로로 꽉 차게 설정
+    margin: "0 auto",
   },
   submitBtn: {
     backgroundColor: "#67AB9F",
@@ -322,6 +334,7 @@ const styles = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
+    width: "100%", // 버튼이 입력 요소와 동일하게 가로 꽉 채우게 설정
   },
   successMessage: {
     marginTop: "15px",
@@ -329,6 +342,29 @@ const styles = {
     color: "green",
     textAlign: "center",
   },
+
+  buttonLink: {
+    display: "inline-block", // 버튼처럼 보이게 하기 위한 설정
+    backgroundColor: "transparent", // 회색 배경
+    border: "2px solid #808080ff",
+    padding: "5px 20px", // 내부 여백
+    borderRadius: "50px", // 동그란 모양
+    textDecoration: "none", // 링크의 기본 밑줄 제거
+    textAlign: "center", // 텍스트 가운데 정렬
+    color: "#808080ff", // 텍스트 색상
+    fontSize: "16px", // 글자 크기
+    marginTop: "30px",
+  },
+  buttonText: {
+    display: "inline-block", // 텍스트가 버튼 안에서 잘 위치하도록 설정
+  },
+
+  select: {
+    marginBottom: "30px",
+    width: "70%",
+    margin: "0 auto",
+  }
+
 };
 
 export default Inquiry;
