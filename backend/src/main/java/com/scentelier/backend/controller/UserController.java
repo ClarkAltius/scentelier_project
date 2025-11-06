@@ -64,21 +64,37 @@ public class UserController {
         }
     }
 
+    //비밀번호 찾기
     @PostMapping(value = "/reset-password",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> resetPassword(
             @RequestParam String name,
             @RequestParam String email,
             @RequestParam String phone,
-            @RequestParam String newPassword
+            @RequestParam(required = false) String newPassword
     ) {
         try {
-            Users updatedUser = userService.resetPassword(name, email, phone, newPassword);
-            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+            Users user = userService.findByEmail(email)
+                    .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+            if (!user.getUsername().equals(name) || !user.getPhone().equals(phone)) {
+                throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+            }
+
+            // newPassword가 null이 아니면 비밀번호 변경
+            if (newPassword != null && !newPassword.isBlank()) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userService.saveUser(user);
+                return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+            }
+
+            // 정보 확인만 하고 싶으면 OK 반환
+            return ResponseEntity.ok("사용자 정보가 확인되었습니다.");
+
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).body("해당 이메일의 사용자를 찾을 수 없습니다.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body("입력한 정보가 일치하지 않습니다.");
+            return ResponseEntity.status(400).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
         }

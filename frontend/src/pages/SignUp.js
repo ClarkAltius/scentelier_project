@@ -9,12 +9,13 @@ function App() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
 
 
     const [errors, setErrors] = useState({
-        name: '', email: '', password: '', address: '', general: ''
+        username: '', email: '', password: '', confirmPassword: '', address: '', phone: '', general: ''
     });
 
     const navigate = useNavigate();
@@ -39,6 +40,14 @@ function App() {
             return; // 서버 호출 중단
         } else {
             setErrors((prev) => ({ ...prev, password: "" })); // 오류 초기화
+        }
+
+        // 비밀번호 확인 체크
+        if (password !== confirmPassword) {
+            setErrors((prev) => ({ ...prev, confirmPassword: "비밀번호가 일치하지 않습니다." }));
+            return;
+        } else {
+            setErrors((prev) => ({ ...prev, confirmPassword: "" }));
         }
 
         try {
@@ -122,7 +131,7 @@ function App() {
                                     <Form.Label>전화번호</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="전화번호를 입력해 주세요."
+                                        placeholder='전화번호에 "-"을 넣어 입력해 주세요.'
                                         value={phone}
                                         // onChange={(e) => setPhone(e.target.value)}
                                         onChange={(event) => {
@@ -130,7 +139,7 @@ function App() {
                                             setPhone(val);
 
                                             if (!PHONE_REGEX.test(val)) {
-                                                setErrors((prev) => ({ ...prev, phone: "전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요." }));
+                                                setErrors((prev) => ({ ...prev, phone: "전화번호 형식이 올바르지 않습니다." }));
                                             } else {
                                                 setErrors((prev) => ({ ...prev, phone: "" }));
                                             }
@@ -194,6 +203,31 @@ function App() {
                                         {errors.password}
                                     </Form.Control.Feedback>
                                 </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>비밀번호 확인</Form.Label>
+                                    <Form.Control
+                                        type="password"
+                                        placeholder="비밀번호를 다시 입력해 주세요."
+                                        value={confirmPassword}
+                                        onChange={(event) => {
+                                            const val = event.target.value;
+                                            setConfirmPassword(val);
+
+                                            if (val !== password) {
+                                                setErrors((prev) => ({ ...prev, confirmPassword: "비밀번호가 일치하지 않습니다." }));
+                                            } else {
+                                                setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                                            }
+                                        }}
+                                        required
+                                        isInvalid={!!errors.confirmPassword}
+                                    />
+                                    <Form.Control.Feedback type="invalid">{errors.confirmPassword}</Form.Control.Feedback>
+                                </Form.Group>
+
+
+
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>주소</Form.Label>

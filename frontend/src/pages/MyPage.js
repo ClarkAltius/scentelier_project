@@ -82,59 +82,17 @@ const MyPage = () => {
 
     // 전화번호 필드일 경우, 실시간 유효성 검사
     if (name === "phone") {
-  if (value === "" || PHONE_REGEX.test(value)) {
-    setEditError((prev) => ({ ...prev, phone: "" }));
-  } else {
-    setEditError((prev) => ({
-      ...prev,
-      phone: "전화번호 형식이 올바르지 않습니다.\n000-0000-0000 형식으로 입력해 주세요.",
-    }));
+      if (value === "" || PHONE_REGEX.test(value)) {
+        setEditError((prev) => ({ ...prev, phone: "" }));
+      } else {
+        setEditError((prev) => ({
+          ...prev,
+          phone: '전화번호 형식이 올바르지 않습니다.',
+        }));
+      }
+    }
   }
-}
-  }
 
-
-
-
-  // 수정 저장
-  // const handleSaveEdit = async () => {
-  //   try {
-  //     const updatedInfo = {
-  //       name: editForm.username,
-  //       email: userInfo.email,
-  //       phone: editForm.phone,
-  //       address: editForm.address,
-  //     };
-
-  //     const params = new URLSearchParams(updatedInfo).toString();
-  //     const response = await fetch(`http://localhost:9000/user/update?${params}`, {
-  //       method: "PUT",
-  //       credentials: "include",
-  //       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  //     });
-
-  //     const result = await response.json();
-  //     if (response.ok) {
-  //       const newUserData = {
-  //         username: result.username,
-  //         email: result.email,
-  //         phone: result.phone,
-  //         address: result.address,
-  //       };
-
-  //       setUserInfo(newUserData);
-  //       login(newUserData);
-  //       alert("회원 정보가 성공적으로 업데이트되었습니다.");
-  //       setPage("view");
-  //     } else {
-  //       alert(`업데이트 실패: ${result}`);
-  //     }
-  //   } catch (error) {
-  //     console.error("업데이트 요청 실패:", error);
-  //     alert("서버 오류가 발생했습니다.");
-  //   }
-  // }; 
-  // 
   const handleSaveEdit = async () => {
 
     // 이전 전화번호 형식 에러 초기화
@@ -145,7 +103,7 @@ const MyPage = () => {
       setEditError((prev) => ({
         ...prev,
         phone: "전화번호 형식이 올바르지 않습니다. 000-0000-0000 형식으로 입력해 주세요.",
-        general : "",
+        general: "",
       }));
       return;
     }
@@ -226,9 +184,9 @@ const MyPage = () => {
     navigate("/order/list"); // 주문내역 페이지로 이동
   };
 
-  const handlePayments = () => {
-    navigate("/payments"); // 결제 페이지로 이동
-  };
+  // const handlePayments = () => {
+  //   navigate("/payments"); // 결제 페이지로 이동
+  // };
 
   const handleMyReviewListPage = () => {
     navigate("/mypage/review"); // 내가 쓴 리뷰 조회하기 페이지로 이동
@@ -239,18 +197,20 @@ const MyPage = () => {
   const [pwForm, setPwForm] = useState({
     currentPassword: "",
     newPassword: "",
+    confirmPassword: "",
   });
 
-  // const handleChangePassword = () => setPage("password");
+
   const handleChangePassword = () => {
-  // 비밀번호 입력값 초기화
-  setPwForm({
-    currentPassword: "",
-    newPassword: "",
-  });
-  setPwError(""); // 에러 메시지도 초기화
-  setPage("password");
-};
+    // 비밀번호 입력값 초기화
+    setPwForm({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+    setPwError(""); // 에러 메시지도 초기화
+    setPage("password");
+  };
 
   const handlePwChange = (e) => {
     const { name, value } = e.target;
@@ -258,17 +218,25 @@ const MyPage = () => {
   };
 
   const handlePwSave = async () => {
-    const { currentPassword, newPassword } = pwForm;
-    if (!currentPassword || !newPassword) {
+    const { currentPassword, newPassword, confirmPassword } = pwForm;
+    if (!currentPassword || !newPassword || !confirmPassword) {
       setPwError("모든 정보를 입력하세요.");
       return;
     }
 
     // 새 비밀번호 형식 검사
     if (!PASSWORD_REGEX.test(newPassword)) {
-      setPwError("첫 글자가 대문자이고 8자 이상이어야 합니다.");
+      setPwError("비밀번호는 첫 글자가 대문자이고 8자 이상이어야 합니다.");
       return;
     }
+
+    if (newPassword !== confirmPassword) {
+      setPwError("새 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+
+
 
     //오류 초기화
     setPwError("");
@@ -368,9 +336,9 @@ const MyPage = () => {
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleOrderList}>
                 주문내역
               </button>
-              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePayments}>
+              {/* <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePayments}>
                 결제 페이지
-              </button>
+              </button> */}
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyReviewListPage}>
                 내가 쓴 리뷰 조회
               </button>
@@ -418,7 +386,7 @@ const MyPage = () => {
                 onChange={handleEditChange}
                 style={styles.input}
               />
-
+              <div style={styles.infoText}>※ 전화번호에 " - "을 넣어 입력해 주세요.</div>
               {/* 전화번호 형식 에러 메시지 표시 */}
               {editError.phone && (
                 <div style={{ ...styles.errorText, whiteSpace: "pre-line" }}>{editError.phone}</div>
@@ -459,6 +427,7 @@ const MyPage = () => {
                 style={styles.input}
               />
             </div>
+
             <div style={styles.inputWrapper}>
               <label style={styles.label}>새 비밀번호</label>
               <input
@@ -468,8 +437,21 @@ const MyPage = () => {
                 onChange={handlePwChange}
                 style={styles.input}
               />
-              {pwError && <div style={styles.errorText}>{pwError}</div>}
             </div>
+            <div style={styles.inputWrapper}>
+              <label style={styles.label}>새 비밀번호 확인</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={pwForm.confirmPassword}
+                onChange={handlePwChange}
+                style={styles.input}
+              />
+            </div>
+
+
+            {pwError && <div style={styles.errorText}>{pwError}</div>}
+
             <div style={styles.buttonGroup}>
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePwSave}>
                 저장

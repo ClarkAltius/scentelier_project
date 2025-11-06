@@ -36,14 +36,27 @@ const Findpass = () => {
     setSaveMessage("");
   };
 
-  const handleCheck = () => {
+  const handleCheck = async () => {
     const { name, email, phone } = inputs;
     if (!name.trim() || !email?.trim() || !phone?.trim()) {
       setMessage("모든 항목을 입력해주세요.");
       return;
     }
-    // 일단 백엔드에서 일치 여부는 검사하지 않음. edit 페이지로 이동.
-    setPage("edit");
+    try {
+      const params = new URLSearchParams();
+      params.append("name", name);
+      params.append("email", email);
+      params.append("phone", phone);
+      // 비밀번호 없이 호출 = 정보 확인만
+      await axios.post(
+        "http://localhost:9000/user/reset-password",
+        params.toString(),
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" }, withCredentials: true }
+      );
+      setPage("edit"); // 정보 확인 OK → 비밀번호 변경 페이지로 이동
+    } catch (error) {
+      setMessage(error.response?.data || "서버 오류");
+    }
   };
 
   const handleSave = async () => {
@@ -62,7 +75,7 @@ const Findpass = () => {
 
     // 비밀번호 형식 검사
     if (!PASSWORD_REGEX.test(newPassword)) {
-      setSaveMessage("비밀번호는 첫 글자가 대문자이고, 8자 이상이어야 합니다.");
+      setSaveMessage("비밀번호를 확인해주세요");
       return;
     }
 
@@ -71,27 +84,22 @@ const Findpass = () => {
       return;
     }
 
-    try {
-      const params = new URLSearchParams();
-      params.append("name", name);
-      params.append("email", email);
-      params.append("phone", phone);
-      params.append("newPassword", newPassword);
+    const params = new URLSearchParams();
+    params.append("name", name);
+    params.append("email", email);
+    params.append("phone", phone);
+    params.append("newPassword", newPassword);
 
+    try {
       const response = await axios.post(
         "http://localhost:9000/user/reset-password",
         params.toString(),
         { headers: { "Content-Type": "application/x-www-form-urlencoded" }, withCredentials: true }
       );
-
       setSaveMessage(response.data);
       setEditInputs({ newPassword: "", confirmPassword: "" });
     } catch (error) {
-      if (error.response) {
-        setSaveMessage(error.response.data);
-      } else {
-        setSaveMessage("서버와의 연결에 문제가 있습니다.");
-      }
+      setSaveMessage(error.response?.data || "서버 오류");
     }
   };
 
@@ -169,6 +177,7 @@ const Findpass = () => {
                 onChange={handleChange}
                 style={styles.input}
               />
+              <small style={{ color: "#888", fontSize: "12px" }}>※ 전화번호에 " - "을 넣어 입력해 주세요.</small>
             </div>
             <div style={styles.message}>{message}</div>
             <button style={styles.button} onClick={handleCheck}>
@@ -200,6 +209,7 @@ const Findpass = () => {
                 onChange={handleEditChange}
                 style={styles.input}
               />
+              <small style={{ color: "#888", fontSize: "12px" }}>※ 비밀번호는 첫 글자가 대문자이고, 8자 이상이어야 합니다.</small>
             </div>
             <div
               style={
