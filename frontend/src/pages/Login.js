@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Alert, Form, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/config";
@@ -9,7 +9,16 @@ function Login() {
     // setUser : 사용자 정보를 저장하기 위한 setter 메소드
     // 전일환: 로그인 기능 외부로 빼와서 setter 메소드 삭제
 
-    const { login } = useAuth(); //콘텍스트에서 정의 한 로그인 기능 사용
+    const { login, user } = useAuth(); //콘텍스트에서 정의 한 로그인 기능 사용
+    const navigate = useNavigate();
+
+    // 로그인 상태일 경우 마이페이지로 리다이렉트
+    useEffect(() => {
+        if (user) {
+            navigate("/mypage"); // 로그인 상태이면 마이페이지로 리다이렉트
+        }
+    }, [user, navigate]);
+
 
     // 로그인 관련 state 정의
     const [email, setEmail] = useState('');
@@ -18,7 +27,7 @@ function Login() {
     // 오류 메시지 관련 state 정의
     const [errors, setErrors] = useState('');
 
-    const navigate = useNavigate();
+
 
     const LoginAction = async (event) => { // 로그인과 관련된 이벤트 처리 함수
         event.preventDefault();
