@@ -68,8 +68,8 @@
 
 /* 커스텀 버튼 (Primary) */
 .btn-primary-custom {
-    background-color: #67ab9f;
-    border-color: #67ab9f;
+    background-color: #67ab9f !important;
+    border-color: #67ab9f !important;
     font-weight: 600;
     padding: 10px 20px;
     font-size: 1rem;
