@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Row, Col } from "react-bootstrap";
+// Row, Col 대신 Link만 사용하므로 react-bootstrap import는 제거해도 됩니다.
+// import { Row, Col } from "react-bootstrap"; 
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../component/AuthContext";
 import { API_BASE_URL } from "../config/config";
+import "./MyInquiry.css"; // 새로 만든 CSS 파일 import
 
 function MyInquiry() {
     const [inquiries, setInquiries] = useState([]);
@@ -12,11 +14,10 @@ function MyInquiry() {
     const [checkedLogin, setCheckedLogin] = useState(false);
     const navigate = useNavigate();
 
-
     const { user } = useAuth();
     const TYPE_LABELS = {
         PRODUCT: "상품",
-        DELIVERY: "배달",
+        DELIVERY: "배달", // '배달' -> '배송'이 더 일반적일 수 있습니다.
         PAYMENT: "결제",
         ETC: "기타"
     };
@@ -31,12 +32,11 @@ function MyInquiry() {
 
         (async () => {
             try {
-
                 const url = `${API_BASE_URL}/api/inquiries/my`;
                 const res = await axios.get(url, { withCredentials: true });
                 const data = res.data?.data ?? res.data ?? [];
                 console.log("inquiry data:", data);
-                // setInquiries(data);
+
                 const inquiriesWithProducts = await Promise.all(
                     data.map(async (inquiry) => {
                         if (inquiry.productId) {
@@ -75,63 +75,65 @@ function MyInquiry() {
         })();
     }, [user, navigate]);
 
-    if (!checkedLogin) return null;
-    if (loading) return <p style={{ padding: "20px" }}>로딩중...</p>;
-    if (error) return <p style={{ color: "red", padding: "20px" }}>에러: {error}</p>;
+    if (!checkedLogin) return null; // 로그인 체크 전에는 아무것도 렌더링하지 않음
+
+    // 로딩 및 에러 상태를 좀 더 명확하게 표시
+    if (loading) {
+        return <div className="inquiry-message inquiry-loading">로딩중...</div>;
+    }
+    if (error) {
+        return <div className="inquiry-message inquiry-error">에러: {error}</div>;
+    }
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>내 문의 내역</h2>
+        <div className="my-inquiry-container">
+            <h1 style={{ fontFamily: "'Gowun Batang', serif" }}>My Questions</h1>
 
-            {inquiries.length === 0 ? (
-                <p>등록된 문의가 없습니다.</p>
-            ) : (
-                inquiries.map((inquiry) => (
-                    <div
-                        key={inquiry.id}
-                        style={{
-                            border: "1px solid #ccc",
-                            padding: "10px",
-                            borderRadius: "8px",
-                            marginBottom: "15px",
-                        }}
-                    >
-                        <Link to={`/inquiry/${inquiry.id}`} style={{ textDecoration: 'none', color: 'black' }}>
-                            <h3>{inquiry.title}</h3>
-                        </Link>
-                        <p>
-                            <strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}
-                        </p>
-                        {inquiry.type && (
-                            <p>
-                                <strong>문의 유형 :</strong> {TYPE_LABELS[inquiry.type] || inquiry.type}
-                            </p>
-                        )}
-                        {inquiry.productName && (
-                            <p>
-                                <strong>상품명 :</strong> {inquiry.productName}
-                            </p>
-                        )}
-                        <p>
-                            <strong>답변 상태:</strong> {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
-                        </p>
-                    </div>
-                ))
-            )}
+            {
+                inquiries.length === 0 ? (
+                    <div className="inquiry-message">등록된 문의가 없습니다.</div>
+                ) : (
+                    inquiries.map((inquiry) => (
+                        <div key={inquiry.id} className="inquiry-card">
+                            <Link to={`/inquiry/${inquiry.id}`} className="inquiry-card-link">
+                                <h3>{inquiry.title}</h3>
+                                <div className="inquiry-details">
+                                    <p>
+                                        <strong>작성일자:</strong> {new Date(inquiry.createdAt).toLocaleString()}
+                                    </p>
+                                    {inquiry.type && (
+                                        <p>
+                                            <strong>문의 유형:</strong> {TYPE_LABELS[inquiry.type] || inquiry.type}
+                                        </p>
+                                    )}
+                                    {inquiry.productName && (
+                                        <p>
+                                            <strong>상품명:</strong> {inquiry.productName}
+                                        </p>
+                                    )}
+                                    <p>
+                                        <strong>답변 상태:</strong>
+                                        <span className={inquiry.status === "PENDING" ? "status-pending" : "status-answered"}>
+                                            {inquiry.status === "PENDING" ? "WAITING" : "ANSWERED"}
+                                        </span>
+                                    </p>
+                                </div>
+                            </Link>
+                        </div>
+                    ))
+                )
+            }
 
-            <Row>
-                <Col className="text-end">
-                    <Link to="/inquiry" className="btn btn-outline-secondary">
-                        문의사항 페이지로
-                    </Link>
-                </Col>
-                <Col className="text-first">
-                    <Link to="/mypage" className="btn btn-outline-secondary">
-                        마이페이지로
-                    </Link>
-                </Col>
-            </Row>
-        </div>
+            {/* react-bootstrap Row/Col 대신 flexbox로 재구성 */}
+            <div className="inquiry-actions">
+                <Link to="/mypage" className="btn-custom btn-secondary-custom">
+                    마이페이지로
+                </Link>
+                <Link to="/inquiry" className="btn-custom btn-primary-custom">
+                    문의하기
+                </Link>
+            </div>
+        </div >
     );
 }
 

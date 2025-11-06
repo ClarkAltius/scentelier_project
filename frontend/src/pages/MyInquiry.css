@@ -1,0 +1,147 @@
+/* MyInquiry.css */
+
+.my-inquiry-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.my-inquiry-container h1 {
+    color: #555;
+    border-bottom: 2px solid #67ab9f;
+    /* 포인트 컬러로 강조 */
+    padding-bottom: 50px;
+    margin-bottom: 50px;
+    font-weight: 700;
+    margin-top: 30px;
+
+}
+
+/* 로딩, 에러, 빈 메시지 공통 스타일 */
+.inquiry-message {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 1.1rem;
+    color: #888;
+    background-color: #fafafa;
+    border-radius: 8px;
+}
+
+.inquiry-error {
+    color: #d9534f;
+    /* 에러 색상 */
+    font-weight: 500;
+}
+
+/* 개별 문의 카드 */
+.inquiry-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* 부드러운 그림자 */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* 카드 호버 시 살짝 떠오르는 효과 */
+.inquiry-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-card-link {
+    text-decoration: none;
+    color: inherit;
+    /* 부모 색상 상속 */
+    display: block;
+    padding: 20px 25px;
+}
+
+.inquiry-card-link:hover h3 {
+    color: #67ab9f;
+    /* 제목 호버 시 포인트 컬러 */
+}
+
+.inquiry-card h3 {
+    color: #808080ff;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+/* 문의 세부 정보 */
+.inquiry-details p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.inquiry-details strong {
+    color: #808080ff;
+    min-width: 80px;
+    /* '상품명:' '작성일자:' 등 라벨 너비 고정 */
+    display: inline-block;
+}
+
+/* 답변 상태 스타일 */
+.status-pending {
+    color: #888;
+    /* 대기중 (회색) */
+    font-weight: 700;
+}
+
+.status-answered {
+    color: #67ab9f;
+    /* 답변완료 (포인트 컬러) */
+    font-weight: 700;
+}
+
+/* 하단 버튼 영역 */
+.inquiry-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* 공통 버튼 스타일 */
+.btn-custom {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid #67ab9f;
+}
+
+/* 주 버튼 (문의하기) */
+.btn-primary-custom {
+    background-color: #67ab9f;
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    background-color: #558c80;
+    /* 호버 시 조금 더 어둡게 */
+    border-color: #558c80;
+    color: white;
+}
+
+/* 보조 버튼 (마이페이지) */
+.btn-secondary-custom {
+    background-color: white;
+    color: #67ab9f;
+}
+
+.btn-secondary-custom:hover {
+    background-color: #f8f9fa;
+    /* 호버 시 살짝 회색 */
+    color: #558c80;
+}
