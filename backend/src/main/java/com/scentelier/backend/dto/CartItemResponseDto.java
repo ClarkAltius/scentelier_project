@@ -30,7 +30,24 @@ public class CartItemResponseDto {
             this.customId = cartItems.getCustomPerfume().getId();
             this.name = cartItems.getCustomPerfume().getName();
             this.imageUrl = null;
-            this.price = BigDecimal.valueOf(50000);
+            int volume = 0;
+            if (cartItems.getCustomPerfume().getVolume() > 0) {
+                volume = cartItems.getCustomPerfume().getVolume();
+            }
+
+            switch (volume) {
+                case 30:
+                    this.price = BigDecimal.valueOf(50000);
+                    break;
+                case 50:
+                    this.price = BigDecimal.valueOf(70000);
+                    break;
+                case 100:
+                    this.price = BigDecimal.valueOf(100000);
+                    break;
+                default:
+                    this.price = BigDecimal.valueOf(50000); // 기본값
+            }
         }
 
         this.quantity = cartItems.getQuantity();

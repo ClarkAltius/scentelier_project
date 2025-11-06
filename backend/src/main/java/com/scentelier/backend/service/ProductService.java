@@ -49,7 +49,6 @@ public class ProductService {
     private ProductRepository productRepository;
     private CartItemRepository cartItemRepository;
     private OrderRepository orderRepository;
-    @Autowired
     private ReviewRepository reviewRepository;
 
     public ProductService(
