@@ -1,19 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/config';
 
 export default function ProductEditModal({ show, product, onClose, onSaved }) {
+
+   const asEnumString = (c) => {
+    if (c == null) return '';
+    if (typeof c === 'string') return c;           // "CITRUS"
+    if (typeof c === 'object') return c.value || c.name || '';
+    return String(c);
+  };
+  const asSeasonString = (s) => {
+    if (s == null || s === '') return '';
+    // 서버가 enum 문자열(SPRING...)을 주면 그대로, 숫자/ordinal이면 매핑
+    if (typeof s === 'string') return s;
+    const map = { 0: 'SPRING', 1: 'SUMMER', 2: 'FALL', 3: 'WINTER' };
+    return map[s] || '';
+  };
+
   const [form, setForm] = useState(() => ({
-    id: product.id,
-    name: product.name ?? '',
-    category: product.category ?? '',
-    price: Number(product.price ?? 0),
-    stock: Number(product.stock ?? 0),
-    description: product.description ?? '',
-    imageUrl: product.imageUrl ?? '',
-    season: product.season ?? null,   // ★ 유지
-    keyword: product.keyword ?? ''    // ★ 유지
-  }));
+  id: product.id,
+  name: product.name ?? '',
+  category: asEnumString(product.category) ?? '',
+  price: Number(product.price ?? 0),
+  stock: Number(product.stock ?? 0),
+  description: product.description ?? '',
+  imageUrl: product.imageUrl ?? '',
+  season: product.season ?? '',
+  keyword: product.keyword ?? '',
+}));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,21 +39,33 @@ export default function ProductEditModal({ show, product, onClose, onSaved }) {
   );
 
   useEffect(() => {
-    setForm({
-      id: product.id,
-      name: product.name ?? '',
-      category: product.category ?? '',
-      price: Number(product.price ?? 0),
-      stock: Number(product.stock ?? 0),
-      description: product.description ?? '',
-      imageUrl: product.imageUrl ?? '',
-      season: product.season ?? null, // ★ 여기도 포함
-      keyword: product.keyword ?? ''  // ★ 여기도 포함
-    });
-    setFile(null);
-    setPreview(product.imageUrl ? `${API_BASE_URL}/uploads/products/${product.imageUrl}` : '');
-    setError(null);
-  }, [product]);
+  setForm({
+    id: product.id,
+    name: product.name ?? '',
+    category: asEnumString(product.category) ?? '',
+    price: Number(product.price ?? 0),
+    stock: Number(product.stock ?? 0),
+    description: product.description ?? '',
+    imageUrl: product.imageUrl ?? '',
+    season: product.season ?? '',
+    keyword: product.keyword ?? '',
+  });
+  setFile(null);
+  setPreview(product.imageUrl ? `${API_BASE_URL}/uploads/products/${product.imageUrl}` : '');
+  setError(null);
+}, [product]);
+
+   // 카테고리 ENUM → 라벨 매핑
+ const CATEGORY_OPTIONS = [
+   { value: 'CITRUS',  label: '시트러스' },
+   { value: 'FLORAL',  label: '플로럴' },
+   { value: 'WOODY',   label: '우디' },
+   { value: 'CHYPRE',  label: '시프레' },
+   { value: 'GREEN',   label: '그린' },
+   { value: 'FRUITY',  label: '프루티' },
+   { value: 'POWDERY', label: '파우더리' },
+   { value: 'CRYSTAL', label: '크리스탈' },
+ ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,17 +107,27 @@ export default function ProductEditModal({ show, product, onClose, onSaved }) {
     }
 
     // 2) 본문 페이로드
-      const payload = {
-   name: form.name,
-   category: form.category,
-   price: form.price,
-   stock: form.stock,
-   description: form.description,
-   imageUrl: filename,
-   // 값이 있을 때만 키를 추가
-   ...(form.season ? { season: form.season } : {}),
-   ...(form.keyword?.trim() ? { keyword: form.keyword.trim() } : {}),
- };
+    // const payload = {
+    //   name: String(form.name ?? '').trim(),
+    //   category: asEnumString(form.category),         // "CITRUS"
+    //   price: Number.isFinite(Number(form.price)) ? Number(form.price) : 0,
+    //   stock: Number.isFinite(Number(form.stock)) ? Number(form.stock) : 0,
+    //   description: String(form.description ?? ''),
+    //   imageUrl: filename,
+    //   season: asSeasonString(form.season) || null,   // "SPRING"|...|null
+    //   keyword: String(form.keyword ?? '').trim(),
+    // };
+
+    const payload = {
+  name: form.name,
+  category: asEnumString(form.category)?.toUpperCase() || null,
+  price: form.price,
+  stock: form.stock, // primitive int 대응: 항상 전송
+  description: form.description,
+  imageUrl: filename, // 업로드 없으면 기존 파일명 유지
+  season: (form.season || '').toUpperCase() || null,
+  keyword: (form.keyword ?? '').trim(),
+};
 
     // 3) 우선 PUT /product/{id} 로 업데이트
     let res;
@@ -206,9 +243,19 @@ export default function ProductEditModal({ show, product, onClose, onSaved }) {
               <input name="name" value={form.name} onChange={handleChange} required />
             </label>
             <label>
-              카테고리
-              <input name="category" value={form.category} onChange={handleChange} />
-            </label>
+            카테고리
+            <select
+        name="category"
+        value={asEnumString(form.category)}
+        onChange={handleChange}
+        required
+      >
+        <option value="">(선택)</option>
+        {CATEGORY_OPTIONS.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+</select>
+          </label>
             <label>
               가격
               <input type="number" name="price" min="0" value={form.price} onChange={handleChange} />
@@ -221,6 +268,22 @@ export default function ProductEditModal({ show, product, onClose, onSaved }) {
               설명
               <textarea name="description" value={form.description} onChange={handleChange} rows={4} style={{ resize: 'vertical' }} />
             </label>
+            <label>
+                키워드
+                <input name="keyword" value={form.keyword ?? ''} onChange={handleChange} />
+              </label>
+
+              <label>
+                계절
+                <select name="season" value={form.season ?? ''} onChange={handleChange}>
+                  <option value="">(선택)</option>
+                  <option value="SPRING">SPRING</option>
+                  <option value="SUMMER">SUMMER</option>
+                  <option value="FALL">FALL</option>
+                  <option value="WINTER">WINTER</option>
+                </select>
+              </label>
+              
 
 
             {error && (
