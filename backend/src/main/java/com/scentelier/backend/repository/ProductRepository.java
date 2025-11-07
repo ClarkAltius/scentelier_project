@@ -14,6 +14,9 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Products, Long> {
 
+    // 특정 수량 이하인 판매중인 완제품 리스트 반환
+    List<Products> findByIsDeletedFalseAndStockLessThan(int stock, Pageable pageable);
+
     List<Products> findAllByIsDeletedFalseAndStockGreaterThan(int stock);
     Page<Products> findAllByIsDeleted(boolean isDeleted, Pageable pageable);
 
