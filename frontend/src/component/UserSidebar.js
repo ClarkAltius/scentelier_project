@@ -43,7 +43,7 @@ function UserSidebar({ activeView, setActiveView }) {
                 <li className={styles.navItem}>
                     <a
                         href="#"
-                        className={`${styles.navLink} ${activeView === 'orders' ? styles.active : ''}`}
+                        className={`${styles.navLink} ${activeView === 'myPerfume' ? styles.active : ''}`}
                         onClick={(e) => handleNavClick(e, 'myPerfume')}
                     >
                         <FlaskConical className={styles.icon} />

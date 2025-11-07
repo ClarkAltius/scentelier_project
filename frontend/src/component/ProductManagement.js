@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef  } from 'react';
 import styles from './ProductManagement.module.css';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
 import { API_BASE_URL } from '../config/config';
@@ -28,7 +28,22 @@ function ProductManagement({ setActiveView }) {
   const [editing, setEditing] = useState(null);   // 선택된 상품
   const [showEdit, setShowEdit] = useState(false);
 
+    const [forceSearchTick, setForceSearchTick] = useState(0);
+    const abortRef = useRef(null);
+
   const isAllSelected = products.length > 0 && selectedIds.length === products.length;
+
+  const category_labels = {
+  ALL: '전체',
+  CITRUS: '시트러스',
+  FLORAL: '플로럴',
+  WOODY: '우디',
+  CHYPRE: '시프레',
+  GREEN: '그린',
+  FRUITY: '프루티',
+  POWDERY: '파우더리',
+  CRYSTAL: '크리스탈',
+};
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -51,57 +66,53 @@ function ProductManagement({ setActiveView }) {
 
   // 목록 로딩
   useEffect(() => {
-    let ignore = false;
-    const controller = new AbortController();
+  if (abortRef.current) abortRef.current.abort();
+  const controller = new AbortController();
+  abortRef.current = controller;
 
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
-          params: { page, size: 10, q: query || undefined, keyword: query || undefined },
-          signal: controller.signal,
-        });
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
+        params: { page, size: 10, q: query || undefined, includeDeleted: false },
+        signal: controller.signal,
+        withCredentials: true,
+      });
 
-        const data = res.data;
-        const raw =
-          Array.isArray(data) ? data :
-            Array.isArray(data?.content) ? data.content :
-              Array.isArray(data?.data) ? data.data :
-                Array.isArray(data?.rows) ? data.rows : [];
+      const data = res.data;
+      const raw =
+        Array.isArray(data) ? data :
+        Array.isArray(data?.content) ? data.content :
+        Array.isArray(data?.data) ? data.data :
+        Array.isArray(data?.rows) ? data.rows : [];
 
-        if (ignore) return;
+      const normalized = raw.map((p) => {
+        const isDelRaw = p.isDeleted ?? p.is_deleted ?? p.isdeleted ?? 0;
+        const isDeleted = isDelRaw === true || Number(isDelRaw) === 1;
+        const base = p.status ?? (p.selling === true ? 'SELLING' : (p.selling === false ? 'STOPPED' : 'SELLING'));
+        const status = (isDeleted || p.stock === 0) ? 'STOPPED' : base;
+        return { ...p, isDeleted, status };
+      });
 
-        const normalized = raw.map((p) => {
-          const isDelRaw = p.isDeleted ?? p.is_deleted ?? p.isdeleted ?? 0;
-          const isDeleted = isDelRaw === true || Number(isDelRaw) === 1;
-          const base = p.status ?? (p.selling === true ? 'SELLING' : (p.selling === false ? 'STOPPED' : 'SELLING'));
-          const status = (isDeleted || p.stock === 0) ? 'STOPPED' : base;
-          return { ...p, isDeleted, status };
-        });
+      setProducts(normalized);
 
-        setProducts(normalized);
+      const tp =
+        Number.isFinite(data?.totalPages) ? data.totalPages :
+        Number.isFinite(data?.page?.totalPages) ? data.page.totalPages : 1;
+      setTotalPages(tp);
+    } catch (err) {
+      if (axios.isCancel?.(err) || err?.name === 'CanceledError') return;
+      console.error('상품 불러오기 에러:', err);
+      setError('상품을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        const tp =
-          Number.isFinite(data?.totalPages) ? data.totalPages :
-            Number.isFinite(data?.page?.totalPages) ? data.page.totalPages :
-              1;
-        setTotalPages(tp);
-      } catch (err) {
-        if (axios.isCancel?.(err) || err?.name === 'CanceledError') return;
-        console.error('상품 불러오기 에러:', err);
-        setError('상품을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
-      } finally {
-        if (!ignore) setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-    return () => {
-      ignore = true;
-      controller.abort();
-    };
-  }, [page, query]);
+  fetchProducts();
+  return () => controller.abort();
+}, [page, query, forceSearchTick]);
 
       // 수정 버튼 클릭
     const handleEdit = (product) => {
@@ -193,22 +204,22 @@ function ProductManagement({ setActiveView }) {
   // CRUD
   const handleAddNew = () => setActiveView('productInsert');
 
-  const handleDelete = async (productId) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+  // const handleDelete = async (productId) => {
+  //   if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
-    const snapshot = [...products];
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  //   const snapshot = [...products];
+  //   setProducts((prev) => prev.filter((p) => p.id !== productId));
 
-    try {
-      await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, { withCredentials: true });
-      alert('상품이 삭제되었습니다.');
-      setSelectedIds((prev) => prev.filter((id) => id !== productId));
-    } catch (error) {
-      console.error('삭제 중 오류:', error);
-      setProducts(snapshot);
-      alert('상품 삭제 중 오류가 발생하였습니다.');
-    }
-  };
+  //   try {
+  //     await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, { withCredentials: true });
+  //     alert('상품이 삭제되었습니다.');
+  //     setSelectedIds((prev) => prev.filter((id) => id !== productId));
+  //   } catch (error) {
+  //     console.error('삭제 중 오류:', error);
+  //     setProducts(snapshot);
+  //     alert('상품 삭제 중 오류가 발생하였습니다.');
+  //   }
+  // };
 
   const handleSelectDelete = async () => {
     if (selectedIds.length === 0) return;
@@ -254,29 +265,7 @@ function ProductManagement({ setActiveView }) {
     }
   };
 
-  // 검색어로 필터된 목록
-  const visibleProducts = useMemo(() => {
-   const term = (query || '').trim().toLowerCase();
-   if (!term) return products;
-   return products.filter((p) => { /* 기존 필터 로직 그대로 */ 
-     const name = String(p.name ?? '').toLowerCase();
-     const category = String(p.category ?? '').toLowerCase();
-     const idStr = String(p.id ?? '');
-     const status = String(p.status ?? '').toLowerCase();
-     const statusKo =
-       p.status === 'SELLING' ? '판매중' :
-       p.status === 'STOPPED' ? '판매중지' :
-       p.status === 'PENDING' ? '주문중' : '';
-     return (
-       name.includes(term) ||
-       category.includes(term) ||
-       idStr.includes(term) ||
-       status.includes(term) ||
-       statusKo.includes(term)
-     );
-   });
- }, [products, query]);
-
+  
 
   // 테이블 렌더
   const renderTable = () => {
@@ -306,20 +295,16 @@ function ProductManagement({ setActiveView }) {
             </tr>
           </thead>
           <tbody>
-            {products.length === 0 ? (
+           {products.length === 0 ? (
               <tr>
                 <td colSpan={8} className={styles.emptyCell}>
-                  상품이 없습니다. '신규 상품 추가' 버튼을 눌러 상품을 등록해주세요.
+                  {query
+                    ? '검색 결과가 없습니다.'
+                    : '상품이 없습니다. "신규 상품 추가" 버튼으로 등록해주세요.'}
                 </td>
-                    </tr>
-                  ) : visibleProducts.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className={styles.emptyCell}>
-                        검색 결과가 없습니다.
-                      </td>
-                    </tr>
-                  ) : (
-                    visibleProducts.map((product) => {
+              </tr>
+            ) : (
+                    products.map((product) => {
             
                 const isStoppedRow = product.isDeleted === true || product.isDeleted === 1 || product.status === 'STOPPED';
                 return (
@@ -354,7 +339,7 @@ function ProductManagement({ setActiveView }) {
                       />
                     </td>
                     <td>{product.name}</td>
-                    <td>{product.category}</td>
+                    <td>{category_labels[product.category] ?? product.category ?? '-'}</td>
                     <td>
                       {(typeof product.price === 'number'
                         ? product.price.toLocaleString('ko-KR')
@@ -403,13 +388,13 @@ function ProductManagement({ setActiveView }) {
                               {product.status === 'SELLING' ? '판매중지' : '판매시작'}
                               </button>
                             {/* 삭제 */}
-                            <button
+                            {/* <button
                               className={`${styles.actionButton} ${styles.deleteButton}`}
                               onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
                               aria-label={`${product.name} 삭제`}
                             >
                               <Trash2 size={16} />
-                            </button>
+                            </button> */}
                           </div>
                         </td>
                   </tr>
@@ -432,23 +417,37 @@ function ProductManagement({ setActiveView }) {
         {/* 검색창 */}
         <div className={styles.searchBar}>
           <Search size={18} className={styles.searchIcon} />
-          <input
-            type="search"
-            placeholder="상품명/카테고리/ID 검색"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            aria-label="검색"
-          />
-          {searchText && (
-            <button
-              className={styles.clearBtn}
-              onClick={() => setSearchText('')}
-              title="지우기"
-              type="button"
-            >
-              ×
-            </button>
-          )}
+         <input
+          type="search"
+          placeholder="상품명/카테고리/키워드/ID 검색"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          // ADD: Enter 누르면 즉시 서버검색
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setQuery(searchText.trim());
+              setPage(0);
+              setForceSearchTick(t => t + 1);
+            }
+          }}
+          aria-label="검색"
+        />
+        {searchText && (
+          <button
+            className={styles.clearBtn}
+            onClick={() => {
+              setSearchText('');
+              setQuery('');
+              setPage(0);
+              // ADD: 지우기 후 즉시 재조회
+              setForceSearchTick(t => t + 1);
+            }}
+            title="지우기"
+            type="button"
+          >
+            ×
+          </button>
+        )}
         </div>
         <button className={styles.addButton} onClick={handleAddNew}>
           <Plus size={20} />
@@ -571,9 +570,9 @@ function ProductManagement({ setActiveView }) {
         >
           {detail?.status === 'SELLING' ? '판매중지' : '판매시작'}
         </button>
-        <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
+        {/* <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
           <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
-        </button>
+        </button> */}
       </div>
     </div>
   </div>

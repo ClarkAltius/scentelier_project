@@ -18,12 +18,12 @@ import InquiryDetail from "../pages/InquiryDetail.js";
 import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
 import PrivateRoute from './PrivateRoute.js';
-import ReviewWriteForm from '../pages/ReviewWriteForm.js'
-import MyReviewListPage from '../pages/MyReviewListPage.js'
-import ReviewBoardPage from '../pages/ReviewBoardPage.js'
-import SignUp from '../pages/SignUp.js'
-import Myperfume from '../pages/Myperfume.js'
-import UserMyPage from '../pages/UserMyPage.js'
+import ReviewWriteForm from '../pages/ReviewWriteForm.js';
+import MyReviewListPage from '../pages/MyReviewListPage.js';
+import ReviewBoardPage from '../pages/ReviewBoardPage.js';
+import SignUp from '../pages/SignUp.js';
+import Myperfume from '../pages/Myperfume.js';
+import UserMyPage from '../pages/UserMyPage.js';
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
