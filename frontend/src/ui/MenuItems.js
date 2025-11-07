@@ -55,7 +55,7 @@ function MenuItems() {
                     <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Products</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
                     <Nav.Link onClick={handleDesignClick} style={{ color: '#808080ff' }}>Design</Nav.Link>
-                    <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link>
+                    {/* <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link> */}
                 </Nav>
                 <Nav>
                     {user ? (
@@ -76,13 +76,18 @@ function MenuItems() {
                             <div style={{ paddingLeft: '10px' }}></div>
                             <Navbar.Text style={{ color: '#6c757d', fontFamily: "'Gowun Batang', serif", fontSize: '1rem', marginLeft: '-5px' }}> {/* Adjusted margin */}
                                 {`어서오세요, ${user.username} 님` || 'User'}
-                            </Navbar.Text>                        </>
+                            </Navbar.Text>
+                            <Nav.Link
+                                style={{ color: '#6c757d', fontSize: '1rem', marginRight: '15px' }}
+                                onClick={() => navigate('/logout')}>Logout</Nav.Link>
+                        </>
+
                     ) : (
                         // 기본적인 로그인 버튼
                         <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>
                     )}
                 </Nav>
-                <div style={{ paddingLeft: '50px' }}></div>
+                <div style={{ paddingLeft: '10px' }}></div>
                 {/** Temporary. 개발용 링크들 */}
                 <div style={{ border: '2px solid black', padding: '5px 10px', borderRadius: '5px' }}>
                     <NavDropdown bg="dark" variant="dark" title={`[임시] 링크 모음`}>
