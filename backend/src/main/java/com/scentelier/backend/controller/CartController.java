@@ -164,6 +164,13 @@ public ResponseEntity<String> addCustomToCart(@RequestBody CartItemDto dto) {
         }
 
         CartItems cartItems = cartItemOptional.get();
+        if (cartItems.getProduct() != null) {
+            if (cartItems.getProduct().getStock() < quantity) {
+                message = "재고보다 많이 주문할 수 없습니다.";
+                return ResponseEntity.badRequest().body(message);
+            }
+        }
+
         cartItems.setQuantity(quantity);
         cartItemService.saveCartItems(cartItems);
 

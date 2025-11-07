@@ -93,34 +93,62 @@ function CartList() {
   const toggleOne = (cartItemId) => // 개별 선택, 해제
     updateItems(items.map((p) => (p.cartItemId === cartItemId ? { ...p, checked: !p.checked } : p)));
 
-  // 수량 조절
-  const inc = (id) => { // 수량 증가 + 버튼 기능
-    updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Number(p.quantity) + 1 } : p)))
-  };
-  const dec = (id) => // 수량 감소 - 버튼 기능
-    updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: Math.max(1, Number(p.quantity) - 1) } : p)));
-  const inputQty = (id, v) => { // 직접입력한 수량
-    const q = Math.max(1, Number(v) || 1);
-    updateItems(items.map((p) => (p.cartItemId === id ? { ...p, quantity: q } : p)));
-    saveQuantity(id);
-  };
+  // 수량 증가
+const inc = async (id) => {
+  const target = items.find((p) => p.cartItemId === id);
+  if (!target) return;
 
-  // 서버 수량 수정
-  const saveQuantity = async (cartItemId) => {
-    const target = items.find((p) => p.cartItemId === cartItemId);
-    if (!target) return;
+  const newQty = Number(target.quantity) + 1;
+  await saveQuantity(id, newQty);
+};
 
-    try {
-      const res = await axios.patch(
-        `${API_BASE_URL}/cart/edit/${cartItemId}`,
-        null,
-        { params: { quantity: target.quantity }, withCredentials: true }
-      );
-    } catch (error) {
-      console.error("수량 변경 오류:", error);
+// 수량 감소
+const dec = async (id) => {
+  const target = items.find((p) => p.cartItemId === id);
+  if (!target) return;
+
+  const newQty = Math.max(1, Number(target.quantity) - 1);
+  await saveQuantity(id, newQty);
+};
+
+// 직접 입력
+const inputQty = async (id, v) => {
+  const q = Math.max(1, Number(v) || 1);
+  await saveQuantity(id, q);
+};
+
+// 서버 요청 및 반영
+const saveQuantity = async (cartItemId, newQuantity) => {
+  const target = items.find((p) => p.cartItemId === cartItemId);
+  if (!target) return;
+
+  try {
+    const res = await axios.patch(
+      `${API_BASE_URL}/cart/edit/${cartItemId}`,
+      null,
+      { params: { quantity: newQuantity }, withCredentials: true }
+    );
+
+    // 성공 시, 로컬 상태 반영
+    updateItems(
+      items.map((p) =>
+        p.cartItemId === cartItemId ? { ...p, quantity: newQuantity } : p
+      )
+    );
+  } catch (error) {
+    console.error("수량 변경 오류:", error);
+
+    // 서버에서 재고 부족 등의 메시지가 내려온 경우
+    if (error.response?.data) {
+      alert(error.response.data);
+    } else {
       alert("수량 변경 중 문제가 발생했습니다.");
     }
-  };
+
+    // 실패 시 원래 수량 유지 (updateItems 호출 안 함)
+  }
+};
+
   // const saveQuantity = async (cartItemId) => {
   //   const target = items.find((p) => p.cartItemId === cartItemId);
   //   if (!target) return;
