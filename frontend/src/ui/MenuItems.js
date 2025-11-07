@@ -26,6 +26,13 @@ function MenuItems() {
         }
     };
 
+    const handleCartClick = () => {
+        // 3. This is the new logic
+        // We navigate to the UserMyPage route and pass
+        // a state object { view: 'cart' } along with it.
+        navigate('/usermypage', { state: { view: 'cart' } });
+    };
+
 
 
     return (
@@ -59,22 +66,13 @@ function MenuItems() {
                                     <Shield size={20} style={{ color: '#808080ff' }} />
                                 </Nav.Link>
                             )}
-                            <Nav.Link onClick={() => navigate('/cart/list')} title="Cart">
+                            <Nav.Link onClick={handleCartClick} title="Cart">
                                 <ShoppingCart size={20} style={{ color: '#808080ff' }} />
                             </Nav.Link>
-                            <NavDropdown title={<User size={20} style={{ color: '#808080ff' }} />} id="user-nav-dropdown" align="end">
-                                <NavDropdown.Item onClick={() => navigate('/mypage')}>마이 페이지</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>내 커스텀 향수</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/mypage/review`)}>내 리뷰</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/reviews/write`)}>리뷰 작성</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>내 문의사항</NavDropdown.Item>
-                                {/* 회원정보 링크 추가 예정 */}
-                                {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
 
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-                            </NavDropdown>
+                            <Nav.Link onClick={() => navigate('/usermypage')} title="My Page">
+                                <User size={20} style={{ color: '#808080ff' }} />
+                            </Nav.Link>
                             <div style={{ paddingLeft: '10px' }}></div>
                             <Navbar.Text style={{ color: '#6c757d', fontFamily: "'Gowun Batang', serif", fontSize: '1rem', marginLeft: '-5px' }}> {/* Adjusted margin */}
                                 {`어서오세요, ${user.username} 님` || 'User'}
@@ -105,6 +103,7 @@ function MenuItems() {
                         <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/signup`)}>회원가입 페이지</NavDropdown.Item>
                         <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>향수조합 저장페이지</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => navigate(`/usermypage`)}>유저 마이페이지</NavDropdown.Item>
                     </NavDropdown>
                 </div>
             </Container>

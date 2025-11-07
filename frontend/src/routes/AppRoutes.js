@@ -23,6 +23,7 @@ import MyReviewListPage from '../pages/MyReviewListPage.js'
 import ReviewBoardPage from '../pages/ReviewBoardPage.js'
 import SignUp from '../pages/SignUp.js'
 import Myperfume from '../pages/Myperfume.js'
+import UserMyPage from '../pages/UserMyPage.js'
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -91,6 +92,14 @@ function AppRoutes() {
                     </PrivateRoute>
                 }
             />
+            <Route
+                path='/usermypage'
+                element={<PrivateRoute>
+                    <UserMyPage />
+                </PrivateRoute>
+                }
+            />
+
             {/**관리자 전용 경로 */}
             <Route
                 path='/admin'

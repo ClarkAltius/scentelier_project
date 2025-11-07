@@ -187,7 +187,7 @@ function CartList() {
 
   // -------------------------------------------------------------------
   return (
-    <>
+    <div>
       {/*상단 헤더*/}
       <div
         style={{
@@ -550,7 +550,7 @@ function CartList() {
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

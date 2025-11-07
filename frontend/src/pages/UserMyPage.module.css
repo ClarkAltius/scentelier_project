@@ -1,0 +1,29 @@
+/* /src/pages/UserMyPage.module.css */
+
+.myPageWrapper {
+    display: flex;
+    /* Use the light gray background from your MyPage.js inline styles */
+    background-color: #eef2f5;
+    min-height: calc(100vh - 84px);
+    /* Assumes 84px header from App.js */
+    width: 100%;
+}
+
+.mainContent {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.contentPanel {
+    /* Padding to match the Admin content area */
+    padding: 24px 30px;
+    width: 100%;
+}
+
+/* This allows the centered content (like MyPage.js) to
+   fill the panel correctly. */
+.contentPanel>div {
+    width: 100%;
+    height: 100%;
+}
