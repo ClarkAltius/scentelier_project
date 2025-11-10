@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
-import { Row, Col, Form, FormSelect } from "react-bootstrap";
+import { Row, Col, Form, FormSelect, Button } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../component/AuthContext";
 
-const Inquiry = () => {
+const Inquiry = ({ activeView, setActiveView }) => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -237,11 +237,9 @@ const Inquiry = () => {
           </div>
 
           <Col>
-            <Link to="/myinquiry" className="form-end" style={styles.buttonLink}>
-
-              <span className="inline-link" href="$">My 문의사항</span>
-
-            </Link>
+            <Button onClick={() => setActiveView('myInquiry')} className="form-end" style={styles.buttonLink}>
+              My 문의사항
+            </Button>
           </Col>
           {successMessage && (
             <div style={styles.successMessage}>{successMessage}</div>

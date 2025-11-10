@@ -39,8 +39,9 @@ function UserMyPage() {
             'myReviews': <MyReviews activeView={activeView} setActiveView={setActiveView} />,
             'myPerfume': <MyPerfume />,
             'reviewWrite': <ReviewWrite />,
-            'inquiry': <Inquiry />,
+            'inquiry': <Inquiry activeView={activeView} setActiveView={setActiveView} />,
             'inquiryDetail': <InquiryDetail inquiryId={selectedInquiryId} setActiveView={setActiveView} />
+
         };
         return views[activeView] || <MyPage />;
     };
