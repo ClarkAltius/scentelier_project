@@ -94,7 +94,6 @@ function Payments(props) {
             ],
         };
         try {
-            await axios.post(url, orderData);
             const res = await axios.post(url, orderData);
             const orderId = res.data.orderId;
 

@@ -23,7 +23,7 @@ function PaymentSuccess() {
 
         const approvePayment = async () => {
             try {
-                const res = await axios.post(
+                const res = await axios.put(
                     `${API_BASE_URL}/api/payment/success`,
                     null,
                     { params: { orderId, pgToken }, withCredentials: true }
