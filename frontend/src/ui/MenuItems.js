@@ -86,30 +86,6 @@ function MenuItems() {
                         <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>
                     )}
                 </Nav>
-                <div style={{ paddingLeft: '10px' }}></div>
-                {/** Temporary. 개발용 링크들 */}
-                <div style={{ border: '2px solid black', padding: '5px 10px', borderRadius: '5px' }}>
-                    <NavDropdown bg="dark" variant="dark" title={`[임시] 링크 모음`}>
-                        <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { navigate(`/cart/list`) }}>장바구니 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { navigate(`/order/list`) }}>주문 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/list`)}>상품 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/detail`)}>상품 상세 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/perfume/finder`)}>향수테스트 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/perfume/blending`)}>향수 배합 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/insert`)}>상품 입력 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/inquiry`)}>문의 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>나의 문의 사항 페이지</NavDropdown.Item>
-                        {/* <NavDropdown.Item onClick={() => navigate(`/inquirydetail`)}>문의 사항 상세 페이지</NavDropdown.Item> */}
-                        <NavDropdown.Item onClick={() => navigate(`/mypage`)}>마이 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/signup`)}>회원가입 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>향수조합 저장페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/usermypage`)}>유저 마이페이지</NavDropdown.Item>
-                    </NavDropdown>
-                </div>
             </Container>
         </Navbar >
     );
