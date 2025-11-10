@@ -8,15 +8,15 @@ import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
 import { Button, Pagination } from "react-bootstrap";
 
-const MyReviewPage = () => {
-    const { user } = useAuth();
+const MyReviewPage = ({ activeView, setActiveView }) => {
+  const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getUserReviews(user.id, page, 12).then((data) => {setReviews(data.content); setTotalPages(data.totalPages);}).catch(console.error);
+    getUserReviews(user.id, page, 12).then((data) => { setReviews(data.content); setTotalPages(data.totalPages); }).catch(console.error);
   }, [user.id]);
 
   const handleUpdate = (updated) => {
@@ -50,24 +50,24 @@ const MyReviewPage = () => {
       <h3 className="fw-bold mb-4">내가 작성한 리뷰</h3>
       {reviews.length === 0 ? (
         <div className="text-center py-5 border rounded bg-light">
-            <p className="text-muted mb-3">아직 작성한 리뷰가 없습니다.</p>
-            <Button variant="primary" onClick={() => navigate("/reviews/write")}>
-                리뷰 작성하러 가기
-            </Button>
+          <p className="text-muted mb-3">아직 작성한 리뷰가 없습니다.</p>
+          <Button variant="primary" onClick={() => setActiveView('reviewWrite')}>
+            리뷰 작성하러 가기
+          </Button>
         </div>
       ) : (
         <div className="row">
-            {reviews.map((review) => (
-                <div className="col-md-6 col-lg-4" key={review.reviewId}>
-                <ReviewCard
-                    review={review}
-                    type="mypage"
-                    onUpdate={handleUpdate}
-                    onDelete={handleDelete}
-                />
-                </div>
-            ))}
-            <Pagination className="justify-content-center mt-4">
+          {reviews.map((review) => (
+            <div className="col-md-6 col-lg-4" key={review.reviewId}>
+              <ReviewCard
+                review={review}
+                type="mypage"
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+              />
+            </div>
+          ))}
+          <Pagination className="justify-content-center mt-4">
             {[...Array(totalPages)].map((_, i) => (
               <Pagination.Item
                 key={i}
@@ -78,12 +78,12 @@ const MyReviewPage = () => {
               </Pagination.Item>
             ))}
           </Pagination>
-            <Button variant="primary" onClick={() => navigate("/reviews/write")}>
-                리뷰 작성하러 가기
-            </Button>
+          <Button variant="primary" onClick={() => navigate("/reviews/write")}>
+            리뷰 작성하러 가기
+          </Button>
         </div>
       )}
-        
+
     </div>
   );
 };

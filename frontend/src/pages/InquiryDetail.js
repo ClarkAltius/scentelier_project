@@ -9,7 +9,7 @@ import "./InquiryDetail.css"; // 새로 만든 CSS 파일 import
 // 여기서는 원래 코드를 유지합니다.
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:9000";
 
-function InquiryDetail() {
+function InquiryDetail({ setActiveView, inquiryId }) {
     const { id } = useParams(); // URL에서 문의 id 가져오기
     const [inquiry, setInquiry] = useState(null);
     const [productName, setProductName] = useState(""); // 상품명 상태
@@ -33,10 +33,16 @@ function InquiryDetail() {
             return;
         }
 
+        if (!inquiryId) {
+            setError("No inquiry selected.");
+            setLoading(false);
+            return;
+        }
+
         (async () => {
             try {
                 setLoading(true); // 로딩 시작
-                const url = `${API_BASE_URL}/api/inquiries/${id}`;
+                const url = `${API_BASE_URL}/api/inquiries/${inquiryId}`;
                 const res = await axios.get(url, { withCredentials: true });
                 const inquiryData = res.data?.data ?? res.data;
                 setInquiry(inquiryData);
@@ -53,16 +59,16 @@ function InquiryDetail() {
                 setLoading(false); // 로딩 종료
             }
         })();
-    }, [id, navigate, user]);
+    }, [inquiryId, user]);
 
     // 삭제 
     const handleDelete = async () => {
         if (!window.confirm("정말 이 문의를 삭제하시겠습니까?")) return;
 
         try {
-            await axios.delete(`${API_BASE_URL}/api/inquiries/${id}`, { withCredentials: true });
+            await axios.delete(`${API_BASE_URL}/api/inquiries/${inquiryId}`, { withCredentials: true });
             alert("문의가 삭제되었습니다.");
-            navigate("/myinquiry");
+            setActiveView('myInquiry');
         } catch (err) {
             console.error(err);
             alert(err.response?.data?.error || "문의 삭제에 실패했습니다.");
@@ -122,9 +128,9 @@ function InquiryDetail() {
                 </section>
 
                 <div className="inquiry-detail-actions">
-                    <Link to="/myinquiry" className="btn-custom btn-secondary-custom">
+                    <button onClick={() => setActiveView('myInquiry')} className="btn-custom btn-secondary-custom">
                         목록으로
-                    </Link>
+                    </button>
                     <button onClick={handleDelete} className="btn-custom btn-danger-custom">
                         삭제
                     </button>
