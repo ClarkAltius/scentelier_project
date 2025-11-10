@@ -131,19 +131,13 @@ function MyInquiry({ activeView, setActiveView, setSelectedInquiryId }) {
 
             {/* react-bootstrap Row/Col 대신 flexbox로 재구성 */}
             <div className="inquiry-actions">
-                <button className="btn-custom btn-secondary-custom" onClick={() => setActiveView('myPage')}>
-                    마이페이지로
+                <button className="mypagebutton" onClick={() => setActiveView('myPage')}>
+                    마이페이지
                 </button >
-                <button className="btn-custom btn-primary-custom" onClick={() => setActiveView('inquiry')}>
+                <button className="inquirybutton" onClick={() => setActiveView('inquiry')}>
                     문의하기
                 </button>
-                {/* <Link to="/mypage" >
-                    마이페이지로
-                </Link>
-                <Link to="/inquiry" >
-                    문의하기
-                </Link> */}
-            </div >
+            </div>
         </div >
     );
 }

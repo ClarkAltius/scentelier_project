@@ -18,6 +18,7 @@ function ProductManagement({ setActiveView }) {
 
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
 
   const [showDetail, setShowDetail] = useState(false);
   const [detail, setDetail] = useState(null);
@@ -74,10 +75,15 @@ function ProductManagement({ setActiveView }) {
       setIsLoading(true);
       setError(null);
       try {
+        const sortParam = `${sortConfig.key},${sortConfig.direction}`;
         const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
-          params: { page, size: 10, includeDeleted: true, q: query },
-          signal: controller.signal,
-          withCredentials: true,
+          params: {
+            page,
+            size: 10,
+            includeDeleted: true,
+            q: query,
+            sort: sortParam,
+          },
         });
 
         const data = res.data;
@@ -113,7 +119,7 @@ function ProductManagement({ setActiveView }) {
 
     fetchProducts();
     return () => controller.abort();
-  }, [page, query, forceSearchTick]);
+  }, [page, query, forceSearchTick, sortConfig]);
 
   // 수정 버튼 클릭
   const handleEdit = (product) => {
@@ -256,6 +262,26 @@ function ProductManagement({ setActiveView }) {
     }
   };
 
+  // 정렬 핸들러
+  const requestSort = (key) => {
+    let direction = 'asc';
+    // If clicking the same column, toggle direction
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    // Set new sort config
+    setSortConfig({ key, direction });
+    setPage(0); // Reset to first page when sorting changes
+  };
+
+  // ADD: Helper to show sort indicator
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) {
+      return null;
+    }
+    return sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽';
+  };
+
 
 
   // 테이블 렌더
@@ -277,10 +303,30 @@ function ProductManagement({ setActiveView }) {
                 />
               </th>
               <th>이미지</th>
-              <th>상품명</th>
-              <th>카테고리</th>
-              <th>가격</th>
-              <th>재고</th>
+              <th
+                className={styles.sortableHeader}
+                onClick={() => requestSort('name')}
+              >
+                상품명 {getSortIndicator('name')}
+              </th>
+              <th
+                className={styles.sortableHeader}
+                onClick={() => requestSort('category')}
+              >
+                카테고리 {getSortIndicator('category')}
+              </th>
+              <th
+                className={styles.sortableHeader}
+                onClick={() => requestSort('price')}
+              >
+                가격 {getSortIndicator('price')}
+              </th>
+              <th
+                className={styles.sortableHeader}
+                onClick={() => requestSort('stock')}
+              >
+                재고 {getSortIndicator('stock')}
+              </th>
               <th>상태</th>
               <th>변경</th>
             </tr>

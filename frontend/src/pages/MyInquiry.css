@@ -101,47 +101,54 @@
     font-weight: 700;
 }
 
-/* 하단 버튼 영역 */
 .inquiry-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 12px;
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #eee;
 }
 
-/* 공통 버튼 스타일 */
-.btn-custom {
-    padding: 10px 20px;
+/* * 🌟 FIX: Made selector more specific by adding .inquiry-actions 
+ * This will make it win against global styles.
+ */
+
+
+
+/* 주 버튼 (문의하기) */
+.inquirybutton {
+    box-sizing: border-box;
     text-decoration: none;
     border-radius: 5px;
     font-weight: 600;
     transition: all 0.3s ease;
-    border: 1px solid #67ab9f;
-}
-
-/* 주 버튼 (문의하기) */
-.btn-primary-custom {
+    border: 1px solid transparent;
+    min-width: 100px;
+    text-align: center;
     background-color: #67ab9f;
     color: white;
 }
 
-.btn-primary-custom:hover {
+.inquirybutton:hover {
     background-color: #558c80;
-    /* 호버 시 조금 더 어둡게 */
-    border-color: #558c80;
     color: white;
 }
 
-/* 보조 버튼 (마이페이지) */
-.btn-secondary-custom {
+.mypagebutton {
+    box-sizing: border-box;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    min-width: 100px;
+    text-align: center;
     background-color: white;
     color: #67ab9f;
 }
 
-.btn-secondary-custom:hover {
+.mypagebutton:hover {
     background-color: #f8f9fa;
-    /* 호버 시 살짝 회색 */
     color: #558c80;
 }
-
