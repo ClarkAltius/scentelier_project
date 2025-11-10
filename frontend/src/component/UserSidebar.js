@@ -77,7 +77,7 @@ function UserSidebar({ activeView, setActiveView }) {
                         onClick={(e) => handleNavClick(e, 'myReviews')}
                     >
                         <Star className={styles.icon} />
-                        <span className={styles.navText}>작성 리뷰</span>
+                        <span className={styles.navText}>나의 후기</span>
                     </a>
                 </li>
                 <li className={styles.navItem}>

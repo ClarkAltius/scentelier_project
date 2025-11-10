@@ -97,7 +97,6 @@
 }
 
 .status-answered {
-    color: #67ab9f;
     /* 답변완료 (포인트 컬러) */
     font-weight: 700;
 }
@@ -145,3 +144,4 @@
     /* 호버 시 살짝 회색 */
     color: #558c80;
 }
+

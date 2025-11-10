@@ -78,7 +78,7 @@ const MyReviewPage = ({ activeView, setActiveView }) => {
               </Pagination.Item>
             ))}
           </Pagination>
-          <Button variant="primary" onClick={() => navigate("/reviews/write")}>
+          <Button variant="primary" onClick={() => setActiveView('reviewWrite')}>
             리뷰 작성하러 가기
           </Button>
         </div>
