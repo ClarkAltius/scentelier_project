@@ -95,10 +95,27 @@ function Payments(props) {
         };
         try {
             await axios.post(url, orderData);
-            setShowModal(true);
+            const res = await axios.post(url, orderData);
+            const orderId = res.data.orderId;
+
+            if (method === "KAKAO_PAY") {
+                await handlePayment(orderId);
+            } else {
+                setShowModal(true);
+            }
         } catch (err) {
             console.error(err);
             alert("결제 요청 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handlePayment = async (orderId) => {
+        try {
+            const res = await axios.post(`${API_BASE_URL}/api/payment/ready/${orderId}`);
+            window.location.href = res.data.next_redirect_pc_url; // 카카오 결제창으로 이동
+        } catch (err) {
+            console.error("결제 준비 실패:", err);
+            alert("결제 준비 중 문제가 발생했습니다.");
         }
     };
 

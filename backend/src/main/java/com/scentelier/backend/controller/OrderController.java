@@ -47,7 +47,7 @@ public class OrderController {
         orders.setStatus(dto.getStatus());
         orders.setPaymentMethod(dto.getPaymentMethod());
 
-        if (dto.getPaymentMethod().equals(Payment.CASH)) orders.setStatus(OrderStatus.PENDING);
+        if (dto.getPaymentMethod().equals(Payment.CASH) || dto.getPaymentMethod().equals(Payment.KAKAO_PAY)) orders.setStatus(OrderStatus.PENDING);
 
         List<OrderProduct> orderProductList = new ArrayList<>();
         // 모든 상품 재고를 검사
@@ -90,7 +90,9 @@ public class OrderController {
         orders.setOrderProducts(orderProductList);
         orderService.save(orders);
 
-        return ResponseEntity.ok(Map.of("message", "주문이 성공적으로 생성되었습니다."));
+        Long orderId = orders.getId();
+
+        return ResponseEntity.ok(Map.of("message", "주문이 성공적으로 생성되었습니다.", "orderId", orderId));
     }
 
     @GetMapping("/list")
