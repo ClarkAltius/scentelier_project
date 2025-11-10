@@ -327,21 +327,6 @@ const MyPage = () => {
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleEditClick}>
                 회원정보 수정
               </button>
-              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyInquiry}>
-                나의 문의사항
-              </button>
-              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleCartList}>
-                장바구니
-              </button>
-              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleOrderList}>
-                주문내역
-              </button>
-              {/* <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handlePayments}>
-                결제 페이지
-              </button> */}
-              <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleMyReviewListPage}>
-                내가 쓴 리뷰 조회
-              </button>
               <button style={{ ...styles.button, backgroundColor: "#67AB9F" }} onClick={handleChangePassword}>
                 비밀번호 변경
               </button>

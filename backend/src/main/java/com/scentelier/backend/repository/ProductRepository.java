@@ -67,6 +67,7 @@ public interface ProductRepository extends JpaRepository<Products, Long> {
        """)
     Page<Products> adminSearch(@Param("q") String q, Pageable pageable);
 
+
 //    @Query("""
 //       SELECT p FROM Products p
 //       WHERE p.isDeleted = false
