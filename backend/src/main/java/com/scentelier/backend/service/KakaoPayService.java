@@ -1,5 +1,6 @@
 package com.scentelier.backend.service;
 
+import com.scentelier.backend.entity.OrderProduct;
 import com.scentelier.backend.entity.Orders;
 import com.scentelier.backend.constant.OrderStatus;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,24 @@ public class KakaoPayService {
         params.put("cid", "TC0ONETIME");
         params.put("partner_order_id", order.getId().toString());
         params.put("partner_user_id", order.getUsers().getId().toString());
-        params.put("item_name", "Scentelier 향수 주문");
-        params.put("quantity", "1");
+        List<OrderProduct> products = order.getOrderProducts();
+        String itemName = "";
+        if (!products.isEmpty()) {
+            itemName = products.get(0).getProducts() != null
+                    ? products.get(0).getProducts().getName()
+                    : products.get(0).getCustomPerfume().getName();
+
+            int extraCount = products.size() - 1;
+            if (extraCount > 0) {
+                itemName += " 외 " + extraCount + "종";
+            }
+        }
+        params.put("item_name", itemName);
+        int totalQuantity = order.getOrderProducts().stream()
+                .mapToInt(OrderProduct::getQuantity)
+                .sum();
+
+        params.put("quantity", String.valueOf(totalQuantity));
         params.put("total_amount", String.valueOf(order.getTotalPrice().intValue()));
         params.put("tax_free_amount", "0");
         params.put("approval_url", approvalUrl + "?orderId=" + order.getId());
