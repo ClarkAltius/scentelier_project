@@ -1,7 +1,7 @@
 import { Nav, Navbar, Container, NavDropdown, NavItem } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
-import { ShoppingCart, User, Shield } from "lucide-react";
+import { ShoppingCart, User, Shield, LogOut } from "lucide-react";
 
 function MenuItems() {
 
@@ -74,12 +74,11 @@ function MenuItems() {
                                 <User size={20} style={{ color: '#808080ff' }} />
                             </Nav.Link>
                             <div style={{ paddingLeft: '10px' }}></div>
-                            <Navbar.Text style={{ color: '#6c757d', fontFamily: "'Gowun Batang', serif", fontSize: '1rem', marginLeft: '-5px' }}> {/* Adjusted margin */}
-                                {`어서오세요, ${user.username} 님` || 'User'}
-                            </Navbar.Text>
                             <Nav.Link
                                 style={{ color: '#6c757d', fontSize: '1rem', marginRight: '15px' }}
-                                onClick={() => navigate('/logout')}>Logout</Nav.Link>
+                                onClick={() => navigate('/logout')}>
+                                <LogOut size={20} style={{ color: '#808080ff' }} />
+                            </Nav.Link>
                         </>
 
                     ) : (
