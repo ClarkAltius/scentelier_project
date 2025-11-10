@@ -196,7 +196,7 @@ public class AdminController {
     public ResponseEntity<Page<Map<String, Object>>> getAdminProducts(
             Pageable pageable,
             @RequestParam(value = "q", required = false) String q,
-            @RequestParam(value = "includeDeleted", defaultValue = "false") boolean includeDeleted
+            @RequestParam(value = "includeDeleted", defaultValue = "true") boolean includeDeleted
     ) {
         // ★ 로그로 q가 실제로 들어오는지 바로 확인
         System.out.println("[ADMIN /products] q=" + q + ", page=" + pageable.getPageNumber());
@@ -349,6 +349,7 @@ public class AdminController {
         ReviewAdminDto updatedReview = reviewService.updateReviewStatus(id, statusDto);
         return ResponseEntity.ok(updatedReview);
     }
+
 }
 
 

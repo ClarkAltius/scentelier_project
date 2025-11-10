@@ -75,8 +75,8 @@ function ProductManagement({ setActiveView }) {
     setError(null);
     try {
       const res = await axios.get(`${API_BASE_URL}/api/admin/products`, {
-        params: { page, size: 10, q: query || undefined, includeDeleted: false },
-        signal: controller.signal,
+    params: { page, size: 10, includeDeleted: true, q: query },
+    signal: controller.signal,  
         withCredentials: true,
       });
 
@@ -172,11 +172,10 @@ function ProductManagement({ setActiveView }) {
         { params: { status: next }, withCredentials: true },
       );
       const serverStatus = data?.status ?? next;
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === item.id ? { ...p, isDeleted: serverStatus === 'STOPPED', status: serverStatus } : p,
-        ),
-      );
+const serverIsDeleted = data?.isDeleted ?? (serverStatus === 'STOPPED');
+setProducts(prev => prev.map(p =>
+  p.id === item.id ? { ...p, isDeleted: serverIsDeleted, status: serverStatus } : p
+));
     } catch (err) {
       setProducts(snapshot);
       const msg = err?.response?.data || '상태 변경 실패';
@@ -204,23 +203,6 @@ function ProductManagement({ setActiveView }) {
   // CRUD
   const handleAddNew = () => setActiveView('productInsert');
 
-  // const handleDelete = async (productId) => {
-  //   if (!window.confirm('정말 삭제하시겠습니까?')) return;
-
-  //   const snapshot = [...products];
-  //   setProducts((prev) => prev.filter((p) => p.id !== productId));
-
-  //   try {
-  //     await axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(productId)}`, { withCredentials: true });
-  //     alert('상품이 삭제되었습니다.');
-  //     setSelectedIds((prev) => prev.filter((id) => id !== productId));
-  //   } catch (error) {
-  //     console.error('삭제 중 오류:', error);
-  //     setProducts(snapshot);
-  //     alert('상품 삭제 중 오류가 발생하였습니다.');
-  //   }
-  // };
-
   const handleSelectDelete = async () => {
     if (selectedIds.length === 0) return;
     if (!window.confirm(`선택된 ${selectedIds.length}개의 상품을 삭제하시겠습니까?`)) {
@@ -229,37 +211,45 @@ function ProductManagement({ setActiveView }) {
     }
 
     const snapshot = [...products];
-    setProducts((prev) => prev.filter((p) => !selectedIds.includes(p.id)));
+    // 1) 로컬에서 먼저 지워서 즉시 화면에서 사라지게(낙관적 UI)
+    const afterLocal = snapshot.filter((p) => !selectedIds.includes(p.id));
+    setProducts(afterLocal);
 
     try {
       const result = await Promise.allSettled(
         selectedIds.map((id) =>
-          axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, { withCredentials: true }),
-        ),
+          axios.delete(`${API_BASE_URL}/product/${encodeURIComponent(id)}`, { withCredentials: true })
+        )
       );
 
-      const successCount = result.filter((r) => r.status === 'fulfilled').length;
-      const failCount = result.length - successCount;
+      const successIds = result
+        .map((r, idx) => (r.status === 'fulfilled' ? selectedIds[idx] : null))
+        .filter(Boolean);
+      const failIds = result
+        .map((r, idx) => (r.status === 'rejected' ? selectedIds[idx] : null))
+        .filter(Boolean);
 
-      if (failCount > 0) {
-        const failedIds = result
-          .map((r, idx) => ({ r, id: selectedIds[idx] }))
-          .filter((x) => x.r.status === 'rejected')
-          .map((x) => x.id);
-
-        setProducts(() => {
-          const failedItems = snapshot.filter((item) => failedIds.includes(item.id));
-          const survivors = snapshot.filter((item) => !failedIds.includes(item.id));
-          return [...survivors, ...failedItems].sort((a, b) => a.id - b.id);
-        });
-
-        alert(`일부 항목 삭제 실패: 성공 ${successCount}개, 실패 ${failCount}개`);
+      // 2) 실패한 항목만 되돌리기
+      if (failIds.length > 0) {
+        const failedItems = snapshot.filter((item) => failIds.includes(item.id));
+        const survivors = afterLocal; // 이미 성공분은 제거된 상태
+        setProducts([...survivors, ...failedItems].sort((a, b) => (a.id > b.id ? 1 : -1)));
+        alert(`일부 항목 삭제 실패: 성공 ${successIds.length}개, 실패 ${failIds.length}개`);
       } else {
-        alert(`선택한 ${successCount}개 상품을 삭제했습니다.`);
+        alert(`선택한 ${successIds.length}개 상품을 삭제했습니다.`);
+        // 3) 이 페이지가 비었으면 이전 페이지로 자동 이동 + 재조회
+        if (afterLocal.length === 0 && page > 0) {
+          setPage((p) => p - 1);
+          setForceSearchTick((t) => t + 1);
+        } else {
+          // 현재 페이지 유지하되 서버와 동기화(토탈페이지/재고/상태 갱신)
+          setForceSearchTick((t) => t + 1);
+        }
       }
       setSelectedIds([]);
     } catch (err) {
       console.error('선택 삭제 오류 :', err);
+      // 전체 실패 시 UI 롤백
       setProducts(snapshot);
       alert('선택 삭제 중 오류가 발생했습니다');
     }

@@ -67,17 +67,6 @@ public interface ProductRepository extends JpaRepository<Products, Long> {
        """)
     Page<Products> adminSearch(@Param("q") String q, Pageable pageable);
 
-//    @Query("""
-//       SELECT p FROM Products p
-//       WHERE p.isDeleted = false
-//         AND (
-//              LOWER(p.name) LIKE CONCAT('%', :q, '%')
-//           OR LOWER(COALESCE(p.keyword, '')) LIKE CONCAT('%', :q, '%')
-//           OR str(p.id) LIKE CONCAT('%', :q, '%')
-//           OR UPPER(CAST(p.category as string)) = UPPER(:q)   -- Hibernate 6에서 동작
-//         )
-//       """)
-//    Page<Products> adminSearchWithCategory(@Param("q") String q, Pageable pageable);
 }
 
 
