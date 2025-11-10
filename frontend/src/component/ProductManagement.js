@@ -87,7 +87,6 @@ function ProductManagement({ setActiveView }) {
         });
 
         const data = res.data;
-        console.log(data);
         const raw =
           Array.isArray(data) ? data :
             Array.isArray(data?.content) ? data.content :
