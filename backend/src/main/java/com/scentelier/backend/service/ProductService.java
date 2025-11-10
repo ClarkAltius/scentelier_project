@@ -194,16 +194,16 @@ public class ProductService {
                 .orElseThrow(() -> new NoSuchElementException("상품 없음: " + id));
         if (stop) {
             // SELLING -> STOPPED: 장바구니/진행주문 있으면 차단
-            long cartCnt  = cartItemRepository.countActiveByProductId(id);
-            long orderCnt = orderRepository.countPendingOrdersByProductId(id, BLOCK_STATUSES);
-            if (cartCnt > 0 || orderCnt > 0) {
-                StringBuilder sb = new StringBuilder("판매중지 불가: ");
-                boolean first = true;
-                if (cartCnt > 0)   { sb.append("장바구니 ").append(cartCnt).append("건"); first = false; }
-                if (orderCnt > 0)  { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(orderCnt).append("건"); }
-                sb.append("이 존재합니다.");
-                throw new IllegalStateException(sb.toString()); // 컨트롤러에서 409로 응답
-            }
+//            long cartCnt  = cartItemRepository.countActiveByProductId(id);
+//            long orderCnt = orderRepository.countPendingOrdersByProductId(id, BLOCK_STATUSES);
+//            if (cartCnt > 0 || orderCnt > 0) {
+//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
+//                boolean first = true;
+//                if (cartCnt > 0)   { sb.append("장바구니 ").append(cartCnt).append("건"); first = false; }
+//                if (orderCnt > 0)  { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(orderCnt).append("건"); }
+//                sb.append("이 존재합니다.");
+//                throw new IllegalStateException(sb.toString()); // 컨트롤러에서 409로 응답
+//            }
             p.setDeleted(true);
             p.setDeletedAt(LocalDate.now());
         } else {
