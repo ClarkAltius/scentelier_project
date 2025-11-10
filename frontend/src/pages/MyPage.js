@@ -146,17 +146,20 @@ const MyPage = () => {
 
       if (response.ok) {
         // 서버에서 새로운 이미지 URL 반환했다고 가정
-        const newUserData = {
-          username: result.username,
-          email: result.email,
-          phone: result.phone,
-          address: result.address,
-          // profileImage: result.profileImage || preview, // 기존 preview 유지
-        };
+        // const newUserData = {
+        //   username: result.username,
+        //   email: result.email,
+        //   phone: result.phone,
+        //   address: result.address,
+        //   // profileImage: result.profileImage || preview, // 기존 preview 유지
+        // };
 
-        setUserInfo(newUserData);
-        // setPreview(newUserData.profileImage); // 미리보기 갱신
-        login(newUserData);
+        // setUserInfo(newUserData);
+        // // setPreview(newUserData.profileImage); // 미리보기 갱신
+        // login(newUserData);
+
+        setUserInfo(result);
+        login(result);
         alert("회원 정보가 성공적으로 업데이트되었습니다.");
         setPage("view");
       } else {
@@ -172,25 +175,25 @@ const MyPage = () => {
 
   //수정 코드 끝
 
-  const handleMyInquiry = () => {
-    navigate("/myinquiry"); // 문의사항 페이지로 이동
-  };
-
-  const handleCartList = () => {
-    navigate("/cart/list"); // 장바구니 페이지로 이동
-  };
-
-  const handleOrderList = () => {
-    navigate("/order/list"); // 주문내역 페이지로 이동
-  };
-
-  // const handlePayments = () => {
-  //   navigate("/payments"); // 결제 페이지로 이동
+  // const handleMyInquiry = () => {
+  //   navigate("/myinquiry"); // 문의사항 페이지로 이동
   // };
 
-  const handleMyReviewListPage = () => {
-    navigate("/mypage/review"); // 내가 쓴 리뷰 조회하기 페이지로 이동
-  };
+  // const handleCartList = () => {
+  //   navigate("/cart/list"); // 장바구니 페이지로 이동
+  // };
+
+  // const handleOrderList = () => {
+  //   navigate("/order/list"); // 주문내역 페이지로 이동
+  // };
+
+  // // const handlePayments = () => {
+  // //   navigate("/payments"); // 결제 페이지로 이동
+  // // };
+
+  // const handleMyReviewListPage = () => {
+  //   navigate("/mypage/review"); // 내가 쓴 리뷰 조회하기 페이지로 이동
+  // };
 
 
   // 비밀번호 변경
