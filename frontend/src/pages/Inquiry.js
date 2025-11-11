@@ -150,7 +150,7 @@ const Inquiry = ({ activeView, setActiveView }) => {
         alert("문의 전송 중 오류가 발생했습니다.");
       }
     }
-
+    setActiveView('myInquiry');
   };
 
   return (
@@ -170,7 +170,7 @@ const Inquiry = ({ activeView, setActiveView }) => {
             <option value="PRODUCT">상품</option>
             <option value="DELIVERY">배달</option>
             <option value="PAYMENT">결제</option>
-            <option value="ETC">기타</option>
+            <option value="OTHER">기타</option>
           </FormSelect>
           {errors.type && <div style={styles.error}>{errors.type}</div>}
 
