@@ -1,16 +1,27 @@
 package com.scentelier.backend.controller;
 
+import com.scentelier.backend.dto.UpdateUserDto;
 import com.scentelier.backend.entity.Users;
+import com.scentelier.backend.repository.UserRepository;
 import com.scentelier.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -19,35 +30,47 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder,UserRepository userRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
      }
+
+    // 프로필 이미지 다운로드
+    @GetMapping("/profile-image")
+    public ResponseEntity<Resource> getProfileImage(@RequestParam String email) throws IOException {
+        String imagePath = userService.getProfileImagePath(email); // DB에서 이미지 파일명 가져오기
+        Path filePath = Paths.get("src/main/uploads/profile").resolve(imagePath).normalize();
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG) // 필요하면 파일 확장자에 따라 contentType 변경
+                .body(resource);
+    }
+
 
     // 회원 정보 수정
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(
-            @RequestParam String name,
-            @RequestParam String email,
-            @RequestParam String phone,
-            @RequestParam String address
-
-    ) {
-        Optional<Users> optionalUser = userService.findByEmail(email);
+    public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto updateUserDto) throws IOException {
+        Optional<Users> optionalUser = userService.findByEmail(updateUserDto.getEmail());
 
         if (optionalUser.isEmpty()) {
             return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
         }
 
         Users user = optionalUser.get();
-        user.setUsername(name);
-        user.setPhone(phone);
-        user.setAddress(address);
+        user.setUsername(updateUserDto.getName());
+        user.setPhone(updateUserDto.getPhone());
+        user.setAddress(updateUserDto.getAddress());
 
-        userService.saveUser(user); // DB에 저장
-        // 업데이트된 사용자 객체를 그대로 반환
+        userService.saveUser(user);
         return ResponseEntity.ok(user);
     }
 
@@ -128,4 +151,67 @@ public class UserController {
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
     //마이페이지 비밀번호 변경 끝
+
+    // 프로필 이미지 조회 로직
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<Resource> getProfileImageById(@PathVariable Long userId) throws IOException {
+        Optional<Users> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        // 업로드된 프로필 이미지 경로
+        Path filePath = Paths.get("src/main/uploads/profile")
+                .resolve(userId + ".jpg")
+                .normalize();
+
+        Resource resource;
+        if (Files.exists(filePath) && Files.isReadable(filePath)) {
+            resource = new UrlResource(filePath.toUri());
+        } else {
+            // 파일 없으면 default.png 반환
+            Path defaultPath = Paths.get("src/main/uploads/profile/default.png").normalize();
+            resource = new UrlResource(defaultPath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("Default image not found");
+            }
+        }
+
+        String contentType = Files.probeContentType(filePath);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+    }
+
+    // 사용자 프로필 업로드 로직
+    @PostMapping("/profile/upload/{userId}")
+    public ResponseEntity<String> uploadProfile(@PathVariable Long userId,
+                                                @RequestParam MultipartFile file) {
+        try {
+            // 프로젝트 기준 경로 (src/main/resources는 개발용)
+            String folderPath = new File("src/main/uploads/profile").getAbsolutePath();
+            File folder = new File(folderPath);
+            if (!folder.exists()) {
+                folder.mkdirs(); // 디렉토리 없으면 생성
+            }
+
+            // 파일 이름은 userId 기반
+
+            String filename = userId + ".jpg";
+            File destination = new File(folder, filename);
+
+            file.transferTo(destination);
+
+            return ResponseEntity.ok("업로드 성공: " + destination.getPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업로드 실패");
+        }
+    }
+
+
 }

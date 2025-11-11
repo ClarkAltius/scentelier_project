@@ -4,7 +4,9 @@ import { Card, Container, Row, Form, Col, Button, Alert } from "react-bootstrap"
 import { API_BASE_URL } from "../config/config";
 import { useNavigate } from "react-router-dom";
 import './Signup.css'; // 새로 만든 CSS 파일 import
+import { useEffect } from "react"; //이미지 미리보기
 
+import { useRef } from "react";
 function App() {
 
     const [username, setUsername] = useState('');
@@ -13,8 +15,8 @@ function App() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
-
-
+    const [profileImage, setProfileImage] = useState(null); // 프로필 이미지 넣기
+    const [previewImage, setPreviewImage] = useState('http://localhost:9000/uploads/profile/default.png'); // 프로필 이미지 미리보기
     const [errors, setErrors] = useState({
         username: '', email: '', password: '', confirmPassword: '', address: '', phone: '', general: ''
     });
@@ -23,8 +25,39 @@ function App() {
     const PASSWORD_REGEX = /^[A-Z][A-Za-z0-9!@#$%^&*]{7,}$/;
     const PHONE_REGEX = /^(\d{2,3}-\d{3,4}-\d{4})$/; // 000-0000-0000 형식
 
+    const fileInputRef = useRef(null);
+
+
+    //프로필 이미지 미리보기
+    useEffect(() => {
+        // if (profileImage) {
+        //     const objectUrl = URL.createObjectURL(profileImage);
+        //     setPreviewImage(objectUrl);
+
+        //     // 컴포넌트 언마운트 시 메모리 해제
+        //     return () => URL.revokeObjectURL(objectUrl);
+        // } else {
+        setPreviewImage('http://localhost:9000/uploads/profile/default.png'); // 업로드 없으면 기본 이미지
+        // }
+    }, [profileImage]);
+
+    const handleProfileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setProfileImage(e.target.files[0]);
+        }
+    };
+
+
+    //프로필 이미지 미리보기 끝
+
+
     const SignupAction = async (event) => {
         event.preventDefault(); // 이벤트 전파 방지
+
+
+
+
+
 
         // 클라이언트 단 전화번호 필수 체크
         if (!phone) {
@@ -53,15 +86,23 @@ function App() {
 
         try {
             const url = `${API_BASE_URL}/signup`;
-            const params = new URLSearchParams();
-            params.append('username', username);
-            params.append('email', email);
-            params.append('password', password);
-            params.append('address', address);
-            params.append('phone', phone);
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('address', address);
+            formData.append('phone', phone);
 
-            const response = await axios.post(url, params, {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+
+            // if (profileImage) {
+            //     formData.append('profileImage', profileImage);
+            // }
+            for (const [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+
+            const response = await axios.post(url, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             if (response.status === 200) {
@@ -232,13 +273,62 @@ function App() {
                             </Form.Control.Feedback>
                         </Form.Group>
 
+                        {/* 💡 프로필 이미지 업로드 추가 */}
+                        {/* <Form.Group className="mb-3">
+                            <Form.Label>프로필 이미지</Form.Label>
+                            <div className="profile-preview-container mb-2">
+                                <img
+                                    src={previewImage}
+                                    alt="프로필 미리보기"
+                                    className="profile-preview-img"
+                                />
+                            </div>
+
+                            <Form.Control
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef} //ref 연결
+                                // onChange={(e) => setProfileImage(e.target.files[0])}
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setProfileImage(e.target.files[0]);
+                                        if (fileInputRef.current) fileInputRef.current.blur();
+                                    }
+                                }}
+                            />
+                            <div className="mt-2 text-start">
+                                <Button
+                                    variant="secondary"
+                                    className="mt-2 w-20"
+                                    onClick={() => {
+                                        setProfileImage(null); //업로드한 이미지 초기화
+                                        setPreviewImage('http://localhost:9000/uploads/profile/default.png')//기본이미지로 설정
+                                        if (fileInputRef.current) {
+                                            fileInputRef.current.value = null; //파일 input 초기화
+                                        }
+
+                                    }}
+                                >
+                                    이미지 삭제
+                                </Button>
+                            </div>
+                        </Form.Group> */}
+
+                        {/* <small className="input-helper-text">
+                            ※ 프로필 이미지는 기본이미지로 설정됩니다.
+                        </small> */}
+
+
+
+
+
                         <Button type="submit" className="w-100 btn-primary-custom">
                             회원 가입
                         </Button>
                     </Form>
                 </Card.Body>
             </Card>
-        </div>
+        </div >
     );
 }
 

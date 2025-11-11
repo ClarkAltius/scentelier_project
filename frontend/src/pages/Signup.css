@@ -89,3 +89,17 @@
     border-color: #558c80;
     box-shadow: 0 0 0 0.25rem rgba(103, 171, 159, 0.5);
 }
+
+/* 프로필 이미지  */
+.profile-preview-container {
+    text-align: center; /* 이미지 가운데 정렬 */
+    margin-bottom: 10px;
+}
+
+.profile-preview-img {
+    width: 120px;   /* 원하는 가로 크기 */
+    height: 120px;  /* 원하는 세로 크기 */
+    object-fit: cover; /* 비율 유지하면서 이미지 자르기 */
+    border-radius: 50%; /* 원형으로 만들고 싶으면 */
+    border: 2px solid #ccc; /* 선택 사항: 테두리 */
+}
