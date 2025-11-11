@@ -41,7 +41,7 @@ public class KakaoPayService {
         headers.add("Content-Type", "application/json");
 
         Map<String, String> params = new HashMap<>();
-        params.put("cid", "TC0ONETIME");
+        params.put("cid", cid);
         params.put("partner_order_id", order.getId().toString());
         params.put("partner_user_id", order.getUsers().getId().toString());
         List<OrderProduct> products = order.getOrderProducts();
