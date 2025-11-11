@@ -5,7 +5,13 @@ import com.scentelier.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +27,9 @@ public class SignupService {
     // 비밀번호 패턴: 첫 글자 대문자 + 8자 이상
     private static final String PASSWORD_PATTERN = "^[A-Z][A-Za-z0-9!@#$%^&*]{7,}$";
     private static final String PHONE_PATTERN = "^\\d{2,3}-\\d{3,4}-\\d{4}$";
+
+    // 이미지 업로드 경로
+   // private static final String UPLOAD_DIR = "src/main/uploads/profile/";
 
     public Map<String, String> registerUser(Users user) {
         Map<String, String> response = new HashMap<>();
@@ -53,12 +62,41 @@ public class SignupService {
             return response;
         }
 
+        // 프로필 이미지 처리
+//        try {
+//            String fileName;
+//
+//            if (profileImage != null && !profileImage.isEmpty()) {
+//                // 이미지 업로드 처리
+//                fileName = System.currentTimeMillis() + "_" + profileImage.getOriginalFilename();
+//
+//                Path uploadPath = Paths.get(UPLOAD_DIR);
+//                if (!Files.exists(uploadPath)) {
+//                    Files.createDirectories(uploadPath);
+//                }
+//
+//                Path filePath = uploadPath.resolve(fileName);
+//                Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+//
+//            } else {
+//                // 기본 이미지 지정
+//                fileName = "default.png";
+//            }
+//
+//            user.setProfileImage(fileName);
+//
+//        } catch (IOException e) {
+//            response.put("error", "이미지 업로드 중 오류가 발생했습니다.");
+//            return response;
+//        }
+//프로필 이미지 처리 끝
 
         //사용자 저장
         userRepository.save(user);
         response.put("message", "회원가입 성공");
         return response;
     }
+    //프로필 이미지 처리 끝
 
 //이메일 중복 체크
     public boolean isEmailExists(String email) {

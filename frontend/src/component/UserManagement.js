@@ -357,7 +357,7 @@ function UserManagement() {
 
         return (
             <div className={styles.detailView}>
-                <Button variant="link" onClick={handleBackToList} className={styles.backButton}>
+                <Button variant="outline-primary" onClick={handleBackToList} className={styles.backButton}>
                     <ArrowLeft size={18} /> 모든 사용자 목록으로
                 </Button>
 

@@ -595,29 +595,6 @@ function ProductManagement({ setActiveView }) {
                 </button>
               </div>
             )}
-
-            {/* <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                className={styles.editButton}
-                onClick={() => {
-                  closeDetail();
-                  handleEdit(detail); // detail 상품을 수정 모달로 넘기기
-                }}
-              >
-                <Edit size={16} style={{ verticalAlign: 'text-bottom' }} /> 수정
-              </button>
-              <button
-                className={styles.toggleStatusButton}
-                onClick={() => { closeDetail(); handleToggleStatus(detail); }}
-                disabled={detail?.status === 'PENDING'}
-                title={detail?.status === 'PENDING' ? '주문중 상태에서는 변경 불가' : ''}
-              >
-                {detail?.status != 'STOPPED' ? '판매중지' : '판매시작'}
-              </button>
-              <button className={styles.deleteButton} onClick={() => { closeDetail(); handleDelete(detail.id); }}>
-                <Trash2 size={16} style={{ verticalAlign: 'text-bottom' }} /> 삭제
-              </button>
-            </div> */}
           </div>
         </div>
       )}

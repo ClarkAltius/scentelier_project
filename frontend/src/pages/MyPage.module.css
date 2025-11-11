@@ -1,0 +1,165 @@
+.container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: left;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+/* Profile View */
+.profileViewWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.infoWrapper {
+  flex: 1;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.label {
+  font-weight: 600;
+  color: #555;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.value {
+  color: #333;
+  word-break: break-all;
+}
+
+/* Form Items */
+.formItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.inputControl {
+  flex: 1;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #67ab9f;
+  box-shadow: 0 0 4px rgba(103, 171, 159, 0.3);
+}
+
+/* Profile Image */
+.profileImageWrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profileImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid #fff;
+}
+
+.fileInput {
+  display: block;
+  margin: 15px auto 0;
+  font-size: 13px;
+  width: 220px;
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  justify-content: flex-end;
+}
+
+.primaryButton {
+  padding: 12px 25px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  background-color: #67ab9f;
+  transition: background-color 0.2s;
+}
+
+.primaryButton:hover {
+  background-color: #559a8f;
+}
+
+.secondaryButton {
+  padding: 12px 25px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #333;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.secondaryButton:hover {
+  background-color: #f7f7f7;
+  border-color: #bbb;
+}
+
+/* Danger Zone */
+.dangerZone {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.dangerLink {
+  color: #f44336;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  padding: 5px;
+}
+
+/* Error Text */
+.errorText {
+  color: #f44336;
+  font-size: 13px;
+  margin-top: 8px;
+}
