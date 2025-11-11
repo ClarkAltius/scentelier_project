@@ -117,6 +117,34 @@ public class ProductService {
         return true;
     }
 
+//    @Transactional
+//    public boolean toggleStatus(Long id) {
+//        Products p = productRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("상품 없음"));
+//
+//        if (p.getStatus() == ProductStatus.SELLING) {
+//            // STOPPED로 내리기 전 “장바구니/주문” 점검
+//            long inCarts = cartItemRepository.countActiveByProductId(id);
+//            long inPendingOrders = orderRepository.countPendingOrdersByProductId(id, PENDING_STATUSES);
+//
+//            if (inCarts > 0 || inPendingOrders > 0) {
+//                StringBuilder sb = new StringBuilder("판매중지 불가: ");
+//                boolean first = true;
+//                if (inCarts > 0) { sb.append("장바구니 ").append(inCarts).append("건"); first = false; }
+//                if (inPendingOrders > 0) { if (!first) sb.append(", "); sb.append("진행 중 주문 ").append(inPendingOrders).append("건"); }
+//                sb.append("이 존재합니다.");
+//                // 커스텀 예외 굳이 안 쓰고 RuntimeException으로 409 응답 유도
+//                throw new RuntimeException(sb.toString());
+//            }
+//            p.setStatus(ProductStatus.STOPPED);
+//        } else {
+//            // STOPPED → SELLING은 제한 없이 허용
+//            p.setStatus(ProductStatus.SELLING);
+//        }
+//
+//        productRepository.save(p);
+//        return true;
+//    }
 
     @EventListener
     @Transactional

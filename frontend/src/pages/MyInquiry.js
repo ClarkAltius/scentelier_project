@@ -7,7 +7,7 @@ import { useAuth } from "../component/AuthContext";
 import { API_BASE_URL } from "../config/config";
 import "./MyInquiry.css"; // 새로 만든 CSS 파일 import
 
-function MyInquiry() {
+function MyInquiry({ activeView, setActiveView, setSelectedInquiryId }) {
     const [inquiries, setInquiries] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
@@ -20,6 +20,11 @@ function MyInquiry() {
         DELIVERY: "배달", // '배달' -> '배송'이 더 일반적일 수 있습니다.
         PAYMENT: "결제",
         ETC: "기타"
+    };
+
+    const handleInquiryClick = (inquiryId) => {
+        setSelectedInquiryId(inquiryId); // Set the ID in the parent state
+        setActiveView('inquiryDetail');     // Then change the view
     };
 
     useEffect(() => {
@@ -95,7 +100,7 @@ function MyInquiry() {
                 ) : (
                     inquiries.map((inquiry) => (
                         <div key={inquiry.id} className="inquiry-card">
-                            <Link to={`/inquiry/${inquiry.id}`} className="inquiry-card-link">
+                            <div onClick={() => handleInquiryClick(inquiry.id)} className="inquiry-card-link"> {/**inquiry.id how? */}
                                 <h3>{inquiry.title}</h3>
                                 <div className="inquiry-details">
                                     <p>
@@ -118,7 +123,7 @@ function MyInquiry() {
                                         </span>
                                     </p>
                                 </div>
-                            </Link>
+                            </div>
                         </div>
                     ))
                 )
@@ -126,12 +131,12 @@ function MyInquiry() {
 
             {/* react-bootstrap Row/Col 대신 flexbox로 재구성 */}
             <div className="inquiry-actions">
-                <Link to="/mypage" className="btn-custom btn-secondary-custom">
-                    마이페이지로
-                </Link>
-                <Link to="/inquiry" className="btn-custom btn-primary-custom">
+                <button className="mypagebutton" onClick={() => setActiveView('myPage')}>
+                    마이페이지
+                </button >
+                <button className="inquirybutton" onClick={() => setActiveView('inquiry')}>
                     문의하기
-                </Link>
+                </button>
             </div>
         </div >
     );

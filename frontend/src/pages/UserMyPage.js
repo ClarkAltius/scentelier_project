@@ -7,8 +7,11 @@ import MyInquiry from '../pages/MyInquiry';
 import Orders from '../pages/OrderList';
 import { useLocation } from 'react-router-dom';
 import MyReviews from '../pages/MyReviewListPage';
+import ReviewWrite from '../pages/ReviewWriteForm';
 import { useEffect } from "react";
 import MyPerfume from '../pages/Myperfume';
+import Inquiry from '../pages/Inquiry';
+import InquiryDetail from '../pages/InquiryDetail';
 
 function UserMyPage() {
 
@@ -17,6 +20,9 @@ function UserMyPage() {
     const [activeView, setActiveView] = useState(
         location.state?.view || 'myPage'
     );
+
+    // 문의 id 저장용 스테이트
+    const [selectedInquiryId, setSelectedInquiryId] = useState(null);
 
     useEffect(() => {
         if (location.state?.view) {
@@ -28,10 +34,14 @@ function UserMyPage() {
         const views = {
             'myPage': <MyPage />,
             'cart': <Cart />,
-            'myInquiry': <MyInquiry />,
+            'myInquiry': <MyInquiry activeView={activeView} setActiveView={setActiveView} setSelectedInquiryId={setSelectedInquiryId} />,
             'orders': <Orders />,
-            'myReviews': <MyReviews />,
-            'myPerfume': <MyPerfume />
+            'myReviews': <MyReviews activeView={activeView} setActiveView={setActiveView} />,
+            'myPerfume': <MyPerfume />,
+            'reviewWrite': <ReviewWrite />,
+            'inquiry': <Inquiry activeView={activeView} setActiveView={setActiveView} />,
+            'inquiryDetail': <InquiryDetail inquiryId={selectedInquiryId} setActiveView={setActiveView} />
+
         };
         return views[activeView] || <MyPage />;
     };

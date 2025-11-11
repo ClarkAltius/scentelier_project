@@ -107,32 +107,32 @@ const ReviewCreatePage = () => {
 
         {/* 선택한 주문 상품 목록 */}
         {selectedOrder && (
-        <Card className="mb-3 p-3 bg-light">
+          <Card className="mb-3 p-3 bg-light">
             <h6 className="fw-semibold">📦 주문 상품</h6>
             <div className="mb-0">
-            {selectedOrder.products.map((item) => (
+              {selectedOrder.products.map((item) => (
                 <div key={item.productId}>
-                {item.productName} × {item.quantity} ({item.price.toLocaleString()}원)
+                  {item.productName} × {item.quantity} ({item.price.toLocaleString()}원)
                 </div>
-            ))}
+              ))}
             </div>
-        </Card>
+          </Card>
         )}
 
         {/* 리뷰 작성 폼 */}
         <Form.Group className="mb-3">
-        <Form.Label>별점</Form.Label>
-        <div className="d-flex justify-content-center gap-2">
+          <Form.Label>별점</Form.Label>
+          <div className="d-flex justify-content-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
-                  key={star}
-                  size={22}
-                  onClick={() => setRating(star)}
-                  style={{ cursor: "pointer" }}
-                  color={rating >= star ? "#FBBF24" : "#9CA3AF"}
+                key={star}
+                size={22}
+                onClick={() => setRating(star)}
+                style={{ cursor: "pointer" }}
+                color={rating >= star ? "#FBBF24" : "#9CA3AF"}
               />
             ))}
-        </div>
+          </div>
         </Form.Group>
 
 
