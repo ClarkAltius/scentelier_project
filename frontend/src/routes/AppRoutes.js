@@ -18,11 +18,16 @@ import InquiryDetail from "../pages/InquiryDetail.js";
 import MyPage from "../pages/MyPage.js";
 import Findpass from "../pages/Findpass.js";
 import PrivateRoute from './PrivateRoute.js';
-import ReviewWriteForm from '../pages/ReviewWriteForm.js'
-import MyReviewListPage from '../pages/MyReviewListPage.js'
-import ReviewBoardPage from '../pages/ReviewBoardPage.js'
-import SignUp from '../pages/SignUp.js'
-import Myperfume from '../pages/Myperfume.js'
+import ReviewWriteForm from '../pages/ReviewWriteForm.js';
+import MyReviewListPage from '../pages/MyReviewListPage.js';
+import ReviewBoardPage from '../pages/ReviewBoardPage.js';
+import SignUp from '../pages/SignUp.js';
+import Myperfume from '../pages/Myperfume.js';
+import UserMyPage from '../pages/UserMyPage.js';
+
+import PaymentSuccess from "../pages/payment/PaymentSuccess";
+import PaymentCancel from "../pages/payment/PaymentCancel";
+import PaymentFail from "../pages/payment/PaymentFail";
 
 import Dashboard from '../component/Dashboard';
 import ProductManagement from '../component/ProductManagement';
@@ -50,6 +55,11 @@ function AppRoutes() {
             <Route path='/reviews/list' element={<ReviewBoardPage />} />
             <Route path='/signup' element={<SignUp />} />
             <Route path='/myperfume' element={<Myperfume />} />
+
+            {/** 결제 관련 */}
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/cancel" element={<PaymentCancel />} />
+            <Route path="/payment/fail" element={<PaymentFail />} />
 
             {/**로그인 사용자 전용 */}
 
@@ -91,6 +101,14 @@ function AppRoutes() {
                     </PrivateRoute>
                 }
             />
+            <Route
+                path='/usermypage'
+                element={<PrivateRoute>
+                    <UserMyPage />
+                </PrivateRoute>
+                }
+            />
+
             {/**관리자 전용 경로 */}
             <Route
                 path='/admin'

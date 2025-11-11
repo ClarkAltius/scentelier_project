@@ -193,8 +193,16 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<Page<Map<String, Object>>> getAdminProducts(Pageable pageable) {
-        Page<Products> page = productService.findAllAdmin(pageable);
+    public ResponseEntity<Page<Map<String, Object>>> getAdminProducts(
+            Pageable pageable,
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "includeDeleted", defaultValue = "true") boolean includeDeleted
+    ) {
+        // ★ 로그로 q가 실제로 들어오는지 바로 확인
+        System.out.println("[ADMIN /products] q=" + q + ", page=" + pageable.getPageNumber());
+
+        Page<Products> page = productService.findAdminProducts(pageable, q, includeDeleted);
+
         List<Map<String, Object>> content = page.getContent().stream().map(p -> {
             Map<String,Object> m = new LinkedHashMap<>();
             m.put("id", p.getId());
@@ -209,9 +217,10 @@ public class AdminController {
             m.put("createdAt", p.getCreatedAt());
             m.put("isDeleted", p.isDeleted());
             m.put("deletedAt", p.getDeletedAt());
-            m.put("status", productService.computeStatus(p)); // SELLING/PENDING/STOPPED
+            m.put("status", productService.computeStatus(p));
             return m;
         }).toList();
+
         return ResponseEntity.ok(new PageImpl<>(content, page.getPageable(), page.getTotalElements()));
     }
 
@@ -340,6 +349,7 @@ public class AdminController {
         ReviewAdminDto updatedReview = reviewService.updateReviewStatus(id, statusDto);
         return ResponseEntity.ok(updatedReview);
     }
+
 }
 
 

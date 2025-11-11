@@ -583,13 +583,13 @@ function StockManagement() {
             </div>
 
             <div className={styles.bulkActions}>
-                <button
+                {/* <button
                     className={styles.bulkRequestButton}
                     onClick={handleBulkRestockRequest}
                     disabled={currentSelectionCount === 0}
                 >
                     <PlusCircle size={16} /> 선택 상품 발주 ({currentSelectionCount})
-                </button>
+                </button> */}
                 <button
                     className={styles.generatePOButton} // 새 버튼 (CSS 클래스 추가 필요)
                     onClick={handleGeneratePurchaseOrder}

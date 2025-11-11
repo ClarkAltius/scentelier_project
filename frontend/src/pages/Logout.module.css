@@ -1,0 +1,47 @@
+    /*
+ * File: frontend/src/pages/Logout.module.css
+ */
+
+    /* This styles the main modal panel */
+    .logoutModalContent {
+        border-radius: 8px;
+        /* Softer corners */
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        /* A bit more shadow */
+    }
+
+    /* This styles the header */
+    .logoutModalHeader {
+        background-color: #f8f9fa;
+        /* A very light grey header */
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    /* This styles the modal's body text */
+    .logoutModalBody {
+        padding: 1.5rem 1.5rem;
+        font-size: 1.1rem;
+        /* Make the text slightly larger */
+        color: #495057;
+    }
+
+    /* This styles the footer */
+    .logoutModalFooter {
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    /* This styles the main logout button */
+    .logoutButton {
+        /* This red color signifies a destructive action */
+        background-color: #dc3545;
+        border-color: #dc3545;
+        font-weight: 500;
+    }
+
+    /* Darken the red on hover */
+    .logoutButton:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }

@@ -26,7 +26,12 @@ import {
 } from '../api/DashboardApi';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-function Dashboard() {
+function Dashboard({ activeView, setActiveView }) {
+
+    const handleNavClick = (e, viewName) => {
+        e.preventDefault();
+        setActiveView(viewName);
+    };
 
     const [kpiData, setKpiData] = useState(null);
     const [salesBreakdown, setSalesBreakdown] = useState(null);
@@ -136,7 +141,7 @@ function Dashboard() {
                     </div>
                     <p className={styles.kpiValue}>₩{(kpiData.totalRevenue / kpiData.totalOrders).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 </div>
-                <div className={styles.card}>
+                <div className={styles.card} onClick={(e) => handleNavClick(e, 'userManagement')}>
                     <div className={styles.cardHeader}>
                         <Users size={20} className={styles.cardIcon} />
                         <h3>신규 고객</h3>
@@ -235,14 +240,14 @@ function Dashboard() {
             {/* Fourth Row: Operational Insights */}
             <div className={styles.operationalGrid}>
                 {/* Actionable Items */}
-                <div className={styles.card}>
+                <div className={styles.card} onClick={(e) => handleNavClick(e, 'orders')}>
                     <div className={styles.cardHeader}>
                         <ClipboardList size={20} className={styles.cardIcon} />
                         <h3>처리 대기 주문</h3>
                     </div>
                     <p className={`${styles.kpiValue} ${styles.operationalValue}`}>{operationalData.pendingOrders}</p>
                 </div>
-                <div className={styles.card}>
+                <div className={styles.card} onClick={(e) => handleNavClick(e, 'inquiries')}>
                     <div className={styles.cardHeader}>
                         <MessageSquare size={20} className={styles.cardIcon} />
                         <h3>미응답 고객 문의</h3>
@@ -251,7 +256,7 @@ function Dashboard() {
                 </div>
 
                 {/* Low Stock Items */}
-                <div className={`${styles.card} ${styles.listCard}`}>
+                <div className={`${styles.card} ${styles.listCard}`} onClick={(e) => handleNavClick(e, 'stock')}>
                     <div className={styles.cardHeader}>
                         <AlertTriangle size={20} className={`${styles.cardIcon} ${styles.warningIcon}`} />
                         <h3>재고 부족 상품/원료</h3>

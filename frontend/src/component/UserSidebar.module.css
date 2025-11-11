@@ -1,0 +1,108 @@
+/* /src/component/UserSidebar.module.css */
+
+/* Theme variables derived from Home.js, ProductList.js, and Footer.js
+*/
+:root {
+    /* Font from Home.js & ProductList.js */
+    --scentelier-font-serif: 'Gowun Batang', serif;
+    /* Muted Heading color from Home.js & ProductList.js */
+    --scentelier-text-heading: #808080ff;
+    /* Warm, dark body text from Footer.js */
+    --scentelier-text-body: #4b3e2a;
+    /* Light border from ProductList.js */
+    --scentelier-border-light: #e0e0e0;
+    /* Light beige hover from ProductList.js tags */
+    --scentelier-bg-hover: #f3f3f3;
+    /* Accent green from MyPage.js / Home.js */
+    --scentelier-accent-green: #67AB9F;
+}
+
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    border-right: 1px solid var(--scentelier-border-light);
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
+    min-height: calc(100vh - 84px);
+}
+
+.logo {
+    font-family: var(--scentelier-font-serif);
+    font-size: 28px;
+    font-weight: 700;
+    padding: 25px 15px;
+    color: var(--scentelier-text-heading);
+    /* Use heading color */
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.navMenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.navItem {
+    margin-bottom: 5px;
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    padding: 14px 15px;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-left 0.2s ease;
+    cursor: pointer;
+
+    /* Apply the theme fonts and colors */
+    font-family: var(--scentelier-font-serif);
+    color: var(--scentelier-text-body);
+    font-weight: 500;
+    /* Regular weight */
+    font-size: 16px;
+    border-left: 3px solid transparent;
+    /* For active state */
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    /* Make icons match the text color */
+    color: var(--scentelier-text-body);
+    transition: color 0.2s ease;
+}
+
+.navLink:hover {
+    background-color: var(--scentelier-bg-hover);
+}
+
+/* NEW ACTIVE STATE:
+  Mimics the subtle, elegant style of ProductList.js
+*/
+.navLink.active {
+    font-weight: 700;
+    /* Bolder */
+    color: var(--scentelier-text-heading);
+    /* Use heading color */
+    background-color: var(--scentelier-bg-hover);
+    border-left: 3px solid var(--scentelier-accent-green);
+    /* Add accent bar */
+}
+
+/* Make the icon in the active link match */
+.navLink.active .icon {
+    color: var(--scentelier-text-heading);
+}
+
+.logoutSection {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--scentelier-border-light);
+}

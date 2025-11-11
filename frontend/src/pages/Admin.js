@@ -27,7 +27,7 @@ function Admin() {
 
     const renderView = () => {
         const views = {
-            'dashboard': <Dashboard />,
+            'dashboard': <Dashboard setActiveView={setActiveView} />,
             'products': <ProductManagement setActiveView={setActiveView} />,
             'stock': <StockManagement />,
             'orders': <OrderManagement />,

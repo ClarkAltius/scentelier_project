@@ -7,6 +7,11 @@ import ChangePasswordModal from "./ChangePasswordModal";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
 
+// (All your existing logic from line 6 to 318 remains exactly the same)
+// ... handleEditClick, handleSaveEdit, handleChangePassword, handleDelete, etc. ...
+
+// 마이페이지 분할 준비
+
 const MyPage = () => {
   const { user, login, logout } = useAuth();
   const [userInfo, setUserInfo] = useState(null);

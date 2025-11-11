@@ -1,7 +1,7 @@
 import { Nav, Navbar, Container, NavDropdown, NavItem } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
-import { ShoppingCart, User, Shield } from "lucide-react";
+import { ShoppingCart, User, Shield, LogOut } from "lucide-react";
 
 function MenuItems() {
 
@@ -26,6 +26,13 @@ function MenuItems() {
         }
     };
 
+    const handleCartClick = () => {
+        // 3. This is the new logic
+        // We navigate to the UserMyPage route and pass
+        // a state object { view: 'cart' } along with it.
+        navigate('/usermypage', { state: { view: 'cart' } });
+    };
+
 
 
     return (
@@ -48,7 +55,7 @@ function MenuItems() {
                     <Nav.Link onClick={() => navigate('/product/list')} style={{ color: '#808080ff' }}>Products</Nav.Link>
                     <Nav.Link onClick={() => navigate('/perfume/finder')} style={{ color: '#808080ff' }}>Discover</Nav.Link>
                     <Nav.Link onClick={handleDesignClick} style={{ color: '#808080ff' }}>Design</Nav.Link>
-                    <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link>
+                    {/* <Nav.Link onClick={() => navigate(`/inquiry`)} style={{ color: '#808080ff' }}>Inquiry</Nav.Link> */}
                 </Nav>
                 <Nav>
                     {user ? (
@@ -59,54 +66,26 @@ function MenuItems() {
                                     <Shield size={20} style={{ color: '#808080ff' }} />
                                 </Nav.Link>
                             )}
-                            <Nav.Link onClick={() => navigate('/cart/list')} title="Cart">
+                            <Nav.Link onClick={handleCartClick} title="Cart">
                                 <ShoppingCart size={20} style={{ color: '#808080ff' }} />
                             </Nav.Link>
-                            <NavDropdown title={<User size={20} style={{ color: '#808080ff' }} />} id="user-nav-dropdown" align="end">
-                                <NavDropdown.Item onClick={() => navigate('/mypage')}>마이 페이지</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate('/order/list')}>내 주문</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>내 커스텀 향수</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/mypage/review`)}>내 리뷰</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/reviews/write`)}>리뷰 작성</NavDropdown.Item>
-                                <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>내 문의사항</NavDropdown.Item>
-                                {/* 회원정보 링크 추가 예정 */}
-                                {/* <NavDropdown.Item onClick={() => navigate('/profile')}>Profile</NavDropdown.Item> */}
 
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-                            </NavDropdown>
+                            <Nav.Link onClick={() => navigate('/usermypage')} title="My Page">
+                                <User size={20} style={{ color: '#808080ff' }} />
+                            </Nav.Link>
                             <div style={{ paddingLeft: '10px' }}></div>
-                            <Navbar.Text style={{ color: '#6c757d', fontFamily: "'Gowun Batang', serif", fontSize: '1rem', marginLeft: '-5px' }}> {/* Adjusted margin */}
-                                {`어서오세요, ${user.username} 님` || 'User'}
-                            </Navbar.Text>                        </>
+                            <Nav.Link
+                                style={{ color: '#6c757d', fontSize: '1rem', marginRight: '15px' }}
+                                onClick={() => navigate('/logout')}>
+                                <LogOut size={20} style={{ color: '#808080ff' }} />
+                            </Nav.Link>
+                        </>
+
                     ) : (
                         // 기본적인 로그인 버튼
                         <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>
                     )}
                 </Nav>
-                <div style={{ paddingLeft: '50px' }}></div>
-                {/** Temporary. 개발용 링크들 */}
-                <div style={{ border: '2px solid black', padding: '5px 10px', borderRadius: '5px' }}>
-                    <NavDropdown bg="dark" variant="dark" title={`[임시] 링크 모음`}>
-                        <NavDropdown.Item onClick={() => navigate(`/admin`)}>관리자 랜딩 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/login`)}>로그인 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { navigate(`/cart/list`) }}>장바구니 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => { navigate(`/order/list`) }}>주문 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/list`)}>상품 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/detail`)}>상품 상세 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/perfume/finder`)}>향수테스트 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/perfume/blending`)}>향수 배합 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/payments`)}>결제 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/product/insert`)}>상품 입력 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/inquiry`)}>문의 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/myinquiry`)}>나의 문의 사항 페이지</NavDropdown.Item>
-                        {/* <NavDropdown.Item onClick={() => navigate(`/inquirydetail`)}>문의 사항 상세 페이지</NavDropdown.Item> */}
-                        <NavDropdown.Item onClick={() => navigate(`/mypage`)}>마이 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/findpass`)}>비밀번호 찾기 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/signup`)}>회원가입 페이지</NavDropdown.Item>
-                        <NavDropdown.Item onClick={() => navigate(`/myperfume`)}>향수조합 저장페이지</NavDropdown.Item>
-                    </NavDropdown>
-                </div>
             </Container>
         </Navbar >
     );

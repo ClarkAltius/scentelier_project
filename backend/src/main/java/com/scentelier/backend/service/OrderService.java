@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import com.scentelier.backend.event.OrderCancelledEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,4 +118,7 @@ public class OrderService {
         return orderPage.map(OrderAdminDto::new);
     }
 
+    public Optional<Orders> findById(Long orderId) {
+        return orderRepository.findById(orderId);
+    }
 }

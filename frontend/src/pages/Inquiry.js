@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/config";
-import { Row, Col, Form, FormSelect } from "react-bootstrap";
+import { Row, Col, Form, FormSelect, Button } from "react-bootstrap";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../component/AuthContext";
 
-const Inquiry = () => {
+const Inquiry = ({ activeView, setActiveView }) => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -150,7 +150,7 @@ const Inquiry = () => {
         alert("문의 전송 중 오류가 발생했습니다.");
       }
     }
-
+    setActiveView('myInquiry');
   };
 
   return (
@@ -170,7 +170,7 @@ const Inquiry = () => {
             <option value="PRODUCT">상품</option>
             <option value="DELIVERY">배달</option>
             <option value="PAYMENT">결제</option>
-            <option value="ETC">기타</option>
+            <option value="OTHER">기타</option>
           </FormSelect>
           {errors.type && <div style={styles.error}>{errors.type}</div>}
 
@@ -237,11 +237,9 @@ const Inquiry = () => {
           </div>
 
           <Col>
-            <Link to="/myinquiry" className="form-end" style={styles.buttonLink}>
-
-              <span className="inline-link" href="$">My 문의사항</span>
-
-            </Link>
+            <Button onClick={() => setActiveView('myInquiry')} className="form-end" style={styles.buttonLink}>
+              My 문의사항
+            </Button>
           </Col>
           {successMessage && (
             <div style={styles.successMessage}>{successMessage}</div>

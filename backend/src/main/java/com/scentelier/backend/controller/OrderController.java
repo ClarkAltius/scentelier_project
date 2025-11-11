@@ -47,31 +47,40 @@ public class OrderController {
         orders.setStatus(dto.getStatus());
         orders.setPaymentMethod(dto.getPaymentMethod());
 
-        if (dto.getPaymentMethod().equals(Payment.CASH)) orders.setStatus(OrderStatus.PENDING);
+        if (dto.getPaymentMethod().equals(Payment.CASH) || dto.getPaymentMethod().equals(Payment.KAKAO_PAY)) orders.setStatus(OrderStatus.PENDING);
 
         List<OrderProduct> orderProductList = new ArrayList<>();
+        // 모든 상품 재고를 검사
         for (OrderProductDto item : dto.getOrderProducts()) {
-            OrderProduct orderProduct = new OrderProduct();
             if (item.getProductId() != null) {
                 Products products = productService.findProductsById(item.getProductId())
                         .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
-                orderProduct.setProducts(products);
-                // 상품의 재고 수량 빼기
+                if (products.getStock() < item.getQuantity()) {
+                    throw new RuntimeException("상품 [" + products.getName() + "]의 재고가 부족합니다. (남은 수량: "
+                            + products.getStock() + ")");
+                }
+            }
+        }
+        // 모든 상품의 재고가 충분하다면 주문 생성 및 재고 차감 실행
+        for (OrderProductDto item : dto.getOrderProducts()) {
+            OrderProduct orderProduct = new OrderProduct();
+            if (item.getProductId() != null) {
+                Products products = productService.findProductsById(item.getProductId()).get();
+                // 재고 차감
                 products.setStock(products.getStock() - item.getQuantity());
                 productService.save(products);
+                orderProduct.setProducts(products);
             } else if (item.getCustomId() != null) {
                 CustomPerfume customPerfume = customPerfumeService.findCustomPerfumeById(item.getCustomId())
                         .orElseThrow(() -> new RuntimeException("커스텀 향수가 존재하지 않습니다."));
                 orderProduct.setCustomPerfume(customPerfume);
+                // 원료 재고 검사 +  차감
                 customPerfumeIngredientService.reduceIngredientStock(customPerfume, item.getQuantity());
             }
-            // 카트에 담겨있던 품목을 삭제
-            Long cartItemId = item.getCartItemId();
-
-            if (cartItemId != null) {
-                cartItemService.deleteCartItemById(cartItemId);
+            // 장바구니에서 해당 아이템 제거
+            if (item.getCartItemId() != null) {
+                cartItemService.deleteCartItemById(item.getCartItemId());
             }
-
             orderProduct.setOrders(orders);
             orderProduct.setQuantity(item.getQuantity());
             orderProduct.setPrice(item.getPrice());
@@ -81,7 +90,9 @@ public class OrderController {
         orders.setOrderProducts(orderProductList);
         orderService.save(orders);
 
-        return ResponseEntity.ok(Map.of("message", "주문이 성공적으로 생성되었습니다."));
+        Long orderId = orders.getId();
+
+        return ResponseEntity.ok(Map.of("message", "주문이 성공적으로 생성되었습니다.", "orderId", orderId));
     }
 
     @GetMapping("/list")
