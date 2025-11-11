@@ -106,6 +106,7 @@ public class KakaoPayService {
         ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
         order.setStatus(OrderStatus.PAID);
+        order.setTrackingNumber(null);
         orderService.save(order);
 
         return response.getBody();
