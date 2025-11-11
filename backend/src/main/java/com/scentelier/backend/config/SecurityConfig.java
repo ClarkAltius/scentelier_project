@@ -52,15 +52,15 @@ public class SecurityConfig {
                 .csrf(csrf->csrf.disable())
                 //권한부여 규칙 설정
                 .authorizeHttpRequests(authz ->authz
-                                .requestMatchers("/member/login","/signup").permitAll()
-                                .requestMatchers("/user/reset-password", "/user/change-password").permitAll()
-                                .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**","/api/perfume/**", "/api/customPerfume/**", "/reviews/**", "/product/top-rated").permitAll()
-                                .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
+                        .requestMatchers("/member/login","/signup").permitAll()
+                        .requestMatchers("/user/reset-password", "/user/change-password").permitAll()
+                        .requestMatchers("/", "/product/list", "/product/detail/**", "/images/**","/uploads/**", "/order", "/order/**", "/cart/**","/api/perfume/**", "/api/customPerfume/**", "/reviews/**", "/product/top-rated").permitAll()
+                        .requestMatchers("/api/test/my-roles", "/payments").authenticated() // Needs login, but no admin role
 
-                                // 관리자 전용 엔드포인트
-                                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                                .anyRequest().authenticated()
-                    )
+                        // 관리자 전용 엔드포인트
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .anyRequest().authenticated()
+                )
 
                 //폼 로그인 설정
                 .formLogin(formLogin->formLogin
@@ -104,24 +104,24 @@ public class SecurityConfig {
                             response.getWriter().write(objectMapper.writeValueAsString(responseData));
                             response.getWriter().flush();
                         })
-                                .failureHandler((request, response, exception) -> {
-                                    // Basic failure response for API testing
-                                    response.setCharacterEncoding("UTF-8");
-                                    response.setContentType("application/json");
-                                    response.setStatus(401); // Unauthorized
+                        .failureHandler((request, response, exception) -> {
+                            // Basic failure response for API testing
+                            response.setCharacterEncoding("UTF-8");
+                            response.setContentType("application/json");
+                            response.setStatus(401); // Unauthorized
 
-                                    String errorMessage = "이메일 또는 비밀번호를 확인해 주세요.";
+                            String errorMessage = "이메일 또는 비밀번호를 확인해 주세요.";
 
-                                    // 탈퇴 회원 체크
-                                    if (exception instanceof org.springframework.security.authentication.DisabledException) {
-                                        errorMessage = "탈퇴된 아이디입니다.";
-                                    }
+                            // 탈퇴 회원 체크
+                            if (exception instanceof org.springframework.security.authentication.DisabledException) {
+                                errorMessage = "탈퇴된 아이디입니다.";
+                            }
 
-                                    response.getWriter().write("{\"message\": \"" + errorMessage + "\"}");
-                                    response.getWriter().flush();
-                                })
+                            response.getWriter().write("{\"message\": \"" + errorMessage + "\"}");
+                            response.getWriter().flush();
+                        })
 
-                                .permitAll() // 로그인 관련 url에 접근 허용하기
+                        .permitAll() // 로그인 관련 url에 접근 허용하기
                 )// 예외 처리 설정
                 .exceptionHandling(exceptions -> exceptions
                         // 인증되지 않은 사용자가 보호된 리소스에 접근하려 할 때

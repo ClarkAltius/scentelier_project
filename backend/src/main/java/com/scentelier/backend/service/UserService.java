@@ -217,5 +217,13 @@ public class UserService {
                 expenditure
         );
     }
+
+    public String getProfileImagePath(String email) {
+        return null;
+    }
+
+    public Optional<Object> findById(Long userId) {
+        return Optional.of(userRepository.findById(userId));
+    }
     // ===== 관리자 유저관리창 끝 =====
 }

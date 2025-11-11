@@ -13,6 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override // "/images/**" 요청시, uploadPath
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**").addResourceLocations("file:" + uploadDir);
+//        registry.addResourceHandler("/uploads/profile/**") //회원가입시 프로필 이미지 넣기
+//                //.addResourceLocations("file:src/main/uploads/profile/"); //회원가입시 프로필 이미지 넣기
 
     }
 }

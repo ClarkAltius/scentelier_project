@@ -18,4 +18,3 @@ public class UserResponseDto {
     private String address;
     private String phone;
 }
-
