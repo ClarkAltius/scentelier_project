@@ -19,6 +19,8 @@ const MyPage = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPwModal, setShowPwModal] = useState(false);
   const navigate = useNavigate();
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState(Date.now()); // 캐시 방지용
+
 
   useEffect(() => {
     if (!user) {
@@ -60,6 +62,7 @@ const MyPage = () => {
 
       setUserInfo(response.data);
       login(response.data); // Context 업데이트
+      setProfileUpdatedAt(Date.now()); // 새 타임스탬프로 갱신 → 이미지 강제 리로드
       alert("회원 정보가 수정되었습니다.");
       setShowEditModal(false);
     } catch (err) {
@@ -112,7 +115,7 @@ const MyPage = () => {
       <div className={styles.profileViewWrapper}>
         <div className={styles.profileImageWrapper}>
           <img
-            src={`${API_BASE_URL}/user/profile/${userInfo.id}`}
+            src={`${API_BASE_URL}/user/profile/${userInfo.id}?t=${profileUpdatedAt}`}
             alt="프로필"
             className={styles.profileImage}
           />
