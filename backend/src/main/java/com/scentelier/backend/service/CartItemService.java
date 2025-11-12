@@ -1,6 +1,7 @@
 package com.scentelier.backend.service;
 
 import com.scentelier.backend.entity.CartItems;
+import com.scentelier.backend.entity.Users;
 import com.scentelier.backend.repository.CartItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ public class CartItemService {
 
     public Optional<CartItems> findCartItemById(Long cartItemId) {
         return cartItemRepository.findById(cartItemId);
+    }
+
+    public int getCartItemCount(Users user) {
+        return cartItemRepository.countByCartUser(user);
     }
 }
 

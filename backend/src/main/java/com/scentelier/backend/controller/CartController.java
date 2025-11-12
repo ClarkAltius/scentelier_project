@@ -6,10 +6,12 @@ import com.scentelier.backend.entity.*;
 import com.scentelier.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -183,5 +185,15 @@ public ResponseEntity<String> addCustomToCart(@RequestBody CartItemDto dto) {
         cartItemService.deleteCartItemById(cartItemId);
         String message = "카트 상품 " + cartItemId + "번이 장바구니 목록에서 삭제 되었습니다.";
         return ResponseEntity.ok(message);
+    }
+
+    // 장바구니에 담긴 전체 상품 수 조회
+    @GetMapping("/count")
+    public ResponseEntity<?> getCartCount(@RequestParam Long userId) {
+        Users user = userService.findUserById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        int count = cartItemService.getCartItemCount(user);
+        return ResponseEntity.ok(Map.of("count", count));
     }
 }

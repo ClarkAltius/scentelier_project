@@ -1,13 +1,23 @@
-import { Nav, Navbar, Container, NavDropdown, NavItem } from "react-bootstrap";
+import { Nav, Navbar, Container, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../component/AuthContext";
 import { ShoppingCart, User, Shield, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchCartCount } from "../api/cartApi";
 
 function MenuItems() {
 
     //로그아웃 버튼 관리용
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    const [cartCount, setCartCount] = useState(0);
+
+    useEffect(() => {
+        if (user?.id) {
+            fetchCartCount(user.id).then(setCartCount);
+        }
+    }, [user]);
 
     const handleLogout = () => {
         logout();
@@ -32,8 +42,6 @@ function MenuItems() {
         // a state object { view: 'cart' } along with it.
         navigate('/usermypage', { state: { view: 'cart' } });
     };
-
-
 
     return (
         <Navbar bg="light" variant="light" expand="lg" fixed="top" className="shadow-sm mb-3">
@@ -66,19 +74,47 @@ function MenuItems() {
                                     <Shield size={20} style={{ color: '#808080ff' }} />
                                 </Nav.Link>
                             )}
-                            <Nav.Link onClick={handleCartClick} title="Cart">
-                                <ShoppingCart size={20} style={{ color: '#808080ff' }} />
-                            </Nav.Link>
-
-                            <Nav.Link onClick={() => navigate('/usermypage')} title="My Page">
-                                <User size={20} style={{ color: '#808080ff' }} />
-                            </Nav.Link>
+                            <OverlayTrigger placement="bottom" overlay={<Tooltip>장바구니</Tooltip>}>
+                                <Nav.Link onClick={handleCartClick} style={{ position: "relative", cursor: "pointer" }}>
+                                    <ShoppingCart size={22} style={{ color: "#808080ff" }} />
+                                    {cartCount > 0 && (
+                                        <span
+                                            style={{
+                                                position: 'absolute',
+                                                top: '0px',
+                                                right: '-3px',
+                                                backgroundColor: 'red',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                padding: '3px 3px',
+                                                fontSize: '11px',
+                                                fontWeight: 'bold',
+                                                lineHeight: '1',
+                                                minWidth: '16px',
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </Nav.Link>
+                            </OverlayTrigger>
+                            
+                            <OverlayTrigger placement="bottom" overlay={<Tooltip>내 정보</Tooltip>}>
+                                <Nav.Link onClick={() => navigate('/usermypage')} title="My Page">
+                                    <User size={22} style={{ color: '#808080ff' }} />
+                                </Nav.Link>
+                            </OverlayTrigger>
                             <div style={{ paddingLeft: '10px' }}></div>
-                            <Nav.Link
-                                style={{ color: '#6c757d', fontSize: '1rem', marginRight: '15px' }}
-                                onClick={() => navigate('/logout')}>
-                                <LogOut size={20} style={{ color: '#808080ff' }} />
-                            </Nav.Link>
+                            <OverlayTrigger placement="bottom" overlay={<Tooltip>로그아웃</Tooltip>}>
+                                <Nav.Link
+                                    style={{ color: '#6c757d', fontSize: '1rem', marginRight: '15px' }}
+                                    onClick={() => navigate('/logout')}
+                                    title="LogOut"
+                                    >
+                                    <LogOut size={22} style={{ color: '#808080ff' }} />
+                                </Nav.Link>
+                            </OverlayTrigger>
                         </>
 
                     ) : (
