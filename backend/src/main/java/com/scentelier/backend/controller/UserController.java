@@ -74,6 +74,25 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    // ⭐ 프로필 이미지 삭제
+    @DeleteMapping("/profile/{userId}")
+    public ResponseEntity<String> deleteProfileImage(@PathVariable Long userId) {
+        try {
+            String uploadDir = "src/main/uploads/profile";
+            Path imagePath = Paths.get(uploadDir).resolve(userId + ".jpg");
+
+            // 파일이 존재하면 삭제
+            if (Files.exists(imagePath)) {
+                Files.delete(imagePath);
+            }
+
+            return ResponseEntity.ok("프로필 이미지가 기본 이미지로 변경되었습니다.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("프로필 이미지 삭제 중 오류가 발생했습니다.");
+        }
+    }
 
     // 회원 탈퇴
     @DeleteMapping("/delete")
