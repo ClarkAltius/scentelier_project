@@ -60,7 +60,7 @@ const EditProfileModal = ({ userInfo, onClose, onSave }) => {
             // ✅ 부모에게 알리지 않음 → 모달 닫히지 않음
             // onSave() 제거
 
-            alert("프로필 이미지가 기본 이미지로 변경되었습니다.");
+            //alert("프로필 이미지가 기본 이미지로 변경되었습니다.");
         } catch (err) {
             console.error("프로필 이미지 삭제 오류:", err);
             alert("프로필 이미지 삭제 중 오류가 발생했습니다.");
@@ -123,32 +123,47 @@ const EditProfileModal = ({ userInfo, onClose, onSave }) => {
                         e.target.src = `${API_BASE_URL}/user/profile/default.png`; // fallback 서버 경로
                     }}
                 />
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className={styles.fileInput}
-                />
+                <div className={styles.formItem}>
+                    <label className={styles.label}></label>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "15px" }}>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{
+                                width: "220px",
+                                margin: 0,       // 중앙 정렬 제거
+                                display: "inline-block", // block 제거
+                                height: "40px",         // 버튼 높이 고정
+                                fontSize: "14px",
+                            }}
+                        />
 
-                {/* ⭐ 이미지 삭제 버튼 추가 */}
-                <button
-                    className={styles.deleteButton}
-                    onClick={handleDeleteImage}
-                    style={{
-                        marginTop: "8px",
-                        backgroundColor: "#f44336",
-                        color: "white",
-                        padding: "6px 10px",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                    }}
-                >
-                    이미지 삭제
-                </button>
+                        {/*  삭제 버튼 추가 */}
+                        <button
+                            className={styles.deleteButton}
+                            onClick={handleDeleteImage}
+                            style={{
+                                marginTop: "-15px",
+                                backgroundColor: "#f44336",
+                                color: "white",
 
+                                height: "27px",
+                                padding: "6px 10px",
+                                border: "none",
+                                borderRadius: "4px",
+                                cursor: "pointer",
+                                fontSize: "14px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            삭제
+                        </button>
 
-
+                    </div>
+                </div>
             </div>
 
 
